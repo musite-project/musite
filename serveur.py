@@ -122,6 +122,11 @@ class Document:
             EXT[self.ext].enregistrer(self.chemin, contenu)
         except AttributeError:
             txt.enregistrer(self.chemin, contenu)
+        f.Depot(
+            os.path.join(
+                cfg.DATA, self.projet
+            )
+        ).sauvegardefichier(f.Fichier(self.fichier))
         b.redirect('/' + self.chemin)
 
 

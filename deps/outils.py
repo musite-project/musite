@@ -1,13 +1,140 @@
 import os
+import subprocess
+from datetime import datetime
 from glob import glob as ls
 import jrnl as l
 
-class Fichier(object):
-    def __init__(self, dossier, titre):
-        os.chdir(depot.dossier)
+
+class Depot():
+    def __init__(self, dossier):
         self.dossier = dossier
-        self.nom = titre
-        self.chemin = os.path.join(dossier, titre)
+
+    def commande(self, arguments):
+        os.chdir(self.dossier)
+        ligne = ['git']
+        ligne.extend(arguments)
+        resultat = subprocess.check_output(ligne)
+        return resultat.decode('utf-8')
+
+    def initialiser(self):
+        self.commande(['init'])
+        self.commande(['add', '.'])
+        self.commande([
+            'commit',
+            '-m',
+            "'Initialisation'"
+        ])
+
+    def journal(self, arguments):
+        ligne = ['log']
+        ligne.extend(arguments)
+        return self.commande(ligne)
+
+    def journalfichier(self, fichier):
+        historique = [
+            version.split(' ')
+            for version in self.journal(
+                [
+                    '--follow',
+                    '--pretty=format:"%h %s"',
+                    fichier.chemin
+                ]
+            )[1:-1].split('"\n"')
+        ]
+        return historique
+
+    def comparer(self, fichier, versionI, versionII):
+        differences = self.commande([
+            'diff',
+            versionI,
+            versionII,
+            fichier.chemin
+        ]).replace('\n', '\n  ')
+        return differences
+
+    def retablir(self, fichier, version):
+        self.commande([
+            'checkout',
+            version,
+            fichier.chemin
+        ])
+        self.sauvegarde(
+            fichier.chemin.replace(self.dossier + os.sep, ''),
+            'Retour de '
+            + fichier.nom
+            + ' à la version '
+            + version
+        )
+
+    def sauvegarde(self, chemin, message):
+        def sauver(self, chemin, message):
+            self.commande(['add', chemin])
+            self.commande([
+                'commit',
+                '-m',
+                datetime.now().isoformat(' ')[:16]
+                + ' '
+                + message
+            ])
+
+        try:
+            sauver(self, chemin, message)
+        except subprocess.CalledProcessError as e:
+            if e.returncode == 128:
+                try:
+                    self.initialiser()
+                except subprocess.CalledProcessError:
+                    pass
+            else:
+                print(e.__dict__)
+
+    def sauvegardefichier(self, fichier):
+        self.sauvegarde(
+            fichier.chemin.replace(self.dossier + os.sep, ''),
+            fichier.nom
+        )
+
+    def sauvegardecomplete(self, message='Sauvegarde complète'):
+            self.sauvegarde('-A', message)
+
+
+class Dossier():
+    def __init__(self, dossier):
+        self.dossier = dossier
+        if not os.path.isdir(dossier):
+            raise TypeError(dossier + " n'est pas un dossier")
+
+    def lister_ancien(self):
+        chemins = []
+        for racine, dossiers, fichiers in os.walk(self.dossier):
+            for fichier in fichiers:
+                chemins.append([racine, fichier])
+        return chemins
+
+    def lister(self, profondeur=1):
+        liste = {
+            self.dossier: [
+                os.path.split(fichier)[-1]
+                for fichier in ls(self.dossier + '/*')
+            ]
+        }
+        if profondeur > 1:
+            for sousdossier in liste[self.dossier]:
+                contenu = Dossier(
+                    os.path.join(self.dossier, sousdossier)
+                ).lister(profondeur - 1)
+                if contenu[os.path.join(self.dossier, sousdossier)] != []:
+                    liste = dict(
+                        liste, **contenu
+                    )
+        return liste
+
+
+class Fichier():
+    def __init__(self, chemin):
+        self.chemin = chemin
+        self.dossier = os.path.dirname(chemin)
+        self.nom = os.path.basename(chemin)
 
     def lire(self):
         fichier = open(self.chemin, 'r')
@@ -132,38 +259,6 @@ class Fichier(object):
     def mouliner(self, commande):
         os.chdir(self.dossier)
         subprocess.call([commande, self.chemin])
-
-
-class Dossier(object):
-    def __init__(self, dossier):
-        self.dossier = dossier
-        if not os.path.isdir(dossier):
-            raise TypeError(dossier + " n'est pas un dossier")
-
-    def lister_ancien(self):
-        chemins = []
-        for racine, dossiers, fichiers in os.walk(self.dossier):
-            for fichier in fichiers:
-                chemins.append([racine, fichier])
-        return chemins
-
-    def lister(self,profondeur=1):
-        liste = {
-            self.dossier: [
-                os.path.split(fichier)[-1]
-                for fichier in ls(self.dossier + '/*')
-            ]
-        }
-        if profondeur > 1:
-            for sousdossier in liste[self.dossier]:
-                contenu = Dossier(
-                    os.path.join(self.dossier,sousdossier)
-                ).lister(profondeur - 1)
-                if contenu[os.path.join(self.dossier,sousdossier)] != []:
-                    liste = dict(
-                        liste, **contenu
-                    )
-        return liste
 
 
 def sansaccents(entree):
