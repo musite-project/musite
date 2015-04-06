@@ -37,6 +37,7 @@ class Document:
         self.ext = ext
         self.chemin = '/'.join((projet, element + ('.' + ext if ext else '')))
         self.fichier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
+        self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
 
     def afficher(self, contenu):
         return {

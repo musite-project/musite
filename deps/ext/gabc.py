@@ -5,7 +5,6 @@ EXT = __name__.split('.')[-1]
 class Document(t.Document):
     def __init__(self, chemin, ext=EXT):
         t.Document.__init__(self, chemin, ext)
-        print(EXT, self.ext)
 
 
 def afficher(fichier):
