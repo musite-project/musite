@@ -1,3 +1,8 @@
+# Fichiers de musite dont la connaissance doit rester privée.
+data/
+etc/groupes
+etc/utilisateurs
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

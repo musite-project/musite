@@ -1,0 +1,24 @@
+
+@font-face {
+  font-family: 'LinLibertineO';
+  src: url('/static/css/LinLibertineO.eot?#iefix') format('embedded-opentype'),  url('/static/css/LinLibertineO.otf')  format('opentype'),
+	     url('/static/css/LinLibertineO.woff') format('woff'), url('/static/css/LinLibertineO.ttf')  format('truetype'), url('/static/css/LinLibertineO.svg#LinLibertineO') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'LinLibertineO';
+  src: url('/static/css/LinLibertineOI.eot?#iefix') format('embedded-opentype'),  url('/static/css/LinLibertineOI.otf')  format('opentype'),
+	     url('/static/css/LinLibertineOI.woff') format('woff'), url('/static/css/LinLibertineOI.ttf')  format('truetype'), url('/static/css/LinLibertineOI.svg#LinLibertineOI') format('svg');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'LinLibertineO';
+  src: url('/static/css/LinLibertineOB.eot?#iefix') format('embedded-opentype'),  url('/static/css/LinLibertineOB.otf')  format('opentype'),
+	     url('/static/css/LinLibertineOB.woff') format('woff'), url('/static/css/LinLibertineOB.ttf')  format('truetype'), url('/static/css/LinLibertineOB.svg#LinLibertineOB') format('svg');
+  font-weight: bold;
+  font-style: bold;
+}
