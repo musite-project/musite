@@ -8,6 +8,7 @@ from pkgutil import iter_modules
 from importlib import import_module
 sys.path.insert(0, 'deps')
 import outils as f
+import auth as a
 import bottle as b
 import HTMLTags as h
 from mistune import markdown
@@ -179,29 +180,7 @@ def strip_path():
     b.request.environ['PATH_INFO'] = b.request.environ['PATH_INFO'].rstrip('/')
 
 
-# I. Méthodes pour l'authentification ########
-
-def utilisateur(u, pw):
-    """ Vérification de l'existence de l'utilisateur.
-    """
-    return (u == 'admin')
-
-
-def administrateur(u, pw):
-    """ Vérification de l'appartenance de l'utilisateur au groupe
-    administrateur.
-    """
-    return (u == 'admin')
-
-
-def editeur(u, pw):
-    """ Vérification de l'appartenance de l'utilisateur au groupe
-    éditeur.
-    """
-    return (u == 'admin')
-
-
-# II. pages du site ########
+# I. pages du site ########
 
 #   1. Accueil
 @app.get('/')
@@ -218,7 +197,7 @@ def accueil():
 #   2. Administration
 @app.get('/admin')
 @app.get('/admin/<action>')
-@b.auth_basic(administrateur)
+@b.auth_basic(a.administrateur)
 @b.view('page')
 def admin(action='utilisateurs'):
     """ Pages réservées à l'administrateur.
@@ -248,6 +227,7 @@ def static(chemin='/'):
 
 # Édition d'un document
 @app.get('/_editer/<nom>/<element:path>.<ext>')
+@b.auth_basic(a.editeur)
 @b.view('page')
 def document_editer(nom, element='', ext=''):
     """ Page d'édition d'un document.
@@ -292,7 +272,7 @@ def document_enregistrer(nom, element='', ext=''):
         return {'corps': 'Pourriez-vous expliciter votre intention ?'}
 
 
-# III. Feuilles de style ########
+# II. Feuilles de style ########
 
 @app.get('/css')
 @app.get('/css/<ext>')
@@ -302,7 +282,7 @@ def css(ext=''):
     return {'ext': ext}
 
 
-# IV. pages d'erreur ########
+# III. pages d'erreur ########
 
 @app.error(code=401)
 @b.view('page')
