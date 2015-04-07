@@ -54,9 +54,7 @@ class Document:
             pass
         liens = {
             'Projet': self.projet,
-            'Dossier': self.projet + (
-                '/'.join('/'.split(self.element)[:-1])
-            )
+            'Dossier': '/'.join(self.chemin.split('/')[:-1])
         }
         return {
             'corps': contenu,
@@ -107,6 +105,13 @@ class Document:
         except EXT[self.ext].FichierIllisible:
             return self.afficher("Ce fichier est illisible.")
 
+    def creer(self):
+        print(self.projet, self.element, self.ext)
+        if not os.path.exists(self.fichier):
+            self.enregistrer('_')
+        else:
+            return self.editer()
+
     def editer(self):
         try:
             return self.afficher(EXT[self.ext].editer(self.chemin))
@@ -146,6 +151,30 @@ class Dossier:
         self.chemin = '/'.join((projet, element))
         self.dossier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
 
+    def afficher(self, contenu):
+        actions = {}
+        try:
+            if a.authentifier(rq.auth[0], rq.auth[1]):
+                actions['Créer document'] = '_creer/' + self.chemin
+                actions['Créer dossier'] = '_creerdossier/' + self.chemin
+        except TypeError:
+            pass
+        liens = {
+            'Projet': self.projet,
+            'Parent': self.projet + (
+                '/'.join(self.nom.split('/')[:-1])
+            )
+        }
+        return {
+            'corps': contenu,
+            'actions': actions,
+            'liens': liens,
+        }
+
+    def creer(self):
+        os.makedirs(self.dossier, exist_ok=True)
+        return self.lister()
+
     def lister(self):
         listefichiers = f.Dossier(self.dossier).lister(1)
         # Si l'on n'est pas à la racine, on affiche un lien vers le parent.
@@ -153,9 +182,8 @@ class Dossier:
             liste = [
                 h.A(
                     '../',
-                    href='/{projet}/{dossier}'.format(
-                        projet=self.projet,
-                        dossier='/'.join('/'.split(self.nom)[:-1])
+                    href='/{}'.format(
+                        '/'.join(self.chemin.split('/')[:-1])
                     )
                 )
             ]
@@ -167,7 +195,7 @@ class Dossier:
             h.A(
                 fichier + '/' if (
                     os.path.isdir(os.path.join(
-                        cfg.DATA, self.projet, fichier
+                        self.dossier, fichier
                     ))
                 ) else fichier,
                 href='/{}/{}/{}'.format(
@@ -176,9 +204,7 @@ class Dossier:
             )
             for fichier in listefichiers[self.dossier]
         ]
-        return {
-            'corps': b.template('liste', liste=liste)
-        }
+        return self.afficher(b.template('liste', liste=liste))
 
 
 # Méthodes globales :  ########################################################
@@ -275,6 +301,51 @@ def static(chemin='/'):
 
 #   4. Pages de gestion de projets
 #      Attention, l'ordre des méthodes est important.
+
+# Création d'un document
+@app.get('/_creer/<nom>')
+@app.get('/_creer/<nom>/<element:path>')
+@app.get('/_creer/<nom>/<element:path>.<ext>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@page
+def document_creer_infos(nom, element=None, ext=None):
+    """ Page de création d'un document.
+    """
+    if element and ext:
+        return Document(nom, element, ext).creer()
+    else:
+        return {'corps': b.template('creation', {'quoi': 'fichier'})}
+
+
+@app.post('/_creer/<nom>')
+@app.post('/_creer/<nom>/<element:path>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@page
+def document_creer(nom, element=''):
+    """ Création effective du document.
+    """
+    doc = rq.forms.nom.split('.')
+    element, ext = element + '/' + '.'.join((doc[:-1])), doc[-1]
+    return Document(nom, element, ext).creer()
+
+
+@app.get('/_creerdossier/<nom>')
+@app.get('/_creerdossier/<nom>/<element:path>')
+@page
+def dossier_creer_infos(nom, element=''):
+    """ Page de création d'un dossier.
+    """
+    return {'corps': b.template('creation', {'quoi': 'dossier'})}
+
+
+@app.post('/_creerdossier/<nom>')
+@app.post('/_creerdossier/<nom>/<element:path>')
+@page
+def dossier_creer_infos(nom, element=''):
+    """ Création effective du dossier.
+    """
+    return Dossier(nom, '/'.join((element, rq.forms.nom))).creer()
+
 
 # Édition d'un document
 @app.get('/_editer/<nom>/<element:path>.<ext>')
