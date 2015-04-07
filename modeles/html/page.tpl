@@ -41,7 +41,27 @@
             <div id="acces">
                 <b>Accès réservé</b><br>
                 <ul>
-                    <li><a href=http://log:log@{{hote}}/authentification>S'authentifier</a></li>
+                    %try:
+                    %if a.authentifier(rq.auth[0], rq.auth[1]) and rq.auth[0] != 'anonyme':
+                    <li>
+                        <a href=http://anonyme@{{hote}}>
+                            Déconnexion
+                        </a>
+                    </li>
+                    %else:
+                    <li>
+                        <a href=http://{{hote}}/authentification>
+                            S'authentifier
+                        </a>
+                    </li>
+                    %end
+                    %except TypeError:
+                    <li>
+                        <a href=http://{{hote}}/authentification>
+                            S'authentifier
+                        </a>
+                    </li>
+                    %end
                     %# Liens réservés aux administrateurs.
                     %try:
                     %if a.admin(rq.auth[0], rq.auth[1]):

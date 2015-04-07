@@ -43,19 +43,25 @@ class Document:
         self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
 
     def afficher(self, contenu):
+        actions = {
+            'Aperçu': self.chemin,
+            'Source': '_src/' + self.chemin
+        }
+        try:
+            if a.authentifier(rq.auth[0], rq.auth[1]):
+                actions['Éditer'] = '_editer/' + self.chemin
+        except TypeError:
+            pass
+        liens = {
+            'Projet': self.projet,
+            'Dossier': self.projet + (
+                '/'.join('/'.split(self.element)[:-1])
+            )
+        }
         return {
             'corps': contenu,
-            'actions': {
-                'Aperçu': self.chemin,
-                'Source': '_src/' + self.chemin,
-                'Éditer': '_editer/' + self.chemin,
-            },
-            'liens': {
-                'Projet': self.projet,
-                'Dossier': self.projet + (
-                    '/'.join('/'.split(self.element)[:-1])
-                )
-            },
+            'actions': actions,
+            'liens': liens,
         }
 
     @property
@@ -208,9 +214,10 @@ def accueil():
 
 #   2. Authentification et administration
 @app.get('/authentification')
-@b.auth_basic(a.authentifier)
+@app.get('/authentification/<action>')
+@b.auth_basic(a.authentifier, 'Accès réservé')
 @page
-def authentifier():
+def authentifier(action=''):
     """ Page destinée à forcer l'authentification.
     """
     return {
@@ -220,7 +227,7 @@ def authentifier():
 
 @app.get('/admin')
 @app.get('/admin/<action>')
-@b.auth_basic(a.admin)
+@b.auth_basic(a.admin, 'Vous devez être administrateur')
 @page
 def admin(action=''):
     """ Pages réservées à l'administrateur.
@@ -235,14 +242,14 @@ def admin(action=''):
 
 
 @app.get('/admin/supprimerutilisateur/<nom>')
-@b.auth_basic(a.admin)
+@b.auth_basic(a.admin, 'Vous devez être administrateur')
 def utilisateur_suppression(nom):
     u.Utilisateur(nom).supprimer()
     b.redirect('/admin/utilisateurs')
 
 
 @app.post('/admin/utilisateurs')
-@b.auth_basic(a.admin)
+@b.auth_basic(a.admin, 'Vous devez être administrateur')
 def utilisateur_ajout():
     """ Ajout d'un nouvel utilisateur à la base.
     """
@@ -271,7 +278,7 @@ def static(chemin='/'):
 
 # Édition d'un document
 @app.get('/_editer/<nom>/<element:path>.<ext>')
-@b.auth_basic(a.editeur)
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_editer(nom, element='', ext=''):
     """ Page d'édition d'un document.
