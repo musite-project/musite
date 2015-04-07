@@ -39,15 +39,23 @@ position:absolute;
 top:170px;
 bottom:0px;
 left:0px;
-right:0;
+right:0px;
 background-color: white;
 margin: 0px;
 margin-left: 10px;
 font-size: 93%;
-width: 90px;
+width: 120px;
 padding: 0px;
 float:left;
 text-align:left;
+}
+
+#acces {
+position:absolute;
+top:auto;
+bottom:0px;
+left:0px;
+right:0px;
 }
 
 #titre {
@@ -70,7 +78,7 @@ min-height:540px;
 overflow:auto;
 padding: 4px;
 font-size: 108%;
-margin-left:100px;
+margin-left:130px;
 margin-right:auto;
 }
 

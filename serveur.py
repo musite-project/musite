@@ -10,6 +10,7 @@ sys.path.insert(0, 'deps')
 import outils as f
 import auth as a
 import bottle as b
+rq = b.request
 import HTMLTags as h
 from mistune import markdown
 from etc import config as cfg
@@ -92,7 +93,7 @@ class Document:
                     + '{}'.format(
                         str(h.BR()).join(
                             "{!s}={!r}".format(item[0], item[1])
-                            for item in b.request.query.items()
+                            for item in rq.query.items()
                         )
                     )
                 )
@@ -177,34 +178,54 @@ class Dossier:
 
 @app.hook('before_request')
 def strip_path():
-    b.request.environ['PATH_INFO'] = b.request.environ['PATH_INFO'].rstrip('/')
+    rq.environ['PATH_INFO'] = rq.environ['PATH_INFO'].rstrip('/')
 
 
-# I. pages du site ########
+# I. Décorateurs destinés à éviter les redondances ########
+
+def page(fonction):
+    def afficher(*arguments, **parametres):
+        contenu = fonction(*arguments, **parametres)
+        contenu['rq'] = rq
+        return b.template('page', contenu)
+    return afficher
+
+
+# II. pages du site ########
 
 #   1. Accueil
 @app.get('/')
-@b.view('page')
+@page
 def accueil():
     """ Page d'accueil du site.
     """
     return {
         'corps': md.afficher(
-            os.path.join(cfg.PAGES, 'md', 'Accueil.md'))
+            os.path.join(cfg.PAGES, 'md', 'Accueil.md')),
     }
 
 
-#   2. Administration
+#   2. Authentification et administration
+@app.get('/authentification')
+@b.auth_basic(a.authentifier)
+@page
+def authentifier():
+    """ Page destinée à forcer l'authentification.
+    """
+    return {
+        'corps': 'Bonjour, {} !'.format(rq.auth[0]),
+    }
+
 @app.get('/admin')
 @app.get('/admin/<action>')
-@b.auth_basic(a.administrateur)
-@b.view('page')
+@b.auth_basic(a.admin)
+@page
 def admin(action='utilisateurs'):
     """ Pages réservées à l'administrateur.
     """
     return {
         'corps': md.afficher(
-            os.path.join(cfg.PAGES, 'md', 'Admin.md'))
+            os.path.join(cfg.PAGES, 'md', 'Admin.md')),
     }
 
 
@@ -214,7 +235,7 @@ def admin(action='utilisateurs'):
 def static(chemin='/'):
     """ Fichiers statiques.
     """
-    telecharger = True if b.request.query.action == 'telecharger' else False
+    telecharger = True if rq.query.action == 'telecharger' else False
     return b.static_file(
         chemin.replace('/', os.sep),
         root=cfg.STATIC,
@@ -228,7 +249,7 @@ def static(chemin='/'):
 # Édition d'un document
 @app.get('/_editer/<nom>/<element:path>.<ext>')
 @b.auth_basic(a.editeur)
-@b.view('page')
+@page
 def document_editer(nom, element='', ext=''):
     """ Page d'édition d'un document.
     """
@@ -237,7 +258,7 @@ def document_editer(nom, element='', ext=''):
 
 # Affichage de la source d'un document
 @app.get('/_src/<nom>/<element:path>.<ext>')
-@b.view('page')
+@page
 def document_src(nom, element='', ext=''):
     """ Source d'un document.
     """
@@ -248,7 +269,7 @@ def document_src(nom, element='', ext=''):
 @app.get('/<nom>')
 @app.get('/<nom>/<element:path>')
 @app.get('/<nom>/<element:path>.<ext>')
-@b.view('page')
+@page
 def document_afficher(nom, element='', ext=''):
     """ Affichage des fichiers et dossiers d'un projet.
 
@@ -264,15 +285,15 @@ def document_afficher(nom, element='', ext=''):
 
 # Enregistrement des documents après édition
 @app.post('/<nom>/<element:path>.<ext>')
-@b.view('page')
+@page
 def document_enregistrer(nom, element='', ext=''):
-    if b.request.forms.action == 'enregistrer':
-        Document(nom, element, ext).enregistrer(b.request.forms.contenu)
+    if rq.forms.action == 'enregistrer':
+        Document(nom, element, ext).enregistrer(rq.forms.contenu)
     else:
         return {'corps': 'Pourriez-vous expliciter votre intention ?'}
 
 
-# II. Feuilles de style ########
+# III. Feuilles de style ########
 
 @app.get('/css')
 @app.get('/css/<ext>')
@@ -282,16 +303,16 @@ def css(ext=''):
     return {'ext': ext}
 
 
-# III. pages d'erreur ########
+# IV. pages d'erreur ########
 
 @app.error(code=401)
-@b.view('page')
+@page
 def erreur_accesreserve(erreur):
     return {'corps': 'Accès réservé !'}
 
 
 @app.error(code=404)
-@b.view('page')
+@page
 def erreur_pageintrouvable(erreur):
     return {'corps': "Il n'y a rien ici !"}
 
