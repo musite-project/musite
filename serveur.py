@@ -9,8 +9,9 @@ from importlib import import_module
 sys.path.insert(0, 'deps')
 import outils as f
 import auth as a
+import utilisateurs as u
 import bottle as b
-rq = b.request
+from bottle import request as rq
 import HTMLTags as h
 from mistune import markdown
 from etc import config as cfg
@@ -30,7 +31,7 @@ txt = EXT['txt']
 md = EXT['md']
 
 
-# Classes : gestion des documents et des dossiers #############################
+# Classes #####################################################################
 
 class Document:
     def __init__(self, projet, element, ext):
@@ -216,17 +217,39 @@ def authentifier():
         'corps': 'Bonjour, {} !'.format(rq.auth[0]),
     }
 
+
 @app.get('/admin')
 @app.get('/admin/<action>')
 @b.auth_basic(a.admin)
 @page
-def admin(action='utilisateurs'):
+def admin(action=''):
     """ Pages réservées à l'administrateur.
     """
-    return {
-        'corps': md.afficher(
-            os.path.join(cfg.PAGES, 'md', 'Admin.md')),
-    }
+    retour = {'actions': {'Utilisateurs': 'admin/utilisateurs'}}
+    if action == 'utilisateurs':
+        retour['corps'] = b.template('utilisateurs')
+    else:
+        retour['corps'] = \
+            md.afficher(os.path.join(cfg.PAGES, 'md', 'Admin.md'))
+    return retour
+
+
+@app.get('/admin/supprimerutilisateur/<nom>')
+@b.auth_basic(a.admin)
+def utilisateur_suppression(nom):
+    u.Utilisateur(nom).supprimer()
+    b.redirect('/admin/utilisateurs')
+
+
+@app.post('/admin/utilisateurs')
+@b.auth_basic(a.admin)
+def utilisateur_ajout():
+    """ Ajout d'un nouvel utilisateur à la base.
+    """
+    print(rq.forms.nom, rq.forms.mdp, rq.forms.mdp_v)
+    if rq.forms.mdp == rq.forms.mdp_v:
+        u.Utilisateur(rq.forms.nom, rq.forms.mdp).ajouter()
+    b.redirect('/admin/utilisateurs')
 
 
 #   3. Fichiers statiques

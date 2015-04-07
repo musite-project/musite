@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys as s
+import os
 import hashlib as h
 
 
@@ -27,8 +28,11 @@ class Utilisateur:
     def __init__(self, nom, mdp=''):
         self.nom = nom
         self.mdp = encoder(mdp)
+        self.fichier = os.path.join('etc', 'utilisateurs')
 
-    def ajouter(self, fichier):
+    def ajouter(self, fichier=False):
+        if not fichier:
+            fichier=self.fichier
         if self.mdp == '':
             raise MotDePasseRequis
         if self.nom not in lister(fichier).keys():
@@ -37,7 +41,9 @@ class Utilisateur:
         else:
             raise UtilisateurExistant(self.nom)
 
-    def supprimer(self, fichier):
+    def supprimer(self, fichier=False):
+        if not fichier:
+            fichier=self.fichier
         utilisateurs = lister(fichier)
         try:
             del utilisateurs[self.nom]
@@ -47,7 +53,9 @@ class Utilisateur:
         except KeyError:
             pass
 
-    def modifier(self, fichier):
+    def modifier(self, fichier=False):
+        if not fichier:
+            fichier=self.fichier
         if self.mdp == '':
             raise MotDePasseRequis
         utilisateurs = lister(fichier)
