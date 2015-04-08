@@ -1,10 +1,11 @@
 %from deps import auth as a
+%from etc import config as cfg
 %hote = rq.headers['Host']
 <html>
     <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
     <link rel="stylesheet" href="/css">
-    <title>Musite</title>
+    <title>{{cfg.TITRE}}</title>
     </head>
     <body>
 
@@ -12,7 +13,7 @@
             <a href="/"><img src="/static/img/logo.png" width="150px" alt="Musite"></a>
         </div>
         <div id="entete">
-            <h1 id='titre'><a href="/">Musite</a></h1>
+            <h1 id='titre'><a href="/">{{cfg.TITRE}}</a></h1>
         </div>
 
         <div id="menu">

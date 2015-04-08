@@ -426,6 +426,8 @@ b.debug(True)
 
 b.run(
     app=app,
+    host=cfg.HOTE,
+    port=cfg.PORT,
     # Rechargement automatique du serveur, utile pendant le développement.
     reloader=True
 )
