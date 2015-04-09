@@ -25,7 +25,11 @@ class Document(txt.Document):
 
     @property
     def pdf(self):
-        if not os.path.isfile(self.fichierpdf):
+        if (
+            not os.path.isfile(self.fichierpdf)
+            or os.path.getmtime(self.fichierpdf)
+                < os.path.getmtime(self.fichier)
+        ):
             self.preparer_pdf()
         return '/' + cfg.STATIC + '/pdf/' + self.cheminpdf
 
