@@ -10,10 +10,15 @@ class Document:
     def __init__(self, chemin, ext='txt'):
         self.ext = ext
         self.chemin = chemin
+        # Chemin relatif du fichier
+        self.fichierrelatif = chemin.replace('/', os.path.sep)
+        self.dossierrelatif = os.path.dirname(self.fichierrelatif)
+        # Chemin absolu du fichier lui-même
         self.fichier = os.path.join(
             cfg.DATA,
-            chemin.replace('/', os.path.sep)
+            self.fichierrelatif
         )
+        self.dossier = os.path.dirname(self.fichier)
 
     def afficher(self):
         return h.CODE(b.html_escape(contenu(self.fichier)))

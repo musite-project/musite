@@ -294,7 +294,7 @@ def static(chemin='/'):
     telecharger = True if rq.query.action == 'telecharger' else False
     return b.static_file(
         chemin.replace('/', os.sep),
-        root=cfg.STATIC,
+        root=os.path.join(cfg.PWD, cfg.STATIC),
         download=telecharger
     )
 
