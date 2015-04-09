@@ -2,6 +2,8 @@ import os
 import subprocess
 from datetime import datetime
 from glob import glob as ls
+import random as rd
+from string import ascii_lowercase
 import jrnl as l
 
 
@@ -264,3 +266,7 @@ class Fichier():
 def sansaccents(entree):
     nkfd_form = ud.normalize('NFKD', entree)
     return "".join([c for c in nkfd_form if not ud.combining(c)])
+
+
+def motaleatoire(longueur, source=ascii_lowercase):
+    return ''.join(rd.choice(source) for i in range(longueur))
