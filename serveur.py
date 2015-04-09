@@ -428,6 +428,7 @@ b.run(
     app=app,
     host=cfg.HOTE,
     port=cfg.PORT,
+    server='cherrypy',
     # Rechargement automatique du serveur, utile pendant le développement.
     reloader=True
 )
