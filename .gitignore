@@ -2,6 +2,10 @@
 data/
 etc/groupes
 etc/utilisateurs
+log
+pdf/
+tmp/
+test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
