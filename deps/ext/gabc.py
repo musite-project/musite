@@ -30,12 +30,25 @@ class Document(txt.Document):
         return '/' + cfg.STATIC + '/pdf/' + self.cheminpdf
 
     def afficher(self):
-        return h.OBJECT(
-        data="{}".format(self.pdf),
-        Type="application/pdf",
-        width="100%",
-        height="100%"
-        )
+        try:
+            return h.OBJECT(
+                data="{}".format(self.pdf),
+                Type="application/pdf",
+                width="100%",
+                height="100%"
+            )
+        except tex.ErreurCompilation:
+            return (
+                "Il y a eu une erreur pendant le traitement du document. "
+                + "Ceci vient probablement d'une erreur de syntaxe ; "
+                + "si vous êtes absolument certain du contraire, merci de "
+                + "signaler le problème."
+                + h.BR()
+                + 'Voici la sortie de la commande :'
+                + h.BR()
+                + h.BR()
+                + tex.traiter_erreur_compilation(self.dossiertmp)
+            )
 
     def preparer_pdf(
         self,

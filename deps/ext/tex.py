@@ -1,16 +1,17 @@
-import ext.txt as t
+import ext.txt as txt
 from etc import config as cfg
 from outils import motaleatoire
 import os
 import shutil
 import subprocess as sp
+import HTMLTags as h
 import jrnl as l
 EXT = __name__.split('.')[-1]
 
 
-class Document(t.Document):
+class Document(txt.Document):
     def __init__(self, chemin, ext=EXT):
-        t.Document.__init__(self, chemin, ext)
+        txt.Document.__init__(self, chemin, ext)
         # Chemin absolu des fichiers temporaires
         self.rd = os.path.join(cfg.TMP, motaleatoire(6))
         self.fichiertmp = os.path.join(self.rd, self.fichierrelatif)
@@ -74,18 +75,34 @@ def compiler_pdf(fichier, environnement={}):
             fichier
         ]
         environnement = dict(os.environ, **environnement)
-        sortie, erreurs = sp.Popen(
+        compilation = sp.Popen(
             commande,
             env=environnement,
             stdout=sp.PIPE,
             stderr=sp.PIPE
-        ).communicate()
-        l.log(
-            'Sortie :\n{}\n\n'.format(sortie.decode('utf8'))
-            + 'Erreurs :\n{}\n'.format(erreurs.decode('utf8'))
         )
+        sortie, erreurs = compilation.communicate()
+        l.log(
+            'Sortie :'
+            + '\n========\n'
+            + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
+            + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
+            + 'Erreurs :'
+            + '\n=========\n'
+            + '\n{}\n'.format(erreurs.decode('utf8'))
+        )
+        if compilation.returncode:
+            raise ErreurCompilation
     finally:
         os.chdir(cfg.PWD)
 
 
-FichierIllisible = t.FichierIllisible
+def traiter_erreur_compilation(dossier):
+    return txt.afficher(dossier.replace(os.path.sep, '/') + '/log')
+
+
+FichierIllisible = txt.FichierIllisible
+
+
+class ErreurCompilation(Exception):
+    pass
