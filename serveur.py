@@ -179,14 +179,17 @@ class Dossier:
         listefichiers = f.Dossier(self.dossier).lister(1)
         # Si l'on n'est pas à la racine, on affiche un lien vers le parent.
         try:
-            liste = [
-                h.A(
-                    '../',
-                    href='/{}'.format(
-                        '/'.join(self.chemin.split('/')[:-1])
+            if self.chemin[:-1] != self.projet:
+                liste = [
+                    h.A(
+                        '../',
+                        href='/{}'.format(
+                            '/'.join(self.chemin.split('/')[:-1])
+                        )
                     )
-                )
-            ]
+                ]
+            else:
+                liste = []
         # Si cette exception est levée, c'est que l'on est à la racine.
         except ValueError:
             liste = []
