@@ -423,15 +423,24 @@ def erreur_pageintrouvable(erreur):
 
 # Lancement du serveur ########################################################
 
-# On active le débogage pour avoir des messages d'erreur plus explicites.
-# Commentez cette ligne en production.
-b.debug(True)
-
-b.run(
-    app=app,
-    host=cfg.HOTE,
-    port=cfg.PORT,
-    server='cherrypy',
-    # Rechargement automatique du serveur, utile pendant le développement.
-    reloader=True
-)
+# En cours de développement ####
+if cfg.DEVEL:
+    # On active le débogage pour avoir des messages d'erreur plus explicites.
+    b.debug(True)
+    b.run(
+        app=app,
+        host=cfg.HOTE,
+        port=cfg.PORT,
+        server='cherrypy',
+        # Rechargement automatique du serveur, utile pendant le développement.
+        reloader=True
+    )
+# En production ####
+else:
+    from cherrypy.wsgiserver import CherryPyWSGIServer
+    server = CherryPyWSGIServer(
+        (cfg.HOTE, cfg.PORT),
+        app,
+        server_name='Musite',
+        numthreads=30)
+    server.start()

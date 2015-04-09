@@ -18,3 +18,6 @@ MODELES = [
     os.path.join(PWD, 'modeles', 'html'),
     os.path.join(PWD, 'modeles', 'tex'),
 ]
+
+# Mettez le paramètre suivant à False en production.
+DEVEL = True
