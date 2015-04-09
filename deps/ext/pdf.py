@@ -12,6 +12,7 @@ def afficher(fichier):
 
 
 def contenu(fichier):
+    fichier = fichier.replace('/', os.path.sep)
     with open(fichier, "rb") as f:
         return b64encode(f.read()).decode('ascii')
 
