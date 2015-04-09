@@ -16,4 +16,5 @@ STATIC = 'static'
 MODELES = [
     os.path.join(PWD, 'modeles', 'css'),
     os.path.join(PWD, 'modeles', 'html'),
+    os.path.join(PWD, 'modeles', 'tex'),
 ]

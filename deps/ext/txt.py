@@ -10,6 +10,7 @@ class Document:
     def __init__(self, chemin, ext='txt'):
         self.ext = ext
         self.chemin = chemin
+        self.nom = os.path.splitext(chemin.split('/')[-1])[0]
         # Chemin relatif du fichier
         self.fichierrelatif = chemin.replace('/', os.path.sep)
         self.dossierrelatif = os.path.dirname(self.fichierrelatif)
