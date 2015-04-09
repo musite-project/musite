@@ -3,6 +3,7 @@ from etc import config as cfg
 import os
 import shutil
 from bottle import template
+import HTMLTags as h
 EXT = __name__.split('.')[-1]
 
 
@@ -26,6 +27,14 @@ class Document(txt.Document):
             self.preparer_pdf()
         return '/' + cfg.STATIC + '/pdf/' + self.cheminpdf
 
+    def afficher(self):
+        return h.OBJECT(
+        data="{}".format(self.pdf),
+        Type="application/pdf",
+        width="100%",
+        height="100%"
+        )
+
     def preparer_pdf(
         self,
         destination=False,
@@ -46,7 +55,10 @@ class Document(txt.Document):
 
 def afficher(fichier):
     return Document(fichier).afficher()
-afficher_source = afficher
+
+
+def afficher_source(fichier):
+    return txt.Document(fichier).afficher_source()
 
 
 def contenu(fichier):
