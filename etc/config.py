@@ -3,7 +3,7 @@ import os
 
 TITRE = 'Musite'
 
-HOTE = ''
+HOTE = '0.0.0.0'
 PORT = 8080
 
 PWD = os.path.abspath(os.getcwd())
