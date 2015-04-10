@@ -46,6 +46,9 @@ class Document:
         with open(self.fichier, 'w') as f:
             f.write(contenu)
 
+    def supprimer(self):
+        os.remove(self.fichier)
+
 
 def afficher(fichier):
     return Document(fichier).afficher()
@@ -62,6 +65,9 @@ def editer(fichier):
 
 def enregistrer(fichier, contenu):
     return Document(fichier).enregistrer(contenu)
+
+def supprimer(fichier):
+    return Document(fichier).supprimer()
 
 
 class FichierIllisible(Exception):

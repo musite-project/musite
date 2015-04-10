@@ -4,6 +4,7 @@
 
 import os
 import sys
+import shutil
 from pkgutil import iter_modules
 from importlib import import_module
 sys.path.insert(0, 'deps')
@@ -50,6 +51,7 @@ class Document:
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 actions['Éditer'] = '_editer/' + self.chemin
+                actions['Supprimer'] = '_supprimer/' + self.chemin
         except TypeError:
             pass
         liens = {
@@ -102,6 +104,8 @@ class Document:
                         )
                     )
                 )
+            except NameError:
+                b.abort(404)
         except EXT[self.ext].FichierIllisible:
             return self.afficher("Ce fichier est illisible.")
 
@@ -111,6 +115,18 @@ class Document:
             self.enregistrer('_')
         else:
             return self.editer()
+
+    def supprimer(self):
+        try:
+            EXT[self.ext].supprimer(self.chemin)
+        except KeyError:
+            txt.supprimer(self.chemin)
+        f.Depot(
+            os.path.join(
+                cfg.DATA, self.projet
+            )
+        ).sauvegardecomplete('Suppression du document {}'.format(self.chemin))
+        return self.afficher('Document supprimé !')
 
     def editer(self):
         try:
@@ -157,6 +173,8 @@ class Dossier:
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 actions['Créer document'] = '_creer/' + self.chemin
                 actions['Créer dossier'] = '_creerdossier/' + self.chemin
+                actions['Supprimer'] = \
+                    '_supprimerdossier/' + self.chemin
         except TypeError:
             pass
         liens = {
@@ -208,6 +226,15 @@ class Dossier:
             for fichier in listefichiers[self.dossier]
         ]
         return self.afficher(b.template('liste', liste=liste))
+
+    def supprimer(self):
+        shutil.rmtree(self.dossier, ignore_errors=True)
+        f.Depot(
+            os.path.join(
+                cfg.DATA, self.projet
+            )
+        ).sauvegardecomplete('Suppression du dossier {}'.format(self.chemin))
+        return self.afficher('Dossier supprimé !')
 
 
 # Méthodes globales :  ########################################################
@@ -348,6 +375,52 @@ def dossier_creer_infos(nom, element=''):
     """ Création effective du dossier.
     """
     return Dossier(nom, '/'.join((element, rq.forms.nom))).creer()
+
+
+# Suppression d'un document
+@app.get('/_supprimer/<nom>/<element:path>')
+@page
+def document_supprimer_confirmation(nom, element=False):
+    if not element:
+        b.abort(404)
+    else:
+        return {'corps': b.template(
+            'suppression',
+            {'quoi': 'le fichier {}/{}'.format(nom, element)}
+        )}
+
+
+@app.post('/_supprimer/<nom>/<element:path>')
+@page
+def document_supprimer(nom, element=False):
+    if not element:
+        b.abort(404)
+    else:
+        element, ext = os.path.splitext(element)
+        return Document(nom, element, ext[1:]).supprimer()
+
+
+@app.get('/_supprimerdossier/<nom>/<element:path>')
+@page
+def dossier_supprimer_confirmation(nom, element=False):
+    if not element:
+        b.abort(404)
+    else:
+        return {'corps': b.template(
+            'suppression',
+            {'quoi': 'le dossier {}/{} et tout son contenu ?'
+                .format(nom, element)}
+        )}
+
+
+@app.post('/_supprimerdossier/<nom>/<element:path>')
+@page
+def document_supprimer(nom, element=False):
+    if not element:
+        b.abort(404)
+    else:
+        element
+        return Dossier(nom, element).supprimer()
 
 
 # Édition d'un document
