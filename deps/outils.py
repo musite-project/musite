@@ -106,13 +106,6 @@ class Dossier():
         if not os.path.isdir(dossier):
             raise TypeError(dossier + " n'est pas un dossier")
 
-    def lister_ancien(self):
-        chemins = []
-        for racine, dossiers, fichiers in os.walk(self.dossier):
-            for fichier in fichiers:
-                chemins.append([racine, fichier])
-        return chemins
-
     def lister(self, profondeur=1):
         liste = {
             self.dossier: [
