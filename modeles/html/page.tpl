@@ -1,7 +1,7 @@
+<html>
 %from deps import auth as a
 %from etc import config as cfg
 %hote = rq.headers['Host']
-<html>
     <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
     <link rel="stylesheet" href="/css">
@@ -18,24 +18,26 @@
 
         <div id="menu">
             %try:
-            %liens  # S'il y a des liens à afficher, on en fait la liste.
+            %if len(liens) > 0:  # S'il y a des liens à afficher, on en fait la liste.
             <b>Liens</b><br>
             <ul>
                 %for lien in sorted(liens.keys()):
                 <li><a href=/{{liens[lien]}}>{{lien}}</a></li>
                 %end
             </ul>
+            %end
             %except NameError: pass
             %end
 
             %try:
-            %actions  # Même chose pour les actions sur les documents.
+            %if len(actions) > 0:  # Même chose pour les actions sur les documents.
             <b>Actions</b><br>
             <ul>
                 %for action in sorted(actions.keys()):
                 <li><a href=/{{actions[action]}}>{{action}}</a></li>
                 %end
             </ul>
+            %end
             %except NameError: pass
             %end
 

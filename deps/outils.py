@@ -20,12 +20,6 @@ class Depot():
 
     def initialiser(self):
         self.commande(['init'])
-        self.commande(['add', '.'])
-        self.commande([
-            'commit',
-            '-m',
-            "'Initialisation'"
-        ])
 
     def journal(self, arguments):
         ligne = ['log']

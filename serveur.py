@@ -237,14 +237,61 @@ class Dossier:
         return self.afficher('Dossier supprimé !')
 
 
+class Projet(Dossier):
+    def __init__(self, projet):
+        Dossier.__init__(self, projet, '')
+
+    def afficher(self, contenu, suppression=False):
+        actions = {}
+        try:
+            if a.authentifier(rq.auth[0], rq.auth[1]):
+                if not suppression:
+                    actions['Créer document'] = '_creer/' + self.chemin
+                    actions['Créer dossier'] = '_creerdossier/' + self.chemin
+                    actions['Supprimer'] = \
+                        '_supprimerprojet/' + self.chemin
+                else:
+                    actions = {'Créer projet': '_creerprojet'}
+        except TypeError:
+            pass
+        liens = {'Projet': self.projet}
+        return {
+            'corps': contenu,
+            'actions': actions,
+            'liens': liens,
+        }
+
+    def creer(self):
+        try:
+            os.makedirs(self.dossier, exist_ok=False)
+            f.Depot(
+                os.path.join(
+                    cfg.DATA, self.projet
+                )
+            ).initialiser()
+            return self.lister()
+        except FileExistsError:
+            return self.afficher('Ce projet existe déjà !')
+
+    def supprimer(self):
+        try:
+            shutil.rmtree(self.dossier, ignore_errors=False)
+            return self.afficher('Projet supprimé !', suppression=True)
+        except FileNotFoundError:
+            # Cette exception est levée quand le projet n'existe pas.
+            return self.afficher('''C'est drôle, ce que vous me demandez :
+                il n'y a pas de projet ici !''', suppression=True)
+
+
 # Méthodes globales :  ########################################################
+
+
+# I. Bidouille et décorateurs destinés à éviter les redondances ########
 
 @app.hook('before_request')
 def strip_path():
     rq.environ['PATH_INFO'] = rq.environ['PATH_INFO'].rstrip('/')
 
-
-# I. Décorateurs destinés à éviter les redondances ########
 
 def page(fonction):
     def afficher(*arguments, **parametres):
@@ -262,9 +309,17 @@ def page(fonction):
 def accueil():
     """ Page d'accueil du site.
     """
+    try:
+        actions = {'Créer projet': '_creerprojet'} \
+            if a.authentifier(rq.auth[0], rq.auth[1]) \
+            else {}
+    except TypeError:
+        # Cette exception est levée en l'absence d'authentification
+        actions = {}
     return {
         'corps': md.afficher(
             os.path.join(cfg.PAGES, 'md', 'Accueil.md')),
+        'actions': actions
     }
 
 
@@ -361,6 +416,7 @@ def document_creer(nom, element=''):
 
 @app.get('/_creerdossier/<nom>')
 @app.get('/_creerdossier/<nom>/<element:path>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def dossier_creer_infos(nom, element=''):
     """ Page de création d'un dossier.
@@ -370,15 +426,35 @@ def dossier_creer_infos(nom, element=''):
 
 @app.post('/_creerdossier/<nom>')
 @app.post('/_creerdossier/<nom>/<element:path>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
-def dossier_creer_infos(nom, element=''):
+def dossier_creer(nom, element=''):
     """ Création effective du dossier.
     """
     return Dossier(nom, '/'.join((element, rq.forms.nom))).creer()
 
 
+@app.get('/_creerprojet')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@page
+def projet_creer_infos():
+    """ Page de création d'un projet.
+    """
+    return {'corps': b.template('creation', {'quoi': 'projet'})}
+
+
+@app.post('/_creerprojet')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@page
+def projet_creer():
+    """ Création effective du projet.
+    """
+    return Projet(rq.forms.nom).creer()
+
+
 # Suppression d'un document
 @app.get('/_supprimer/<nom>/<element:path>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_supprimer_confirmation(nom, element=False):
     if not element:
@@ -391,16 +467,21 @@ def document_supprimer_confirmation(nom, element=False):
 
 
 @app.post('/_supprimer/<nom>/<element:path>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_supprimer(nom, element=False):
     if not element:
         b.abort(404)
     else:
-        element, ext = os.path.splitext(element)
-        return Document(nom, element, ext[1:]).supprimer()
+        if rq.forms.action == 'supprimer':
+            element, ext = os.path.splitext(element)
+            return Document(nom, element, ext[1:]).supprimer()
+        else:
+            b.redirect('/{}/{}'.format(nom, element))
 
 
 @app.get('/_supprimerdossier/<nom>/<element:path>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def dossier_supprimer_confirmation(nom, element=False):
     if not element:
@@ -414,13 +495,39 @@ def dossier_supprimer_confirmation(nom, element=False):
 
 
 @app.post('/_supprimerdossier/<nom>/<element:path>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
-def document_supprimer(nom, element=False):
+def dossier_supprimer(nom, element=False):
     if not element:
         b.abort(404)
     else:
-        element
-        return Dossier(nom, element).supprimer()
+        if rq.forms.action == 'supprimer':
+            return Dossier(nom, element).supprimer()
+        else:
+            b.redirect('/{}/{}'.format(nom, element))
+
+
+@app.get('/_supprimerprojet/<nom>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@page
+def projet_supprimer_confirmation(nom):
+    return {'corps': b.template(
+        'suppression',
+        {
+            'quoi': 'le projet {} et tout son contenu ? '.format(nom)
+                    + 'Attention : cette opération est irréversible !'
+        }
+    )}
+
+
+@app.post('/_supprimerprojet/<nom>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@page
+def projet_supprimer(nom):
+    if rq.forms.action == 'supprimer':
+        return Projet(nom).supprimer()
+    else:
+        b.redirect('/{}'.format(nom))
 
 
 # Édition d'un document
@@ -447,7 +554,7 @@ def document_src(nom, element='', ext=''):
 @app.get('/<nom>/<element:path>')
 @app.get('/<nom>/<element:path>.<ext>')
 @page
-def document_afficher(nom, element='', ext=''):
+def document_afficher(nom, element=None, ext=None):
     """ Affichage des fichiers et dossiers d'un projet.
 
     Cette page renvoie :
@@ -455,7 +562,10 @@ def document_afficher(nom, element='', ext=''):
         − la mise en forme du document s'il s'agit d'un fichier connu.
     #~ """
     try:
-        return Dossier(nom, element).lister()
+        if not element:
+            return Projet(nom).lister()
+        else:
+            return Dossier(nom, element).lister()
     except TypeError:    # Cette exception est levée s'il s'agit d'un document.
         return Document(nom, element, ext).contenu
 
