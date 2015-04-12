@@ -316,9 +316,36 @@ def accueil():
     except TypeError:
         # Cette exception est levée en l'absence d'authentification
         actions = {}
+    liens = {'Projets': '_projets'}
     return {
         'corps': md.afficher(
             os.path.join(cfg.PAGES, 'md', 'Accueil.md')),
+        'actions': actions,
+        'liens': liens
+    }
+
+
+@app.get('/_projets')
+@page
+def lister_projets():
+    try:
+        actions = {'Créer projet': '_creerprojet'} \
+            if a.authentifier(rq.auth[0], rq.auth[1]) \
+            else {}
+    except TypeError:
+        # Cette exception est levée en l'absence d'authentification
+        actions = {}
+    listefichiers = f.Dossier(cfg.DATA).lister(1)
+    # Formatage de la liste des fichiers.
+    liste = [
+        h.A(
+            projet, href='/{}'.format(projet)
+        )
+        for projet in sorted(listefichiers[cfg.DATA])
+        if os.path.isdir(os.path.join(cfg.DATA, projet))
+    ]
+    return {
+        'corps': b.template('liste', liste=liste),
         'actions': actions
     }
 
