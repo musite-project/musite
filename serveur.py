@@ -410,6 +410,12 @@ def static(chemin='/'):
         download=telecharger
     )
 
+@app.get('/favicon.ico')
+def favicon():
+    """Icône du site.
+    """
+    return static('img/favicon.ico')
+
 
 #   4. Pages de gestion de projets
 #      Attention, l'ordre des méthodes est important.
