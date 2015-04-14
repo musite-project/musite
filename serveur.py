@@ -110,7 +110,6 @@ class Document:
             return self.afficher("Ce fichier est illisible.")
 
     def creer(self):
-        print(self.projet, self.element, self.ext)
         if not os.path.exists(self.fichier):
             self.enregistrer('_')
         else:
@@ -240,9 +239,10 @@ class Dossier:
 class Projet(Dossier):
     def __init__(self, projet):
         Dossier.__init__(self, projet, '')
+        self.depot = f.Depot(os.path.join(cfg.DATA, self.projet))
 
     def afficher(self, contenu, suppression=False):
-        actions = {}
+        actions = {'Historique': '_historique/' + self.chemin}
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 if not suppression:
@@ -251,7 +251,7 @@ class Projet(Dossier):
                     actions['Supprimer'] = \
                         '_supprimerprojet/' + self.chemin
                 else:
-                    actions = {'Créer projet': '_creerprojet'}
+                    actions['Créer projet'] = '_creerprojet'
         except TypeError:
             pass
         liens = {'Projet': self.projet}
@@ -264,14 +264,22 @@ class Projet(Dossier):
     def creer(self):
         try:
             os.makedirs(self.dossier, exist_ok=False)
-            f.Depot(
-                os.path.join(
-                    cfg.DATA, self.projet
-                )
-            ).initialiser()
+            self.depot.initialiser()
             return self.lister()
         except FileExistsError:
             return self.afficher('Ce projet existe déjà !')
+
+    @property
+    def historique(self):
+        tableau = self.depot.journalcomplet
+        for element in tableau[1:]:
+            element[0] = h.A(element[0], href='?commit=' + element[0])
+        return self.afficher(
+            b.template(
+                'tableau',
+                tableau = tableau
+            )
+        )
 
     def supprimer(self):
         try:
@@ -391,7 +399,6 @@ def utilisateur_suppression(nom):
 def utilisateur_ajout():
     """ Ajout d'un nouvel utilisateur à la base.
     """
-    print(rq.forms.nom, rq.forms.mdp, rq.forms.mdp_v)
     if rq.forms.mdp == rq.forms.mdp_v:
         u.Utilisateur(rq.forms.nom, rq.forms.mdp).ajouter()
     b.redirect('/admin/utilisateurs')
@@ -409,6 +416,7 @@ def static(chemin='/'):
         root=os.path.join(cfg.PWD, cfg.STATIC),
         download=telecharger
     )
+
 
 @app.get('/favicon.ico')
 def favicon():
@@ -561,6 +569,13 @@ def projet_supprimer(nom):
         return Projet(nom).supprimer()
     else:
         b.redirect('/{}'.format(nom))
+
+
+# Historique d'un projet
+@app.get('/_historique/<nom>')
+@page
+def projet_historique(nom):
+    return Projet(nom).historique
 
 
 # Édition d'un document

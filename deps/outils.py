@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 from datetime import datetime
 from glob import glob as ls
@@ -21,10 +22,22 @@ class Depot():
     def initialiser(self):
         self.commande(['init'])
 
-    def journal(self, arguments):
+    def journal(self, arguments = []):
         ligne = ['log']
         ligne.extend(arguments)
         return self.commande(ligne)
+
+    @property
+    def journalcomplet(self):
+        entete = [['Id', 'auteur', 'date', 'message']]
+        historique = [
+                re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
+                for entree in self.journal().split('commit ')
+            ][1:]
+        for element in historique:
+            element[0] = element[0][:7]
+            element.pop(3)
+        return entete + historique
 
     def journalfichier(self, fichier):
         historique = [
@@ -68,9 +81,7 @@ class Depot():
             self.commande([
                 'commit',
                 '-m',
-                datetime.now().isoformat(' ')[:16]
-                + ' '
-                + message
+                message
             ])
 
         try:
