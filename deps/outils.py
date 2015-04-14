@@ -77,7 +77,7 @@ class Depot():
                 version
             ]
         if fichier:
-            parametres.extend([fichier])
+            parametres.append(fichier)
         details = self.commande(parametres).replace('\r','').split('\n')
         return details
 
@@ -95,14 +95,20 @@ class Depot():
             + version
         )
 
-    def sauvegarde(self, chemin, message):
+    def sauvegarde(self, chemin, message, auteur=None):
+        print(auteur)
         def sauver(self, chemin, message):
-            self.commande(['add', chemin])
-            self.commande([
+            arguments = [
                 'commit',
                 '-m',
                 message
-            ])
+            ]
+            if auteur:
+                print(auteur)
+                arguments.append('--author="{0} <{0}>'.format(auteur))
+                print(arguments)
+            self.commande(['add', chemin])
+            self.commande(arguments)
 
         try:
             sauver(self, chemin, message)
@@ -115,14 +121,15 @@ class Depot():
             else:
                 print(e.__dict__)
 
-    def sauvegardefichier(self, fichier):
+    def sauvegardefichier(self, fichier, auteur=None):
         self.sauvegarde(
             fichier.chemin.replace(self.dossier + os.sep, ''),
-            fichier.nom
+            fichier.nom,
+            auteur
         )
 
-    def sauvegardecomplete(self, message='Sauvegarde complète'):
-            self.sauvegarde('-A', message)
+    def sauvegardecomplete(self, message='Sauvegarde complète', auteur=None):
+            self.sauvegarde('-A', message, auteur)
 
 
 class Dossier():

@@ -127,7 +127,10 @@ class Document:
             os.path.join(
                 cfg.DATA, self.projet
             )
-        ).sauvegardecomplete('Suppression du document {}'.format(self.chemin))
+        ).sauvegardecomplete(
+            'Suppression du document {}'.format(self.chemin),
+            rq.auth[0]
+        )
         return self.afficher('Document supprimé !')
 
     def editer(self):
@@ -158,7 +161,7 @@ class Document:
             os.path.join(
                 cfg.DATA, self.projet
             )
-        ).sauvegardefichier(f.Fichier(self.fichier))
+        ).sauvegardefichier(f.Fichier(self.fichier), rq.auth[0])
         b.redirect('/' + self.chemin)
 
     @property
@@ -166,6 +169,7 @@ class Document:
         tableau = self.depot.journalfichier(self.fichier)
         for element in tableau[1:]:
             element[0] = h.A(element[0], href='?commit=' + element[0])
+            element[1] = re.sub('\<.*\>', '', element[1])
         return self.afficher(
             b.template(
                 'tableau',
@@ -289,7 +293,10 @@ class Dossier:
             os.path.join(
                 cfg.DATA, self.projet
             )
-        ).sauvegardecomplete('Suppression du dossier {}'.format(self.chemin))
+        ).sauvegardecomplete(
+            'Suppression du dossier {}'.format(self.chemin),
+            rq.auth[0]
+        )
         return self.afficher('Dossier supprimé !')
 
 
@@ -331,6 +338,7 @@ class Projet(Dossier):
         tableau = self.depot.journalcomplet
         for element in tableau[1:]:
             element[0] = h.A(element[0], href='?commit=' + element[0])
+            element[1] = re.sub('\<.*\>', '', element[1])
         return self.afficher(
             b.template(
                 'tableau',
