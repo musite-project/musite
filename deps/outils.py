@@ -61,6 +61,26 @@ class Depot():
         ]).replace('\n', '\n  ')
         return differences
 
+    def detailler(self, version, versionb = None, fichier=None):
+        if versionb:
+            parametres = [
+                'diff',
+                '--word-diff',
+                version,
+                versionb
+            ]
+        else:
+            parametres = [
+                'diff',
+                '--word-diff',
+                version + '^',
+                version
+            ]
+        if fichier:
+            parametres.extend([fichier])
+        details = self.commande(parametres).replace('\r','').split('\n')
+        return details
+
     def retablir(self, fichier, version):
         self.commande([
             'checkout',

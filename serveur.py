@@ -5,6 +5,7 @@
 import os
 import sys
 import shutil
+import re
 from pkgutil import iter_modules
 from importlib import import_module
 sys.path.insert(0, 'deps')
@@ -279,6 +280,46 @@ class Projet(Dossier):
                 'tableau',
                 tableau = tableau
             )
+        )
+
+    def modification(self, commit):
+        modification = b.html_escape('\n'.join(self.depot.detailler(commit))) \
+            .replace('[-', '<i>') \
+            .replace('-]', '</i>') \
+            .replace('{+', '<b>') \
+            .replace('+}', '</b>')
+        modification =  re.sub(
+            'diff.*\n', '\n\n<hr>\n', modification
+        )
+        modification = re.sub(
+            '(@@.*@@)', '\n<b><i>\\1</i></b>\n', modification
+        )
+        differences = b.html_escape(
+            '\n'.join(self.depot.detailler(commit, 'HEAD'))
+        ) \
+            .replace('[-', '<i>') \
+            .replace('-]', '</i>') \
+            .replace('{+', '<b>') \
+            .replace('+}', '</b>')
+        differences =  re.sub(
+            'diff.*\n', '\n\n<hr>\n', differences
+        )
+        differences = re.sub(
+            '(@@.*@@)', '\n<b><i>\\1</i></b>\n', differences
+        )
+        return self.afficher(
+            'Les <i>suppressions</i> sont en italique, '
+            + 'les <b>additions</b> en gras.'
+            + h.BR()
+            + h.H2(
+                'Changements apportés par la modification {} :'.format(commit)
+            )
+            + h.BR()
+            + h.CODE(modification)
+            + h.BR()
+            + h.H2('Changements effectués depuis cette modification :')
+            + h.BR()
+            + h.CODE(differences)
         )
 
     def supprimer(self):
@@ -575,7 +616,11 @@ def projet_supprimer(nom):
 @app.get('/_historique/<nom>')
 @page
 def projet_historique(nom):
-    return Projet(nom).historique
+    if rq.query.commit:
+        return Projet(nom).modification(rq.query.commit)
+    else:
+        # Ceci survient si l'on ne demande pas un commit précis.
+        return Projet(nom).historique
 
 
 # Édition d'un document

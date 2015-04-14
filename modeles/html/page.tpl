@@ -1,4 +1,5 @@
 <html>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 %from deps import auth as a
 %from etc import config as cfg
 %hote = rq.headers['Host']
