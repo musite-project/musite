@@ -40,28 +40,28 @@ class Depot():
         return entete + historique
 
     def journalfichier(self, fichier):
+        entete = [['Id', 'auteur', 'date', 'message']]
+        historique = [
+                re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
+                for entree
+                in self.journal(['--follow', fichier]).split('commit ')
+            ][1:]
+        for element in historique:
+            element[0] = element[0][:7]
+            element.pop(3)
+        return entete + historique
         historique = [
             version.split(' ')
             for version in self.journal(
                 [
                     '--follow',
-                    '--pretty=format:"%h %s"',
-                    fichier.chemin
+                    fichier
                 ]
             )[1:-1].split('"\n"')
         ]
         return historique
 
-    def comparer(self, fichier, versionI, versionII):
-        differences = self.commande([
-            'diff',
-            versionI,
-            versionII,
-            fichier.chemin
-        ]).replace('\n', '\n  ')
-        return differences
-
-    def detailler(self, version, versionb = None, fichier=None):
+    def comparer(self, version, versionb = None, fichier=None):
         if versionb:
             parametres = [
                 'diff',
