@@ -1,5 +1,7 @@
+import os
 import HTMLTags as h
 from base64 import b64encode
+from etc import config as cfg
 
 
 def afficher(fichier):
@@ -12,7 +14,7 @@ def afficher(fichier):
 
 
 def contenu(fichier):
-    fichier = fichier.replace('/', os.path.sep)
+    fichier = os.path.join(cfg.DATA,fichier.replace('/', os.path.sep))
     with open(fichier, "rb") as f:
         return b64encode(f.read()).decode('ascii')
 
