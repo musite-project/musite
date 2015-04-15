@@ -65,14 +65,14 @@ class Depot():
         if versionb:
             parametres = [
                 'diff',
-                '--word-diff',
+                '--word-diff-regex=.??',
                 version,
                 versionb
             ]
         else:
             parametres = [
                 'diff',
-                '--word-diff',
+                '--word-diff-regex=.??',
                 version + '^',
                 version
             ]

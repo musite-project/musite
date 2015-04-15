@@ -35,6 +35,46 @@ md = EXT['md']
 
 # Classes #####################################################################
 
+class Depot:
+    def __init__(self, projet):
+        self.projet = projet
+        self.depot = f.Depot(os.path.join(cfg.DATA, projet))
+
+    def comparer(self, commit, commitb=None, fichier=''):
+        if not commitb:
+            commitb = commit
+            commit += '^'
+        modification = b.html_escape(
+            '\n'.join(self.depot.comparer(commit, commitb, fichier=fichier))
+        ) \
+            .replace('[-', '<em class="suppr"><del>[-') \
+            .replace('-]', '-]</del></em class="suppr">') \
+            .replace('{+', '<strong class="add">{+') \
+            .replace('+}', '+}</strong class="add">')
+        modification = re.sub(
+            'diff.*\n', '\n\n<hr>\n', modification
+        )
+        modification = re.sub(
+            'index.*\n.*\n\+\+\+ b/(.*)',
+            str(h.B(h.I('{}'))).format(h.A('\\1', href='\\1')),
+            modification
+        )
+        modification = re.sub(
+            '(@@.*@@)', '\n{}\n'.format(h.B(h.I('\\1'))), modification
+        )
+        return h.CODE(modification)
+
+    def historique(self, fichier=None):
+        if fichier:
+            tableau = self.depot.journalfichier(fichier)
+        else:
+            tableau = self.depot.journalcomplet
+        for element in tableau[1:]:
+            element[0] = h.A(element[0], href='?commit=' + element[0])
+            element[1] = re.sub('\<.*\>', '', element[1])
+        return b.template('tableau', tableau=tableau)
+
+
 class Document:
     def __init__(self, projet, element, ext):
         self.projet = projet
@@ -43,7 +83,7 @@ class Document:
         self.chemin = '/'.join((projet, element + ('.' + ext if ext else '')))
         self.fichier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
         self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
-        self.depot = f.Depot(os.path.join(cfg.DATA, self.projet))
+        self.depot = Depot(self.projet)
 
     def afficher(self, contenu):
         actions = {
@@ -166,57 +206,24 @@ class Document:
 
     @property
     def historique(self):
-        tableau = self.depot.journalfichier(self.fichier)
-        for element in tableau[1:]:
-            element[0] = h.A(element[0], href='?commit=' + element[0])
-            element[1] = re.sub('\<.*\>', '', element[1])
-        return self.afficher(
-            b.template(
-                'tableau',
-                tableau = tableau
-            )
-        )
+        return self.afficher(self.depot.historique(self.fichier))
 
     def modification(self, commit):
-        modification = b.html_escape(
-            '\n'.join(self.depot.comparer(commit, fichier=self.fichier))
-        ) \
-            .replace('[-', '<i>') \
-            .replace('-]', '</i>') \
-            .replace('{+', '<b>') \
-            .replace('+}', '</b>')
-        modification =  re.sub(
-            'diff.*\n', '\n\n<hr>\n', modification
-        )
-        modification = re.sub(
-            '(@@.*@@)', '\n<b><i>\\1</i></b>\n', modification
-        )
-        differences = b.html_escape(
-            '\n'.join(self.depot.comparer(commit, 'HEAD', self.fichier))
-        ) \
-            .replace('[-', '<i>') \
-            .replace('-]', '</i>') \
-            .replace('{+', '<b>') \
-            .replace('+}', '</b>')
-        differences =  re.sub(
-            'diff.*\n', '\n\n<hr>\n', differences
-        )
-        differences = re.sub(
-            '(@@.*@@)', '\n<b><i>\\1</i></b>\n', differences
-        )
+        modification = self.depot.comparer(commit, fichier=self.fichier)
+        differences = self.depot.comparer(commit, fichier=self.fichier)
         return self.afficher(
-            'Les <i>suppressions</i> sont en italique, '
-            + 'les <b>additions</b> en gras.'
+            'Les {} sont en italique, les {} en gras.'.format(
+                h.EM(h.DEL('suppressions'), Class='suppr'),
+                h.STRONG('additions', Class='add')
+            )
             + h.BR()
             + h.H2(
                 'Changements apportés par la modification {} :'.format(commit)
             )
-            + h.BR()
             + h.CODE(modification)
             + h.BR()
             + h.H2('Changements effectués depuis cette modification :')
-            + h.BR()
-            + h.CODE(differences)
+            + (h.CODE(differences) if differences else h.B(h.I('aucun.')))
         )
 
 
@@ -303,7 +310,7 @@ class Dossier:
 class Projet(Dossier):
     def __init__(self, projet):
         Dossier.__init__(self, projet, '')
-        self.depot = f.Depot(os.path.join(cfg.DATA, self.projet))
+        self.depot = Depot(self.projet)
 
     def afficher(self, contenu, suppression=False):
         actions = {'Historique': '_historique/' + self.chemin}
@@ -335,55 +342,24 @@ class Projet(Dossier):
 
     @property
     def historique(self):
-        tableau = self.depot.journalcomplet
-        for element in tableau[1:]:
-            element[0] = h.A(element[0], href='?commit=' + element[0])
-            element[1] = re.sub('\<.*\>', '', element[1])
-        return self.afficher(
-            b.template(
-                'tableau',
-                tableau = tableau
-            )
-        )
+        return self.afficher(self.depot.historique())
 
     def modification(self, commit):
-        modification = b.html_escape('\n'.join(self.depot.comparer(commit))) \
-            .replace('[-', '<i>') \
-            .replace('-]', '</i>') \
-            .replace('{+', '<b>') \
-            .replace('+}', '</b>')
-        modification =  re.sub(
-            'diff.*\n', '\n\n<hr>\n', modification
-        )
-        modification = re.sub(
-            '(@@.*@@)', '\n<b><i>\\1</i></b>\n', modification
-        )
-        differences = b.html_escape(
-            '\n'.join(self.depot.comparer(commit, 'HEAD'))
-        ) \
-            .replace('[-', '<i>') \
-            .replace('-]', '</i>') \
-            .replace('{+', '<b>') \
-            .replace('+}', '</b>')
-        differences =  re.sub(
-            'diff.*\n', '\n\n<hr>\n', differences
-        )
-        differences = re.sub(
-            '(@@.*@@)', '\n<b><i>\\1</i></b>\n', differences
-        )
+        modification = self.depot.comparer(commit, 'HEAD')
+        differences = self.depot.comparer(commit, 'HEAD')
         return self.afficher(
-            'Les <i>suppressions</i> sont en italique, '
-            + 'les <b>additions</b> en gras.'
+            'Les {} sont en italique, les {} en gras.'.format(
+                h.EM(h.DEL('suppressions'), Class='suppr'),
+                h.STRONG('additions', Class='add')
+            )
             + h.BR()
             + h.H2(
                 'Changements apportés par la modification {} :'.format(commit)
             )
-            + h.BR()
             + h.CODE(modification)
             + h.BR()
             + h.H2('Changements effectués depuis cette modification :')
-            + h.BR()
-            + h.CODE(differences)
+            + (h.CODE(differences) if differences else h.B(h.I('aucun.')))
         )
 
     def supprimer(self):

@@ -124,12 +124,6 @@ text-align:left;
 font-size: 120%;
 }
 
-h2
-{
-        text-align:left;
-    font-size: 100%;
-}
-
 body{
 counter-reset: h1 h2 h3;
 font-size: 90%;
@@ -159,6 +153,14 @@ overflow: auto;
 textarea {
 width: 80%;
 height: 80%;
+}
+
+strong.add {
+color: green;
+}
+
+em.suppr {
+color: red;
 }
 
 {{ext}}
