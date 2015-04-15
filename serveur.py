@@ -78,6 +78,12 @@ class Depot:
             element[1] = re.sub('\<.*\>', '', element[1])
         return b.template('tableau', tableau=tableau)
 
+    def annuler(self, commit):
+        self.depot.annuler(commit)
+
+    def retablir(self, commit, fichier=None, auteur=None):
+        self.depot.retablir(commit, fichier)
+
 
 class Document:
     def __init__(self, projet, element, ext):
@@ -220,9 +226,15 @@ class Document:
                 'historique',
                 commit=commit,
                 modifications=modifications,
-                differences=differences
+                differences=differences,
+                emplacement=self.chemin,
+                rq=rq
             )
         )
+
+    def retablir(self, commit):
+        self.depot.retablir(commit, f.Fichier(self.fichier), rq.auth[0])
+        b.redirect('/_historique/' + self.chemin)
 
 
 class Dossier:
@@ -308,6 +320,7 @@ class Dossier:
 class Projet(Dossier):
     def __init__(self, projet):
         Dossier.__init__(self, projet, '')
+        self.projet = projet
         self.depot = Depot(self.projet)
 
     def afficher(self, contenu, suppression=False):
@@ -350,9 +363,15 @@ class Projet(Dossier):
                 'historique',
                 commit=commit,
                 modifications=modifications,
-                differences=differences
+                differences=differences,
+                emplacement=self.projet,
+                rq=rq
             )
         )
+
+    def retablir(self, commit):
+        self.depot.retablir(commit)
+        b.redirect('/_historique/' + self.chemin)
 
     def supprimer(self):
         try:
@@ -656,6 +675,14 @@ def document_historique(nom, element):
         return Document(nom, element, ext[1:]).historique
 
 
+@app.post('/_retablir/<nom>/<element:path>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@page
+def document_retablir_commit(nom, element):
+    element, ext = os.path.splitext(element)
+    return Document(nom, element, ext[1:]).retablir(rq.forms.commit)
+
+
 # Historique d'un projet
 @app.get('/_historique/<nom>')
 @page
@@ -665,6 +692,13 @@ def projet_historique(nom):
     else:
         # Ceci survient si l'on ne demande pas un commit précis.
         return Projet(nom).historique
+
+
+@app.post('/_retablir/<nom>')
+@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@page
+def projet_retablir_commit(nom):
+    return Projet(nom).retablir(rq.forms.commit)
 
 
 # Édition d'un document

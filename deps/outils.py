@@ -16,7 +16,11 @@ class Depot():
         os.chdir(self.dossier)
         ligne = ['git']
         ligne.extend(arguments)
-        resultat = subprocess.check_output(ligne)
+        try:
+            resultat = subprocess.check_output(ligne)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            raise
         return resultat.decode('utf-8')
 
     def initialiser(self):
@@ -81,22 +85,28 @@ class Depot():
         details = self.commande(parametres).replace('\r','').split('\n')
         return details
 
-    def retablir(self, fichier, version):
-        self.commande([
-            'checkout',
-            version,
-            fichier.chemin
-        ])
-        self.sauvegarde(
-            fichier.chemin.replace(self.dossier + os.sep, ''),
-            'Retour de '
-            + fichier.nom
-            + ' à la version '
-            + version
+    def retablir(self, version, fichier=None, auteur=None):
+        if fichier:
+            self.commande([
+                'checkout',
+                version,
+                fichier.chemin
+            ])
+        else:
+            self.commande([
+                'revert',
+                '-n',
+                version + '..HEAD'
+            ])
+        self.sauvegardecomplete(
+            'Retour '
+            + ('du fichier {} '.format(fichier.nom) if fichier else '')
+            + 'à la version '
+            + version,
+            auteur
         )
 
     def sauvegarde(self, chemin, message, auteur=None):
-        print(auteur)
         def sauver(self, chemin, message):
             arguments = [
                 'commit',
@@ -104,9 +114,7 @@ class Depot():
                 message
             ]
             if auteur:
-                print(auteur)
                 arguments.append('--author="{0} <{0}>'.format(auteur))
-                print(arguments)
             self.commande(['add', chemin])
             self.commande(arguments)
 
