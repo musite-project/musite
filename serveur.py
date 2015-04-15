@@ -6,6 +6,7 @@ import os
 import sys
 import shutil
 import re
+from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 sys.path.insert(0, 'deps')
@@ -44,25 +45,28 @@ class Depot:
         if not commitb:
             commitb = commit
             commit += '^'
-        modification = b.html_escape(
-            '\n'.join(self.depot.comparer(commit, commitb, fichier=fichier))
-        ) \
-            .replace('[-', '<em class="suppr"><del>[-') \
-            .replace('-]', '-]</del></em class="suppr">') \
-            .replace('{+', '<strong class="add">{+') \
-            .replace('+}', '+}</strong class="add">')
-        modification = re.sub(
-            'diff.*\n', '\n\n<hr>\n', modification
-        )
-        modification = re.sub(
-            'index.*\n.*\n\+\+\+ b/(.*)',
-            str(h.B(h.I('{}'))).format(h.A('\\1', href='\\1')),
-            modification
-        )
-        modification = re.sub(
-            '(@@.*@@)', '\n{}\n'.format(h.B(h.I('\\1'))), modification
-        )
-        return h.CODE(modification)
+        try:
+            modification = b.html_escape(
+                '\n'.join(self.depot.comparer(commit, commitb, fichier=fichier))
+            ) \
+                .replace('[-', '<em class="suppr"><del>[-') \
+                .replace('-]', '-]</del></em class="suppr">') \
+                .replace('{+', '<strong class="add">{+') \
+                .replace('+}', '+}</strong class="add">')
+            modification = re.sub(
+                'diff.*\n', '\n\n<hr>\n', modification
+            )
+            modification = re.sub(
+                'index.*\n.*\n\+\+\+ b/(.*)',
+                str(h.B(h.I('{}'))).format(h.A('\\1', href='\\1')),
+                modification
+            )
+            modification = re.sub(
+                '(@@.*@@)', '\n{}\n'.format(h.B(h.I('\\1'))), modification
+            )
+            return h.CODE(modification)
+        except CalledProcessError:
+            return "Il n'y a rien avant la création !"
 
     def historique(self, fichier=None):
         if fichier:
@@ -209,21 +213,15 @@ class Document:
         return self.afficher(self.depot.historique(self.fichier))
 
     def modification(self, commit):
-        modification = self.depot.comparer(commit, fichier=self.fichier)
-        differences = self.depot.comparer(commit, fichier=self.fichier)
+        modifications = self.depot.comparer(commit, fichier=self.fichier)
+        differences = self.depot.comparer(commit, 'HEAD', fichier=self.fichier)
         return self.afficher(
-            'Les {} sont en italique, les {} en gras.'.format(
-                h.EM(h.DEL('suppressions'), Class='suppr'),
-                h.STRONG('additions', Class='add')
+            b.template(
+                'historique',
+                commit=commit,
+                modifications=modifications,
+                differences=differences
             )
-            + h.BR()
-            + h.H2(
-                'Changements apportés par la modification {} :'.format(commit)
-            )
-            + h.CODE(modification)
-            + h.BR()
-            + h.H2('Changements effectués depuis cette modification :')
-            + (h.CODE(differences) if differences else h.B(h.I('aucun.')))
         )
 
 
@@ -345,21 +343,15 @@ class Projet(Dossier):
         return self.afficher(self.depot.historique())
 
     def modification(self, commit):
-        modification = self.depot.comparer(commit, 'HEAD')
+        modifications = self.depot.comparer(commit)
         differences = self.depot.comparer(commit, 'HEAD')
         return self.afficher(
-            'Les {} sont en italique, les {} en gras.'.format(
-                h.EM(h.DEL('suppressions'), Class='suppr'),
-                h.STRONG('additions', Class='add')
+            b.template(
+                'historique',
+                commit=commit,
+                modifications=modifications,
+                differences=differences
             )
-            + h.BR()
-            + h.H2(
-                'Changements apportés par la modification {} :'.format(commit)
-            )
-            + h.CODE(modification)
-            + h.BR()
-            + h.H2('Changements effectués depuis cette modification :')
-            + (h.CODE(differences) if differences else h.B(h.I('aucun.')))
         )
 
     def supprimer(self):
