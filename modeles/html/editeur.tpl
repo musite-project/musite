@@ -22,5 +22,7 @@
         <textarea name="contenu" id="saisie" placeholder="Texte">{{texte}}</textarea>
         <br>
         <button type="submit" name="action" value="enregistrer">Enregistrer</button>
+        &nbsp
+        <button type="submit" name="action" value="annuler">Annuler</button>
     </form>
 </div>

@@ -1,8 +1,14 @@
 %from deps import auth as a
 
+<p>
 Les <em class='suppr'><del>suppressions</del></em> sont en italique,
 les <strong class='add'>additions</strong> en gras.
+Seules sont affichées les parties concernées par les changements.
 <br>
+Les <em class='suppr'>[- -]</em> et les <strong class='add'>{+ +}</strong>
+ne font pas partie de la suppression ou de l'addition, mais servent à les
+mettre davantage en évidence.
+</p>
 
 <h2>Changements apportés par la modification {{commit}} :</h2>
 

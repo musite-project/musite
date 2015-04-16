@@ -747,6 +747,12 @@ def document_afficher(nom, element=None, ext=None):
 def document_enregistrer(nom, element='', ext=''):
     if rq.forms.action == 'enregistrer':
         Document(nom, element, ext).enregistrer(rq.forms.contenu)
+    elif rq.forms.action == 'annuler':
+        b.redirect(
+            '/' + nom
+            + ('/' + element if element else '')
+            + ('.' + ext if ext else '')
+        )
     else:
         return {'corps': 'Pourriez-vous expliciter votre intention ?'}
 
