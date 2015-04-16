@@ -41,6 +41,9 @@ class Depot:
         self.projet = projet
         self.depot = f.Depot(os.path.join(cfg.DATA, projet))
 
+    def initialiser(self):
+        self.depot.initialiser()
+
     def comparer(self, commit, commitb=None, fichier=''):
         if not commitb:
             commitb = commit
