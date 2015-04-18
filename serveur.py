@@ -72,10 +72,13 @@ class Depot:
             return "Il n'y a rien avant la création !"
 
     def historique(self, fichier=None):
-        if fichier:
-            tableau = self.depot.journalfichier(fichier)
-        else:
-            tableau = self.depot.journalcomplet
+        try:
+            if fichier:
+                tableau = self.depot.journalfichier(fichier)
+            else:
+                tableau = self.depot.journalcomplet
+        except CalledProcessError:
+            return "Il n'y a pas encore de modifications à signaler."
         for element in tableau[1:]:
             element[0] = h.A(element[0], href='?commit=' + element[0])
             element[1] = re.sub('\<.*\>', '', element[1])
@@ -123,13 +126,13 @@ class Document:
     @property
     def contenu(self):
         try:
-            return self.afficher(EXT[self.ext].afficher(self.chemin))
+            return self.afficher(EXT[self.ext].Document(self.chemin).afficher())
         except (KeyError, AttributeError):
             # Si le type de document est inconnu ou ne prévoit pas d'affichage,
             # on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
             try:
-                return self.afficher(txt.afficher(self.chemin))
+                return self.afficher(txt.Document(self.chemin).afficher())
             except txt.FichierIllisible:
                 return self.afficher("Extension inconnue : {}.".format(e))
             except FileNotFoundError:
@@ -140,13 +143,13 @@ class Document:
     @property
     def source(self):
         try:
-            return self.afficher(EXT[self.ext].afficher_source(self.chemin))
+            return self.afficher(EXT[self.ext].Document(self.chemin).afficher_source())
         except (KeyError, AttributeError):
             # Si le type de document est inconnu ou ne prévoit pas d'affichage
             # de la source, on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
             try:
-                return self.afficher(txt.afficher_source(chemin))
+                return self.afficher(txt.Document(self.chemin).afficher_source())
             except txt.FichierIllisible:
                 return self.afficher(
                     "Extension inconnue : {}.".format(e)
@@ -166,16 +169,13 @@ class Document:
             return self.afficher("Ce fichier est illisible.")
 
     def creer(self):
-        if not os.path.exists(self.fichier):
-            self.enregistrer('_')
-        else:
-            return self.editer()
+        return self.editer(creation=True)
 
     def supprimer(self):
         try:
-            EXT[self.ext].supprimer(self.chemin)
+            EXT[self.ext].Document(self.chemin).supprimer()
         except KeyError:
-            txt.supprimer(self.chemin)
+            txt.Document(self.chemin).supprimer()
         f.Depot(
             os.path.join(
                 cfg.DATA, self.projet
@@ -186,14 +186,18 @@ class Document:
         )
         return self.afficher('Document supprimé !')
 
-    def editer(self):
+    def editer(self, creation=False):
         try:
-            return self.afficher(EXT[self.ext].editer(self.chemin))
+            return self.afficher(
+                EXT[self.ext].Document(self.chemin).editer(creation)
+            )
         except KeyError:
             # Si le type de document est inconnu, on essaie de le traiter
             # comme un document texte. Sinon, on abandonne.
             try:
-                return self.afficher(txt.editer(self.chemin))
+                return self.afficher(
+                    txt.Document(self.chemin).editer(creation)
+                )
             except txt.FichierIllisible:
                 return self.afficher("Ce type de document n'est pas éditable.")
         except AttributeError:
@@ -207,9 +211,9 @@ class Document:
 
     def enregistrer(self, contenu):
         try:
-            EXT[self.ext].enregistrer(self.chemin, contenu)
+            EXT[self.ext].Document(self.chemin).enregistrer(contenu)
         except AttributeError:
-            txt.enregistrer(self.chemin, contenu)
+            txt.Document(self.chemin).enregistrer(self.chemin)
         f.Depot(
             os.path.join(
                 cfg.DATA, self.projet
@@ -546,7 +550,7 @@ def document_creer(nom, element=''):
     """ Création effective du document.
     """
     doc = rq.forms.nom.split('.')
-    element, ext = element + '/' + '.'.join((doc[:-1])), doc[-1]
+    element, ext = element + '.'.join((doc[:-1])), doc[-1]
     return Document(nom, element, ext).creer()
 
 
@@ -741,7 +745,13 @@ def document_afficher(nom, element=None, ext=None):
         else:
             return Dossier(nom, element).lister()
     except TypeError:    # Cette exception est levée s'il s'agit d'un document.
-        return Document(nom, element, ext).contenu
+        try:
+            return Document(nom, element, ext).contenu
+        except FileNotFoundError:
+            # Cette exception est levée s'il n'y a pas de document, ce qui
+            # arrive notamment lorsque l'on renonce à créer un nouveau
+            # document.
+            b.redirect('/' + nom)
 
 
 # Enregistrement des documents après édition

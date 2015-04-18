@@ -14,7 +14,7 @@ class Document:
         # Chemin relatif du fichier
         self.fichierrelatif = chemin.replace('/', os.path.sep)
         self.dossierrelatif = os.path.dirname(self.fichierrelatif)
-        # Chemin absolu du fichier lui-même
+        # Chemin absolu du fichier
         self.fichier = os.path.join(
             cfg.DATA,
             self.fichierrelatif
@@ -22,7 +22,7 @@ class Document:
         self.dossier = os.path.dirname(self.fichier)
 
     def afficher(self):
-        return h.CODE(b.html_escape(contenu(self.fichier)))
+        return h.CODE(b.html_escape(self.contenu))
 
     afficher_source = afficher
 
@@ -34,13 +34,24 @@ class Document:
         except UnicodeDecodeError:
             raise FichierIllisible(self.fichier)
 
-    def editer(self):
-        return b.template(
-            'editeur',
-            emplacement=self.chemin,
-            texte=self.contenu,
-            ext=self.ext
-        )
+    def editer(self, creation=False):
+        try:
+            return b.template(
+                'editeur',
+                emplacement=self.chemin,
+                texte=self.contenu,
+                ext=self.ext
+            )
+        except FileNotFoundError:
+            if creation:
+                return b.template(
+                'editeur',
+                emplacement=self.chemin,
+                texte='',
+                ext=self.ext
+            )
+            else:
+                b.abort(404)
 
     def enregistrer(self, contenu):
         with open(self.fichier, 'w') as f:
@@ -48,26 +59,6 @@ class Document:
 
     def supprimer(self):
         os.remove(self.fichier)
-
-
-def afficher(fichier):
-    return Document(fichier).afficher()
-afficher_source = afficher
-
-
-def contenu(fichier):
-    return Document(fichier).contenu
-
-
-def editer(fichier):
-    return Document(fichier).editer()
-
-
-def enregistrer(fichier, contenu):
-    return Document(fichier).enregistrer(contenu)
-
-def supprimer(fichier):
-    return Document(fichier).supprimer()
 
 
 class FichierIllisible(Exception):

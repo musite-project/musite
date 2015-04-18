@@ -56,30 +56,6 @@ class Document(txt.Document):
         shutil.rmtree(self.rd, ignore_errors=True)
 
 
-def afficher(fichier):
-    return Document(fichier).afficher()
-
-
-def afficher_source(fichier):
-    return txt.Document(fichier).afficher_source()
-
-
-def contenu(fichier):
-    return Document(fichier).contenu
-
-
-def editer(fichier):
-    return Document(fichier).editer()
-
-
-def enregistrer(fichier, contenu):
-    return Document(fichier).enregistrer(contenu)
-
-
-def pdf(fichier, recompiler=False):
-    return Document(fichier).pdf
-
-
 def compiler_pdf(fichier, environnement={}):
     try:
         os.chdir(os.path.dirname(fichier))
@@ -111,7 +87,7 @@ def compiler_pdf(fichier, environnement={}):
 
 
 def traiter_erreur_compilation(dossier):
-    return txt.afficher(dossier.replace(os.path.sep, '/') + '/log')
+    return txt.Document(dossier.replace(os.path.sep, '/') + '/log').afficher()
 
 
 FichierIllisible = txt.FichierIllisible
