@@ -20,7 +20,7 @@ Concrètement, sous Debian, la commande suivante devrait installer le nécessair
 
 Quant à Gregorio :
 
-- si vous ne craignez pas d'activer les dépôts *sid* (ce qui suppose que vous sachiez ce que vous faites :
+- si vous ne craignez pas d'activer les dépôts *sid* (ce qui suppose que vous sachiez ce que vous faites) :
 
     apt-get install gregorio gregoriotex
 
