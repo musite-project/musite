@@ -1,6 +1,7 @@
 <html>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 %from deps import auth as a
+%from deps import outils as o
 %from etc import config as cfg
 %hote = rq.headers['Host']
     <head>
@@ -22,7 +23,7 @@
             %if len(liens) > 0:  # S'il y a des liens à afficher, on en fait la liste.
             <b>Liens</b><br>
             <ul>
-                %for lien in sorted(liens.keys()):
+                %for lien in sorted(liens.keys(), key=lambda s: o.sansaccents(s.lower())):
                 <li><a href=/{{liens[lien]}}>{{lien}}</a></li>
                 %end
             </ul>
@@ -34,7 +35,7 @@
             %if len(actions) > 0:  # Même chose pour les actions sur les documents.
             <b>Actions</b><br>
             <ul>
-                %for action in sorted(actions.keys()):
+                %for action in sorted(actions.keys(), key=lambda s: o.sansaccents(s.lower())):
                 <li><a href=/{{actions[action]}}>{{action}}</a></li>
                 %end
             </ul>

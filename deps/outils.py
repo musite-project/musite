@@ -11,6 +11,7 @@ from datetime import datetime
 from glob import glob as ls
 import random as rd
 from string import ascii_lowercase
+import unicodedata as ud
 import jrnl as l
 
 

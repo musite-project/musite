@@ -374,7 +374,7 @@ class Dossier:
     def lister(self):
         """Affichage des fichiers présents dans un dossier
         """
-        listefichiers = f.Dossier(self.dossier).lister(1)
+        fichiers = f.Dossier(self.dossier).lister(1)[self.dossier]
         # Si l'on n'est pas à la racine, on affiche un lien vers le parent.
         try:
             if self.chemin[:-1] != self.projet:
@@ -391,19 +391,41 @@ class Dossier:
         # Si cette exception est levée, c'est que l'on est à la racine.
         except ValueError:
             liste = []
+        # Liste des dossiers, puis des fichiers
+        listedossiers = sorted(
+            [
+                fichier + '/'
+                for fichier in fichiers
+                if os.path.isdir(os.path.join(self.dossier, fichier))
+            ],
+            key=lambda s: s.lower()
+        )
+        listefichiers = sorted(
+            [
+                fichier
+                for fichier in fichiers
+                if not os.path.isdir(os.path.join(self.dossier, fichier))
+            ],
+            key=lambda s: s.lower()
+        )
         # Formatage de la liste des fichiers.
         liste += [
             h.A(
-                fichier + '/' if (
-                    os.path.isdir(os.path.join(
-                        self.dossier, fichier
-                    ))
-                ) else fichier,
+                dossier,
+                href='/{}/{}/{}'.format(
+                    self.projet, self.nom, dossier
+                ).replace('//', '/')
+            )
+            for dossier in listedossiers
+        ]
+        liste += [
+            h.A(
+                fichier,
                 href='/{}/{}/{}'.format(
                     self.projet, self.nom, fichier
                 ).replace('//', '/')
             )
-            for fichier in listefichiers[self.dossier]
+            for fichier in listefichiers
         ]
         return self.afficher(b.template('liste', liste=liste))
 
