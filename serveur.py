@@ -425,8 +425,8 @@ def accueil():
         actions = {}
     liens = {'Projets': '_projets'}
     return {
-        'corps': md.afficher(
-            os.path.join(cfg.PAGES, 'md', 'Accueil.md')),
+        'corps': md.Document(
+            os.path.join(cfg.PAGES, 'md', 'Accueil.md')).afficher(),
         'actions': actions,
         'liens': liens
     }
