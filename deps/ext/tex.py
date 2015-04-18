@@ -1,3 +1,14 @@
+# coding: utf-8
+"""Gestion des documents tex
+
+Ces documents nécessitent TeXLive (ou équivalent) avec un ensemble raisonnable
+d'extensions.
+
+Pour la documentation, google est votre ami…
+Les pages de M. Pégourié-Gonnard peuvent être de quelque utilité pour un bon
+point de départ :
+https://elzevir.fr/imj/latex/
+"""
 import ext.txt as txt
 from etc import config as cfg
 from outils import motaleatoire

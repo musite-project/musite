@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Gestion de l'authentification des utilisateurs
+"""
 import os
 import hashlib
 import random as r
@@ -10,23 +13,27 @@ PWD = cfg.PWD
 
 
 def crypter(mdp):
-    '''Encodage des mots de passe.'''
+    """Encodage des mots de passe
+    """
     mdp = mdp.encode('utf-8')
     return hashlib.sha1(mdp).hexdigest()
 
 
 def utilisateurs():
-    '''Liste des utilisateurs'''
+    """Liste des utilisateurs
+    """
     return u.lister(os.path.join(PWD, 'etc', 'utilisateurs'))
 
 
 def groupes():
-    '''Liste des groupes.'''
+    """Liste des groupes.
+    """
     return u.listergroupes(os.path.join(PWD, 'etc', 'groupes'))
 
 
 def authentifier(nom, mdp):
-    '''Vérification des identifiants.'''
+    """Vérification des identifiants.
+    """
     try:
         return utilisateurs()[nom] == crypter(mdp)
     except KeyError:
@@ -34,8 +41,9 @@ def authentifier(nom, mdp):
 
 
 def valider(nom, mdp, critere):
-    '''Validation de la correspondance à un nom ou de l'appartenance
-    à un groupe.'''
+    """Validation de la correspondance à un nom ou de l'appartenance
+    à un groupe.
+    """
     if not authentifier(nom, mdp):
         return False
     if 'utilisateur' in critere:
@@ -47,8 +55,12 @@ def valider(nom, mdp, critere):
 
 
 def admin(nom=None, mdp=None):
+    """Vérification de l'appartenance au groupe administrateur.
+    """
     return valider(nom, mdp, {'groupe': 'admin'})
 
 
 def editeur(nom=None, mdp=None):
+    """Vérification de l'appartenance au groupe editeurs.
+    """
     return valider(nom, mdp, {'groupe': 'editeurs'})

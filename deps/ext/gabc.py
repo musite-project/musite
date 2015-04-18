@@ -1,3 +1,12 @@
+# coding: utf-8
+"""Gestion des partitions gabc
+
+Ces partitions nécessitent Gregorio, TeXLive avec un ensemble raisonnable
+d'extensions, et GregorioTeX.
+
+Voir plus d'informations à l'adresse :
+http://gregorio-project.github.io/
+"""
 from ext import txt, tex
 from etc import config as cfg
 from outils import motaleatoire

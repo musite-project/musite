@@ -1,3 +1,9 @@
+# coding: utf-8
+"""Gestion des fichiers, dossiers et dépôts
+
+Vous trouverez aussi à la fin des méthodes un peu "inclassables", mais utiles
+en plusieurs points du programme.
+"""
 import os
 import re
 import subprocess
@@ -26,7 +32,7 @@ class Depot():
     def initialiser(self):
         self.commande(['init'])
 
-    def journal(self, arguments = []):
+    def journal(self, arguments=[]):
         ligne = ['log']
         ligne.extend(arguments)
         return self.commande(ligne)
@@ -35,9 +41,9 @@ class Depot():
     def journalcomplet(self):
         entete = [['Id', 'auteur', 'date', 'message']]
         historique = [
-                re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
-                for entree in self.journal().split('commit ')
-            ][1:]
+            re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
+            for entree in self.journal().split('commit ')
+        ][1:]
         for element in historique:
             element[0] = element[0][:7]
             element.pop(3)
@@ -46,10 +52,10 @@ class Depot():
     def journalfichier(self, fichier):
         entete = [['Id', 'auteur', 'date', 'message']]
         historique = [
-                re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
-                for entree
-                in self.journal(['--follow', fichier]).split('commit ')
-            ][1:]
+            re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
+            for entree
+            in self.journal(['--follow', fichier]).split('commit ')
+        ][1:]
         for element in historique:
             element[0] = element[0][:7]
             element.pop(3)
@@ -65,7 +71,7 @@ class Depot():
         ]
         return historique
 
-    def comparer(self, version, versionb = None, fichier=None):
+    def comparer(self, version, versionb=None, fichier=None):
         if versionb:
             parametres = [
                 'diff',
@@ -82,7 +88,7 @@ class Depot():
             ]
         if fichier:
             parametres.append(fichier)
-        details = self.commande(parametres).replace('\r','').split('\n')
+        details = self.commande(parametres).replace('\r', '').split('\n')
         return details
 
     def retablir(self, version, fichier=None, auteur=None):

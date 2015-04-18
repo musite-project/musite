@@ -1,3 +1,12 @@
+# coding: utf-8
+"""Gestion des fichiers MarkDown
+
+Le langage MarkDown est géré ici par le module mistune, intégré au programme :
+il n'y a donc pas de dépendance externe particulière.
+
+Voyez pour la syntaxe :
+http://fr.wikipedia.org/wiki/Markdown
+"""
 from mistune import markdown
 import ext.txt as txt
 EXT = __name__.split('.')[-1]

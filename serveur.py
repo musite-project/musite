@@ -1,4 +1,17 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+"""Musite − wiki musical
+
+Musite est une sorte de wiki, pensé pour gérer des documents contenant des
+partitions de musique, mais adaptable à toutes sortes d'autres usages.
+
+Ce fichier gère la partie interface du site, renvoyant les pages
+correspondant aux urls saisies dans le navigateur.
+"""
+
+__license__ = 'GPLv2'
+
 
 # Import de librairies externes ###############################################
 
@@ -37,20 +50,34 @@ md = EXT['md']
 # Classes #####################################################################
 
 class Depot:
+    """Interaction avec le dépôt des documents.
+
+    Cette classe ne gère pas directement le dépôt, mais l'affichage des
+    messages le concernant et la transmission des instructions en provenance
+    de l'interface.
+    """
     def __init__(self, projet):
         self.projet = projet
         self.depot = f.Depot(os.path.join(cfg.DATA, projet))
 
     def initialiser(self):
+        """Initialisation d'un nouveau dépôt."""
         self.depot.initialiser()
 
     def comparer(self, commit, commitb=None, fichier=''):
+        """Comparaison entre deux versions.
+
+        Si le deuxième commit n'est pas précisé, on compare la version
+        demandée avec la précédente.
+        """
         if not commitb:
             commitb = commit
             commit += '^'
         try:
             modification = b.html_escape(
-                '\n'.join(self.depot.comparer(commit, commitb, fichier=fichier))
+                '\n'.join(
+                    self.depot.comparer(commit, commitb, fichier=fichier)
+                )
             ) \
                 .replace('[-', '<em class="suppr"><del>[-') \
                 .replace('-]', '-]</del></em class="suppr">') \
@@ -72,6 +99,11 @@ class Depot:
             return "Il n'y a rien avant la création !"
 
     def historique(self, fichier=None):
+        """Liste des modifications d'un dépôt ou d'un fichier
+
+        Si un fichier est précisé, on renvoie la liste des modifications de ce
+        fichier uniquement ; sinon, on renvoie tout l'historique du dépôt.
+        """
         try:
             if fichier:
                 tableau = self.depot.journalfichier(fichier)
@@ -85,13 +117,29 @@ class Depot:
         return b.template('tableau', tableau=tableau)
 
     def annuler(self, commit):
+        """Annulation des modifications d'un seul commit
+
+        Cette méthode est là au cas où elle pourrait servir dans la suite, mais
+        son usage est très délicat : cette opération peut en effet engendrer
+        des conflits, dont la gestion depuis un script est complexe. À utiliser
+        avec modération !
+        """
         self.depot.annuler(commit)
 
     def retablir(self, commit, fichier=None, auteur=None):
-        self.depot.retablir(commit, fichier)
+        """Retour en arrière à une version donnée
+
+        Cette méthode revient à la version spécifiée, ou pour l'ensemble du
+        dépôt, ou pour un seul fichier. Elle est non-destructrice : bien que
+        les modifications ayant suivi cette version soient annulées, elles
+        restent présentes dans l'historique.
+        """
+        self.depot.retablir(commit, fichier, auteur)
 
 
 class Document:
+    """Gestion des documents
+    """
     def __init__(self, projet, element, ext):
         self.projet = projet
         self.element = element
@@ -102,6 +150,12 @@ class Document:
         self.depot = Depot(self.projet)
 
     def afficher(self, contenu):
+        """Propriétés communes des pages de gestion de documents
+
+        Cette méthode définit en particulier ce qui apparaît dans le menu.
+        C'est ici qu'il faut définir ce qui est commun à toutes les pages
+        proposant une opération sur un document.
+        """
         actions = {
             'Aperçu': self.chemin,
             'Historique': '_historique/' + self.chemin,
@@ -125,8 +179,18 @@ class Document:
 
     @property
     def contenu(self):
+        """Contenu du document
+
+        Ce contenu dépend du type du document : c'est donc le module gérant
+        l'extension concernée qui s'occupe de retourner un code html
+        correspondant audit contenu.
+        Pour développer un module gérant une nouvelle extension, référez-vous
+        aux docstrings du module deps/ext/txt.py.
+        """
         try:
-            return self.afficher(EXT[self.ext].Document(self.chemin).afficher())
+            return self.afficher(
+                EXT[self.ext].Document(self.chemin).afficher()
+            )
         except (KeyError, AttributeError):
             # Si le type de document est inconnu ou ne prévoit pas d'affichage,
             # on essaie de le traiter comme un document texte.
@@ -142,14 +206,20 @@ class Document:
 
     @property
     def source(self):
+        """Affichage de la source du document
+        """
         try:
-            return self.afficher(EXT[self.ext].Document(self.chemin).afficher_source())
+            return self.afficher(
+                EXT[self.ext].Document(self.chemin).afficher_source()
+            )
         except (KeyError, AttributeError):
             # Si le type de document est inconnu ou ne prévoit pas d'affichage
             # de la source, on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
             try:
-                return self.afficher(txt.Document(self.chemin).afficher_source())
+                return self.afficher(
+                    txt.Document(self.chemin).afficher_source()
+                )
             except txt.FichierIllisible:
                 return self.afficher(
                     "Extension inconnue : {}.".format(e)
@@ -169,9 +239,13 @@ class Document:
             return self.afficher("Ce fichier est illisible.")
 
     def creer(self):
+        """Création d'un nouveau document
+        """
         return self.editer(creation=True)
 
     def supprimer(self):
+        """Suppression du document
+        """
         try:
             EXT[self.ext].Document(self.chemin).supprimer()
         except KeyError:
@@ -187,6 +261,8 @@ class Document:
         return self.afficher('Document supprimé !')
 
     def editer(self, creation=False):
+        """Édition du document
+        """
         try:
             return self.afficher(
                 EXT[self.ext].Document(self.chemin).editer(creation)
@@ -210,6 +286,8 @@ class Document:
                 )
 
     def enregistrer(self, contenu):
+        """Enregistrement du document
+        """
         try:
             EXT[self.ext].Document(self.chemin).enregistrer(contenu)
         except AttributeError:
@@ -223,9 +301,13 @@ class Document:
 
     @property
     def historique(self):
+        """Liste des modifications
+        """
         return self.afficher(self.depot.historique(self.fichier))
 
     def modification(self, commit):
+        """Affichage des modifications effectuées dans une version donnée
+        """
         modifications = self.depot.comparer(commit, fichier=self.fichier)
         differences = self.depot.comparer(commit, 'HEAD', fichier=self.fichier)
         return self.afficher(
@@ -240,11 +322,15 @@ class Document:
         )
 
     def retablir(self, commit):
+        """Retour en arrière jusqu'à une version donnée
+        """
         self.depot.retablir(commit, f.Fichier(self.fichier), rq.auth[0])
         b.redirect('/_historique/' + self.chemin)
 
 
 class Dossier:
+    """Gestion des dossiers
+    """
     def __init__(self, projet, element):
         self.projet = projet
         self.nom = element
@@ -252,6 +338,12 @@ class Dossier:
         self.dossier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
 
     def afficher(self, contenu):
+        """Propriétés communes des pages de gestion de dossiers
+
+        Cette méthode définit en particulier ce qui apparaît dans le menu.
+        C'est ici qu'il faut définir ce qui est commun à toutes les pages
+        proposant une opération sur un dossier.
+        """
         actions = {}
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
@@ -274,10 +366,14 @@ class Dossier:
         }
 
     def creer(self):
+        """Création d'un nouveau dossier
+        """
         os.makedirs(self.dossier, exist_ok=True)
         return self.lister()
 
     def lister(self):
+        """Affichage des fichiers présents dans un dossier
+        """
         listefichiers = f.Dossier(self.dossier).lister(1)
         # Si l'on n'est pas à la racine, on affiche un lien vers le parent.
         try:
@@ -312,6 +408,8 @@ class Dossier:
         return self.afficher(b.template('liste', liste=liste))
 
     def supprimer(self):
+        """Suppression d'un dossier et de son contenu
+        """
         shutil.rmtree(self.dossier, ignore_errors=True)
         f.Depot(
             os.path.join(
@@ -325,12 +423,20 @@ class Dossier:
 
 
 class Projet(Dossier):
+    """Gestion des projets
+    """
     def __init__(self, projet):
         Dossier.__init__(self, projet, '')
         self.projet = projet
         self.depot = Depot(self.projet)
 
     def afficher(self, contenu, suppression=False):
+        """Propriétés communes des pages de gestion de dossiers
+
+        Cette méthode définit en particulier ce qui apparaît dans le menu.
+        C'est ici qu'il faut définir ce qui est commun à toutes les pages
+        proposant une opération sur un projet.
+        """
         actions = {'Historique': '_historique/' + self.chemin}
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
@@ -351,6 +457,8 @@ class Projet(Dossier):
         }
 
     def creer(self):
+        """Création d'un nouveau projet
+        """
         try:
             os.makedirs(self.dossier, exist_ok=False)
             self.depot.initialiser()
@@ -360,9 +468,13 @@ class Projet(Dossier):
 
     @property
     def historique(self):
+        """Liste des modifications
+        """
         return self.afficher(self.depot.historique())
 
     def modification(self, commit):
+        """Affichage des modifications effectuées dans une version donnée
+        """
         modifications = self.depot.comparer(commit)
         differences = self.depot.comparer(commit, 'HEAD')
         return self.afficher(
@@ -377,10 +489,14 @@ class Projet(Dossier):
         )
 
     def retablir(self, commit):
-        self.depot.retablir(commit)
+        """Retour en arrière jusqu'à une version donnée
+        """
+        self.depot.retablir(commit, auteur=rq.auth[0])
         b.redirect('/_historique/' + self.chemin)
 
     def supprimer(self):
+        """Suppression du projet
+        """
         try:
             shutil.rmtree(self.dossier, ignore_errors=False)
             return self.afficher('Projet supprimé !', suppression=True)
@@ -397,10 +513,18 @@ class Projet(Dossier):
 
 @app.hook('before_request')
 def strip_path():
+    """Effacement du / final s'il y en a un dans l'url
+    """
     rq.environ['PATH_INFO'] = rq.environ['PATH_INFO'].rstrip('/')
 
 
 def page(fonction):
+    """Mise en forme commune à toutes les pages
+
+    Cette fonction est un décorateur à appliquer à toutes les fonctions
+    affichant des pages, mais non à celles qui retournent des données
+    particulières, tels les css ou les fichiers statiques.
+    """
     def afficher(*arguments, **parametres):
         contenu = fonction(*arguments, **parametres)
         contenu['rq'] = rq
@@ -414,7 +538,7 @@ def page(fonction):
 @app.get('/')
 @page
 def accueil():
-    """ Page d'accueil du site.
+    """ Page d'accueil du site
     """
     try:
         actions = {'Créer projet': '_creerprojet'} \
@@ -435,6 +559,8 @@ def accueil():
 @app.get('/_projets')
 @page
 def lister_projets():
+    """Liste des projets existants
+    """
     try:
         actions = {'Créer projet': '_creerprojet'} \
             if a.authentifier(rq.auth[0], rq.auth[1]) \
@@ -489,6 +615,8 @@ def admin(action=''):
 @app.get('/admin/supprimerutilisateur/<nom>')
 @b.auth_basic(a.admin, 'Vous devez être administrateur')
 def utilisateur_suppression(nom):
+    """Suppression d'un utilisateur
+    """
     u.Utilisateur(nom).supprimer()
     b.redirect('/admin/utilisateurs')
 
@@ -496,7 +624,7 @@ def utilisateur_suppression(nom):
 @app.post('/admin/utilisateurs')
 @b.auth_basic(a.admin, 'Vous devez être administrateur')
 def utilisateur_ajout():
-    """ Ajout d'un nouvel utilisateur à la base.
+    """ Ajout d'un nouvel utilisateur à la base
     """
     if rq.forms.mdp == rq.forms.mdp_v:
         u.Utilisateur(rq.forms.nom, rq.forms.mdp).ajouter()
@@ -507,7 +635,7 @@ def utilisateur_ajout():
 @app.get('/static')
 @app.get('/static/<chemin:path>')
 def static(chemin='/'):
-    """ Fichiers statiques.
+    """ Fichiers statiques
     """
     telecharger = True if rq.query.action == 'telecharger' else False
     return b.static_file(
@@ -519,7 +647,7 @@ def static(chemin='/'):
 
 @app.get('/favicon.ico')
 def favicon():
-    """Icône du site.
+    """Icône du site
     """
     return static('img/favicon.ico')
 
@@ -534,7 +662,7 @@ def favicon():
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_creer_infos(nom, element=None, ext=None):
-    """ Page de création d'un document.
+    """ Page de création d'un document
     """
     if element and ext:
         return Document(nom, element, ext).creer()
@@ -547,7 +675,7 @@ def document_creer_infos(nom, element=None, ext=None):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_creer(nom, element=''):
-    """ Création effective du document.
+    """ Création effective du document
     """
     doc = rq.forms.nom.split('.')
     element, ext = element + '.'.join((doc[:-1])), doc[-1]
@@ -559,7 +687,7 @@ def document_creer(nom, element=''):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def dossier_creer_infos(nom, element=''):
-    """ Page de création d'un dossier.
+    """ Page de création d'un dossier
     """
     return {'corps': b.template('creation', {'quoi': 'dossier'})}
 
@@ -569,7 +697,7 @@ def dossier_creer_infos(nom, element=''):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def dossier_creer(nom, element=''):
-    """ Création effective du dossier.
+    """ Création effective du dossier
     """
     return Dossier(nom, '/'.join((element, rq.forms.nom))).creer()
 
@@ -578,7 +706,7 @@ def dossier_creer(nom, element=''):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def projet_creer_infos():
-    """ Page de création d'un projet.
+    """ Page de création d'un projet
     """
     return {'corps': b.template('creation', {'quoi': 'projet'})}
 
@@ -587,7 +715,7 @@ def projet_creer_infos():
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def projet_creer():
-    """ Création effective du projet.
+    """ Création effective du projet
     """
     return Projet(rq.forms.nom).creer()
 
@@ -597,6 +725,8 @@ def projet_creer():
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_supprimer_confirmation(nom, element=False):
+    """Page de confirmation avant de supprimer un document
+    """
     if not element:
         b.abort(404)
     else:
@@ -610,6 +740,8 @@ def document_supprimer_confirmation(nom, element=False):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_supprimer(nom, element=False):
+    """Suppression effective du document
+    """
     if not element:
         b.abort(404)
     else:
@@ -624,6 +756,8 @@ def document_supprimer(nom, element=False):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def dossier_supprimer_confirmation(nom, element=False):
+    """Page de confirmation avant de supprimer un dossier
+    """
     if not element:
         b.abort(404)
     else:
@@ -638,6 +772,8 @@ def dossier_supprimer_confirmation(nom, element=False):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def dossier_supprimer(nom, element=False):
+    """Suppression effective du dossier
+    """
     if not element:
         b.abort(404)
     else:
@@ -651,6 +787,8 @@ def dossier_supprimer(nom, element=False):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def projet_supprimer_confirmation(nom):
+    """Page de confirmation avant de supprimer un projet
+    """
     return {'corps': b.template(
         'suppression',
         {
@@ -664,6 +802,8 @@ def projet_supprimer_confirmation(nom):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def projet_supprimer(nom):
+    """Suppression effective du projet
+    """
     if rq.forms.action == 'supprimer':
         return Projet(nom).supprimer()
     else:
@@ -674,6 +814,8 @@ def projet_supprimer(nom):
 @app.get('/_historique/<nom>/<element:path>')
 @page
 def document_historique(nom, element):
+    """Page affichant les modifications successives affectant un document
+    """
     element, ext = os.path.splitext(element)
     if rq.query.commit:
         return Document(nom, element, ext[1:]).modification(rq.query.commit)
@@ -686,6 +828,8 @@ def document_historique(nom, element):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_retablir_commit(nom, element):
+    """Retour à une version antérieure d'un document
+    """
     element, ext = os.path.splitext(element)
     return Document(nom, element, ext[1:]).retablir(rq.forms.commit)
 
@@ -694,6 +838,8 @@ def document_retablir_commit(nom, element):
 @app.get('/_historique/<nom>')
 @page
 def projet_historique(nom):
+    """Page affichant les modifications successives affectant un projet
+    """
     if rq.query.commit:
         return Projet(nom).modification(rq.query.commit)
     else:
@@ -705,6 +851,8 @@ def projet_historique(nom):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def projet_retablir_commit(nom):
+    """Retour à une version antérieure de l'ensemble d'un projet
+    """
     return Projet(nom).retablir(rq.forms.commit)
 
 
@@ -713,7 +861,7 @@ def projet_retablir_commit(nom):
 @b.auth_basic(a.editeur, 'Réservé aux éditeurs')
 @page
 def document_editer(nom, element='', ext=''):
-    """ Page d'édition d'un document.
+    """ Page d'édition d'un document
     """
     return Document(nom, element, ext).editer()
 
@@ -722,7 +870,7 @@ def document_editer(nom, element='', ext=''):
 @app.get('/_src/<nom>/<element:path>.<ext>')
 @page
 def document_src(nom, element='', ext=''):
-    """ Source d'un document.
+    """ Source d'un document
     """
     return Document(nom, element, ext).source
 
@@ -733,7 +881,7 @@ def document_src(nom, element='', ext=''):
 @app.get('/<nom>/<element:path>.<ext>')
 @page
 def document_afficher(nom, element=None, ext=None):
-    """ Affichage des fichiers et dossiers d'un projet.
+    """ Affichage des fichiers et dossiers d'un projet
 
     Cette page renvoie :
         − la liste des fichiers si <element> pointe sur un dossier ;
@@ -758,6 +906,8 @@ def document_afficher(nom, element=None, ext=None):
 @app.post('/<nom>/<element:path>.<ext>')
 @page
 def document_enregistrer(nom, element='', ext=''):
+    """Enregistrement d'un document
+    """
     if rq.forms.action == 'enregistrer':
         Document(nom, element, ext).enregistrer(rq.forms.contenu)
     elif rq.forms.action == 'annuler':
@@ -785,12 +935,22 @@ def css(ext=''):
 @app.error(code=401)
 @page
 def erreur_accesreserve(erreur):
+    """Accès réservé
+
+    Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page
+    réservée.
+    """
     return {'corps': 'Accès réservé !'}
 
 
 @app.error(code=404)
 @page
 def erreur_pageintrouvable(erreur):
+    """Page introuvable
+
+    Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page
+    qui n'existe pas.
+    """
     return {'corps': "Il n'y a rien ici !"}
 
 

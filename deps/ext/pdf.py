@@ -1,3 +1,6 @@
+# coding: utf-8
+"""Gestion des fichiers pdf
+"""
 import os
 import HTMLTags as h
 from base64 import b64encode

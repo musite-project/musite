@@ -1,3 +1,11 @@
+# coding: utf-8
+"""Gestion des partitions ly
+
+Ces partitions nécessitent LilyPond.
+
+Voir plus d'informations à l'adresse :
+http://www.lilypond.org
+"""
 import ext.txt as txt
 from etc import config as cfg
 from outils import motaleatoire

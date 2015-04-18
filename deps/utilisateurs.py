@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Gestion des utilisateurs et des groupes
+"""
 import sys as s
 import os
 import hashlib as h
@@ -24,7 +27,6 @@ def lister(fichier):
 
 
 class Utilisateur:
-
     def __init__(self, nom, mdp=''):
         self.nom = nom
         self.mdp = encoder(mdp)
@@ -32,7 +34,7 @@ class Utilisateur:
 
     def ajouter(self, fichier=False):
         if not fichier:
-            fichier=self.fichier
+            fichier = self.fichier
         if self.mdp == '':
             raise MotDePasseRequis
         if self.nom not in lister(fichier).keys():
@@ -43,7 +45,7 @@ class Utilisateur:
 
     def supprimer(self, fichier=False):
         if not fichier:
-            fichier=self.fichier
+            fichier = self.fichier
         utilisateurs = lister(fichier)
         try:
             del utilisateurs[self.nom]
@@ -55,7 +57,7 @@ class Utilisateur:
 
     def modifier(self, fichier=False):
         if not fichier:
-            fichier=self.fichier
+            fichier = self.fichier
         if self.mdp == '':
             raise MotDePasseRequis
         utilisateurs = lister(fichier)
@@ -97,7 +99,6 @@ def listergroupes(fichier):
 
 
 class Groupe:
-
     def __init__(self, nom):
         self.nom = nom
 

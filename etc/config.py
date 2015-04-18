@@ -1,3 +1,10 @@
+# coding: utf-8
+"""Configuration générale de musite.
+
+Vous pouvez modifier ici le titre du site, l'adresse et le port d'écoute, les
+emplacements des dossiers.
+Vous pouvez aussi définir si vous êtes ou non en mode développement.
+"""
 import os
 
 
