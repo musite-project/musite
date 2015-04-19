@@ -14,7 +14,9 @@ Musite est prévu pour être le plus simple *possible* à installer, c'est pourq
 - [LilyPond](http://www.lilypond.org) pour les partitions classiques ;
 - [Git](http://git-scm.com/) pour la gestion de version (qui vous permettra d'annuler les changements intempestifs).
 
-Concrètement, sous Debian, la commande suivante devrait installer le nécessaire, Gregorio mis à part :
+#### Sous Debian
+
+La commande suivante devrait installer le nécessaire, Gregorio mis à part :
 
     apt-get install python3 lilypond git texlive texlive-latex-extra texlive-xetex texlive-lang-latin texlive-lang-french texlive-humanities texlive-extra-utils latex-xcolor texlive-fonts-extra fonts-linuxlibertine lmodern gregorio gregoriotex
 
@@ -22,7 +24,7 @@ Quant à Gregorio :
 
 - si vous ne craignez pas d'activer les dépôts *sid* (ce qui suppose que vous sachiez ce que vous faites) :
 
-    apt-get install gregorio gregoriotex
+    `apt-get install gregorio gregoriotex`
 
 - option recommandée : suivez les [instructions du site de Gregorio](http://gregorio-project.github.io/installation.html).
 
@@ -53,4 +55,4 @@ Et voilà !
 
 ## Configuration
 
-Vous pouvez définir certains paramètres dans le fichier *etc/config.py*. En particulier, il est recommandé de définir l'adresse d'écoute sur l'adresse de la carte réseau où vous voulez rendre l'interface accessible. Si ceci vous semble du chinois, remplacez *0.0.0.0* par *127.0.0.1*. De mème, pour une utilisation ordinaire, définissez le paramètre *DEVEL* à *False*.
+Vous pouvez définir certains paramètres dans le fichier *etc/config.py*. En particulier, il est recommandé de définir l'adresse d'écoute sur l'adresse de la carte réseau où vous voulez rendre l'interface accessible. Si ceci vous semble du chinois, remplacez *0.0.0.0* par *127.0.0.1*. De même, pour une utilisation ordinaire, définissez le paramètre *DEVEL* à *False*.
