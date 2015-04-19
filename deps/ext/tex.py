@@ -15,6 +15,7 @@ from outils import motaleatoire
 import os
 import shutil
 import subprocess as sp
+import re
 import HTMLTags as h
 import jrnl as l
 EXT = __name__.split('.')[-1]
@@ -34,6 +35,37 @@ class Document(txt.Document):
             cfg.PWD, cfg.STATIC, 'pdf', self.fichierrelatifpdf
         )
         self.fichiertmppdf = os.path.join(self.rd, self.fichierrelatifpdf)
+
+    def afficher(self):
+        def documentmaitre():
+            entete = re.compile('\\\\documentclass')
+            with open(self.fichier) as f:
+                for ligne in f:
+                    if entete.match(ligne):
+                        return True
+            return False
+        if documentmaitre():
+            try:
+                return h.OBJECT(
+                    data="{}".format(self.pdf),
+                    Type="application/pdf",
+                    width="100%",
+                    height="100%"
+                )
+            except tex.ErreurCompilation:
+                return (
+                    "Il y a eu une erreur pendant le traitement du document. "
+                    + "Ceci vient probablement d'une erreur de syntaxe ; "
+                    + "si vous êtes absolument certain du contraire, merci de "
+                    + "signaler le problème."
+                    + h.BR()
+                    + 'Voici la sortie de la commande :'
+                    + h.BR()
+                    + h.BR()
+                    + traiter_erreur_compilation(self.dossiertmp)
+                )
+        else:
+            return txt.Document.afficher(self)
 
     @property
     def pdf(self):
