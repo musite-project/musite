@@ -13,7 +13,9 @@ TITRE = 'Musite'
 HOTE = '0.0.0.0'
 PORT = 8080
 
-PWD = os.path.abspath(os.getcwd())
+PWD = os.sep + os.path.join(
+        *os.path.dirname(os.path.realpath(__file__)).split(os.sep)[:-1]
+)
 TMP = os.path.join(PWD, 'tmp')
 DATA = os.path.join(PWD, 'data')
 PAGES = os.path.join(PWD, 'pages')

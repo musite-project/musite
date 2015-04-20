@@ -17,12 +17,13 @@ __license__ = 'GPLv2'
 
 import os
 import sys
+LIB = os.path.join(os.path.dirname(os.path.realpath(__file__)),'deps')
+sys.path.insert(0, LIB)
 import shutil
 import re
 from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
-sys.path.insert(0, 'deps')
 import outils as f
 import auth as a
 import utilisateurs as u
@@ -41,7 +42,8 @@ app = b.Bottle()
 
 # Import des modules qui vont traiter chaque extension ########################
 EXT = {
-    e[1]: import_module('ext.' + e[1]) for e in iter_modules(path=['deps/ext'])
+    e[1]: import_module('ext.' + e[1]) \
+        for e in iter_modules(path=[os.path.join(LIB, 'ext')])
 }
 txt = EXT['txt']
 md = EXT['md']
