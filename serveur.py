@@ -916,7 +916,8 @@ def document_afficher(nom, element=None, ext=None):
             return Projet(nom).lister()
         else:
             return Dossier(nom, element).lister()
-    except TypeError:    # Cette exception est levée s'il s'agit d'un document.
+    except TypeError:
+        # Cette exception est levée s'il ne s'agit pas d'un dossier.
         try:
             return Document(nom, element, ext).contenu
         except FileNotFoundError:
@@ -924,6 +925,10 @@ def document_afficher(nom, element=None, ext=None):
             # arrive notamment lorsque l'on renonce à créer un nouveau
             # document.
             b.redirect('/' + nom)
+        except TypeError:
+            # Cette exception est levée si l'on tente d'accéder à un
+            # emplacement inexistant.
+            b.abort(404)
 
 
 # Enregistrement des documents après édition
