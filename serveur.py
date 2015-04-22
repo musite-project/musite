@@ -32,8 +32,7 @@ from bottle import request as rq
 import HTMLTags as h
 from mistune import markdown
 from etc import config as cfg
-from etc.messages import msg
-msg = msg[cfg.LNG]
+from outils import msg
 
 
 # Paramètres bottle ###########################################################
@@ -625,12 +624,12 @@ def authentifier(action=''):
 def admin(action=''):
     """ Pages réservées à l'administrateur.
     """
-    retour = {'actions': {msg.usrs: 'admin/utilisateurs'}}
+    retour = {'actions': {msg.Usrs: 'admin/utilisateurs'}}
     if action == 'utilisateurs':
         retour['corps'] = b.template('utilisateurs')
     else:
         retour['corps'] = \
-            md.afficher(os.path.join(cfg.PAGES, 'md', 'Admin.md'))
+            md.Document(os.path.join(cfg.PAGES, 'md', 'Admin.md')).afficher()
     return retour
 
 

@@ -11,7 +11,7 @@ https://elzevir.fr/imj/latex/
 """
 import ext.txt as txt
 from etc import config as cfg
-from outils import motaleatoire
+from outils import msg, motaleatoire
 import os
 import shutil
 import subprocess as sp
@@ -53,17 +53,10 @@ class Document(txt.Document):
                     height="100%"
                 )
             except tex.ErreurCompilation:
-                return (
-                    "Il y a eu une erreur pendant le traitement du document. "
-                    + "Ceci vient probablement d'une erreur de syntaxe ; "
-                    + "si vous êtes absolument certain du contraire, merci de "
-                    + "signaler le problème."
-                    + h.BR()
-                    + 'Voici la sortie de la commande :'
-                    + h.BR()
-                    + h.BR()
-                    + traiter_erreur_compilation(self.dossiertmp)
-                )
+                return (template(
+                'erreur',
+                {'sortie': traiter_erreur_compilation(self.dossiertmp)}
+            ))
         else:
             return txt.Document.afficher(self)
 
@@ -109,13 +102,13 @@ def compiler_pdf(fichier, environnement={}):
         )
         sortie, erreurs = compilation.communicate()
         l.log(
-            'Sortie :'
-            + '\n========\n'
-            + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
-            + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-            + 'Erreurs :'
-            + '\n=========\n'
-            + '\n{}\n'.format(erreurs.decode('utf8'))
+            msg.srt + ' :'
+            + '\n' + '=' * (len(msg.srt) + 2) + '\n' * 2
+            + sortie.decode('utf8')
+            + '\n' * 6 + '−' * 80 + '\n' * 4
+            + msg.errs + ' :'
+            + '\n' + '=' * (len(msg.errs) + 2) + '\n' * 2
+            + erreurs.decode('utf8')
         )
         if compilation.returncode:
             raise ErreurCompilation

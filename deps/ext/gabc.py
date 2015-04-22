@@ -12,7 +12,8 @@ from etc import config as cfg
 from outils import motaleatoire
 import os
 import shutil
-from bottle import template
+from bottle import template, TEMPLATE_PATH
+TEMPLATE_PATH += cfg.MODELES
 import HTMLTags as h
 EXT = __name__.split('.')[-1]
 
@@ -51,17 +52,10 @@ class Document(txt.Document):
                 height="100%"
             )
         except tex.ErreurCompilation:
-            return (
-                "Il y a eu une erreur pendant le traitement du document. "
-                + "Ceci vient probablement d'une erreur de syntaxe ; "
-                + "si vous êtes absolument certain du contraire, merci de "
-                + "signaler le problème."
-                + h.BR()
-                + 'Voici la sortie de la commande :'
-                + h.BR()
-                + h.BR()
-                + tex.traiter_erreur_compilation(self.dossiertmp)
-            )
+            return (template(
+                'erreur',
+                {'sortie': tex.traiter_erreur_compilation(self.dossiertmp)}
+            ))
 
     def preparer_pdf(
         self,
