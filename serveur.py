@@ -32,6 +32,8 @@ from bottle import request as rq
 import HTMLTags as h
 from mistune import markdown
 from etc import config as cfg
+from etc.messages import msg
+msg = msg[cfg.LNG]
 
 
 # Paramètres bottle ###########################################################
@@ -98,7 +100,7 @@ class Depot:
             )
             return h.CODE(modification)
         except CalledProcessError:
-            return "Il n'y a rien avant la création !"
+            return msg.a
 
     def historique(self, fichier=None):
         """Liste des modifications d'un dépôt ou d'un fichier
@@ -112,7 +114,7 @@ class Depot:
             else:
                 tableau = self.depot.journalcomplet
         except CalledProcessError:
-            return "Il n'y a pas encore de modifications à signaler."
+            return msg.b
         for element in tableau[1:]:
             element[0] = h.A(element[0], href='?commit=' + element[0])
             element[1] = re.sub('\<.*\>', '', element[1])
@@ -159,19 +161,19 @@ class Document:
         proposant une opération sur un document.
         """
         actions = {
-            'Aperçu': self.chemin,
-            'Historique': '_historique/' + self.chemin,
-            'Source': '_src/' + self.chemin
+            msg.voir: self.chemin,
+            msg.hist: '_historique/' + self.chemin,
+            msg.src: '_src/' + self.chemin
         }
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
-                actions['Éditer'] = '_editer/' + self.chemin
-                actions['Supprimer'] = '_supprimer/' + self.chemin
+                actions[msg.edit] = '_editer/' + self.chemin
+                actions[msg.suppr] = '_supprimer/' + self.chemin
         except TypeError:
             pass
         liens = {
-            'Projet': self.projet,
-            'Dossier': '/'.join(self.chemin.split('/')[:-1])
+            msg.Prj: self.projet,
+            msg.Dss: '/'.join(self.chemin.split('/')[:-1])
         }
         return {
             'corps': contenu,
@@ -199,12 +201,12 @@ class Document:
             # Sinon, on abandonne.
             try:
                 return self.afficher(txt.Document(self.chemin).afficher())
-            except txt.FichierIllisible:
-                return self.afficher("Extension inconnue : {}.".format(e))
+            except txt.FichierIllisible as e:
+                return self.afficher(msg.c + e)
             except FileNotFoundError:
                 b.abort(404)
         except EXT[self.ext].FichierIllisible:
-            return self.afficher("Ce fichier est illisible.")
+            return self.afficher(msg.d)
 
     @property
     def source(self):
@@ -222,11 +224,11 @@ class Document:
                 return self.afficher(
                     txt.Document(self.chemin).afficher_source()
                 )
-            except txt.FichierIllisible:
+            except txt.FichierIllisible as e:
                 return self.afficher(
-                    "Extension inconnue : {}.".format(e)
+                    msg.c + e
                     + h.BR()
-                    + 'Voici les données de la requète :'
+                    + msg.e
                     + h.BR()
                     + '{}'.format(
                         str(h.BR()).join(
@@ -238,7 +240,7 @@ class Document:
             except NameError:
                 b.abort(404)
         except EXT[self.ext].FichierIllisible:
-            return self.afficher("Ce fichier est illisible.")
+            return self.afficher(msg.d)
 
     def creer(self):
         """Création d'un nouveau document
@@ -257,10 +259,10 @@ class Document:
                 cfg.DATA, self.projet
             )
         ).sauvegardecomplete(
-            'Suppression du document {}'.format(self.chemin),
+            msg.f + self.chemin,
             rq.auth[0]
         )
-        return self.afficher('Document supprimé !')
+        return self.afficher(msg.g)
 
     def editer(self, creation=False):
         """Édition du document
@@ -277,15 +279,12 @@ class Document:
                     txt.Document(self.chemin).editer(creation)
                 )
             except txt.FichierIllisible:
-                return self.afficher("Ce type de document n'est pas éditable.")
+                return self.afficher(msg.h)
         except AttributeError:
             # Si le type de document ne prévoit pas d'édition, on abandonne.
-            return self.afficher("Ce type de document n'est pas éditable.")
+            return self.afficher(msg.h)
         except EXT[self.ext].FichierIllisible:
-            return self.afficher(
-                '''Si je ne puis même pas lire ce fichier,
-                comment voulez-vous que je l'édite ?'''
-                )
+            return self.afficher(msg.i)
 
     def enregistrer(self, contenu):
         """Enregistrement du document
@@ -349,15 +348,15 @@ class Dossier:
         actions = {}
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
-                actions['Créer document'] = '_creer/' + self.chemin
-                actions['Créer dossier'] = '_creerdossier/' + self.chemin
-                actions['Supprimer'] = \
+                actions[msg.crdoc] = '_creer/' + self.chemin
+                actions[msg.crdss] = '_creerdossier/' + self.chemin
+                actions[msg.suppr] = \
                     '_supprimerdossier/' + self.chemin
         except TypeError:
             pass
         liens = {
-            'Projet': self.projet,
-            'Parent': self.projet + (
+            msg.Prj: self.projet,
+            msg.prt: self.projet + (
                 '/'.join(self.nom.split('/')[:-1])
             )
         }
@@ -440,10 +439,10 @@ class Dossier:
                 cfg.DATA, self.projet
             )
         ).sauvegardecomplete(
-            'Suppression du dossier {}'.format(self.chemin),
+            msg.j + self.chemin,
             rq.auth[0]
         )
-        return self.afficher('Dossier supprimé !')
+        return self.afficher(msg.k)
 
 
 class Projet(Dossier):
@@ -461,19 +460,19 @@ class Projet(Dossier):
         C'est ici qu'il faut définir ce qui est commun à toutes les pages
         proposant une opération sur un projet.
         """
-        actions = {'Historique': '_historique/' + self.chemin}
+        actions = {msg.hist: '_historique/' + self.chemin}
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 if not suppression:
-                    actions['Créer document'] = '_creer/' + self.chemin
-                    actions['Créer dossier'] = '_creerdossier/' + self.chemin
-                    actions['Supprimer'] = \
+                    actions[msg.crdoc] = '_creer/' + self.chemin
+                    actions[msg.crdss] = '_creerdossier/' + self.chemin
+                    actions[msg.suppr] = \
                         '_supprimerprojet/' + self.chemin
                 else:
-                    actions['Créer projet'] = '_creerprojet'
+                    actions[msg.crprj] = '_creerprojet'
         except TypeError:
             pass
-        liens = {'Projet': self.projet}
+        liens = {msg.Prj: self.projet}
         return {
             'corps': contenu,
             'actions': actions,
@@ -523,11 +522,10 @@ class Projet(Dossier):
         """
         try:
             shutil.rmtree(self.dossier, ignore_errors=False)
-            return self.afficher('Projet supprimé !', suppression=True)
+            return self.afficher(msg.l, suppression=True)
         except FileNotFoundError:
             # Cette exception est levée quand le projet n'existe pas.
-            return self.afficher('''C'est drôle, ce que vous me demandez :
-                il n'y a pas de projet ici !''', suppression=True)
+            return self.afficher(msg.m, suppression=True)
 
 
 # Méthodes globales :  ########################################################
@@ -565,13 +563,13 @@ def accueil():
     """ Page d'accueil du site
     """
     try:
-        actions = {'Créer projet': '_creerprojet'} \
+        actions = {msg.crprj: '_creerprojet'} \
             if a.authentifier(rq.auth[0], rq.auth[1]) \
             else {}
     except TypeError:
         # Cette exception est levée en l'absence d'authentification
         actions = {}
-    liens = {'Projets': '_projets'}
+    liens = {msg.Prjs: '_projets'}
     return {
         'corps': md.Document(
             os.path.join(cfg.PAGES, 'md', 'Accueil.md')).afficher(),
@@ -586,7 +584,7 @@ def lister_projets():
     """Liste des projets existants
     """
     try:
-        actions = {'Créer projet': '_creerprojet'} \
+        actions = {msg.crprj: '_creerprojet'} \
             if a.authentifier(rq.auth[0], rq.auth[1]) \
             else {}
     except TypeError:
@@ -610,7 +608,7 @@ def lister_projets():
 #   2. Authentification et administration
 @app.get('/authentification')
 @app.get('/authentification/<action>')
-@b.auth_basic(a.authentifier, 'Accès réservé')
+@b.auth_basic(a.authentifier, msg.acr)
 @page
 def authentifier(action=''):
     """ Page destinée à forcer l'authentification.
@@ -622,12 +620,12 @@ def authentifier(action=''):
 
 @app.get('/admin')
 @app.get('/admin/<action>')
-@b.auth_basic(a.admin, 'Vous devez être administrateur')
+@b.auth_basic(a.admin, msg.admin)
 @page
 def admin(action=''):
     """ Pages réservées à l'administrateur.
     """
-    retour = {'actions': {'Utilisateurs': 'admin/utilisateurs'}}
+    retour = {'actions': {msg.usrs: 'admin/utilisateurs'}}
     if action == 'utilisateurs':
         retour['corps'] = b.template('utilisateurs')
     else:
@@ -637,7 +635,7 @@ def admin(action=''):
 
 
 @app.get('/admin/supprimerutilisateur/<nom>')
-@b.auth_basic(a.admin, 'Vous devez être administrateur')
+@b.auth_basic(a.admin, msg.admin)
 def utilisateur_suppression(nom):
     """Suppression d'un utilisateur
     """
@@ -646,7 +644,7 @@ def utilisateur_suppression(nom):
 
 
 @app.post('/admin/utilisateurs')
-@b.auth_basic(a.admin, 'Vous devez être administrateur')
+@b.auth_basic(a.admin, msg.admin)
 def utilisateur_ajout():
     """ Ajout d'un nouvel utilisateur à la base
     """
@@ -683,7 +681,7 @@ def favicon():
 @app.get('/_creer/<nom>')
 @app.get('/_creer/<nom>/<element:path>')
 @app.get('/_creer/<nom>/<element:path>.<ext>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def document_creer_infos(nom, element=None, ext=None):
     """ Page de création d'un document
@@ -691,12 +689,12 @@ def document_creer_infos(nom, element=None, ext=None):
     if element and ext:
         return Document(nom, element, ext).creer()
     else:
-        return {'corps': b.template('creation', {'quoi': 'fichier'})}
+        return {'corps': b.template('creation', {'quoi': msg.fch})}
 
 
 @app.post('/_creer/<nom>')
 @app.post('/_creer/<nom>/<element:path>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def document_creer(nom, element=''):
     """ Création effective du document
@@ -708,17 +706,17 @@ def document_creer(nom, element=''):
 
 @app.get('/_creerdossier/<nom>')
 @app.get('/_creerdossier/<nom>/<element:path>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def dossier_creer_infos(nom, element=''):
     """ Page de création d'un dossier
     """
-    return {'corps': b.template('creation', {'quoi': 'dossier'})}
+    return {'corps': b.template('creation', {'quoi': msg.dss})}
 
 
 @app.post('/_creerdossier/<nom>')
 @app.post('/_creerdossier/<nom>/<element:path>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def dossier_creer(nom, element=''):
     """ Création effective du dossier
@@ -727,16 +725,16 @@ def dossier_creer(nom, element=''):
 
 
 @app.get('/_creerprojet')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def projet_creer_infos():
     """ Page de création d'un projet
     """
-    return {'corps': b.template('creation', {'quoi': 'projet'})}
+    return {'corps': b.template('creation', {'quoi': msg.prj})}
 
 
 @app.post('/_creerprojet')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def projet_creer():
     """ Création effective du projet
@@ -746,7 +744,7 @@ def projet_creer():
 
 # Suppression d'un document
 @app.get('/_supprimer/<nom>/<element:path>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def document_supprimer_confirmation(nom, element=False):
     """Page de confirmation avant de supprimer un document
@@ -756,12 +754,12 @@ def document_supprimer_confirmation(nom, element=False):
     else:
         return {'corps': b.template(
             'suppression',
-            {'quoi': 'le fichier {}/{}'.format(nom, element)}
+            {'quoi': msg.lfch + '{}/{}'.format(nom, element)}
         )}
 
 
 @app.post('/_supprimer/<nom>/<element:path>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def document_supprimer(nom, element=False):
     """Suppression effective du document
@@ -777,7 +775,7 @@ def document_supprimer(nom, element=False):
 
 
 @app.get('/_supprimerdossier/<nom>/<element:path>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def dossier_supprimer_confirmation(nom, element=False):
     """Page de confirmation avant de supprimer un dossier
@@ -787,13 +785,12 @@ def dossier_supprimer_confirmation(nom, element=False):
     else:
         return {'corps': b.template(
             'suppression',
-            {'quoi': 'le dossier {}/{} et tout son contenu ?'
-                .format(nom, element)}
+            {'quoi': msg.ldss + '{}/{}'.format(nom, element) + msg.n}
         )}
 
 
 @app.post('/_supprimerdossier/<nom>/<element:path>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def dossier_supprimer(nom, element=False):
     """Suppression effective du dossier
@@ -808,22 +805,19 @@ def dossier_supprimer(nom, element=False):
 
 
 @app.get('/_supprimerprojet/<nom>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def projet_supprimer_confirmation(nom):
     """Page de confirmation avant de supprimer un projet
     """
     return {'corps': b.template(
         'suppression',
-        {
-            'quoi': 'le projet {} et tout son contenu ? '.format(nom)
-                    + 'Attention : cette opération est irréversible !'
-        }
+        {'quoi': msg.lprj + nom + msg.n + msg.o}
     )}
 
 
 @app.post('/_supprimerprojet/<nom>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def projet_supprimer(nom):
     """Suppression effective du projet
@@ -831,7 +825,7 @@ def projet_supprimer(nom):
     if rq.forms.action == 'supprimer':
         return Projet(nom).supprimer()
     else:
-        b.redirect('/{}'.format(nom))
+        b.redirect('/' + nom)
 
 
 # Historique d'un document
@@ -849,7 +843,7 @@ def document_historique(nom, element):
 
 
 @app.post('/_retablir/<nom>/<element:path>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def document_retablir_commit(nom, element):
     """Retour à une version antérieure d'un document
@@ -872,7 +866,7 @@ def projet_historique(nom):
 
 
 @app.post('/_retablir/<nom>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def projet_retablir_commit(nom):
     """Retour à une version antérieure de l'ensemble d'un projet
@@ -882,7 +876,7 @@ def projet_retablir_commit(nom):
 
 # Édition d'un document
 @app.get('/_editer/<nom>/<element:path>.<ext>')
-@b.auth_basic(a.editeur, 'Réservé aux éditeurs')
+@b.auth_basic(a.editeur, msg.edt)
 @page
 def document_editer(nom, element='', ext=''):
     """ Page d'édition d'un document
@@ -946,7 +940,7 @@ def document_enregistrer(nom, element='', ext=''):
             + ('.' + ext if ext else '')
         )
     else:
-        return {'corps': 'Pourriez-vous expliciter votre intention ?'}
+        return {'corps': msg.p}
 
 
 # III. Feuilles de style ########
@@ -969,7 +963,7 @@ def erreur_accesreserve(erreur):
     Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page
     réservée.
     """
-    return {'corps': 'Accès réservé !'}
+    return {'corps': msg.ar}
 
 
 @app.error(code=404)
@@ -980,7 +974,7 @@ def erreur_pageintrouvable(erreur):
     Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page
     qui n'existe pas.
     """
-    return {'corps': "Il n'y a rien ici !"}
+    return {'corps': msg.q}
 
 
 # Lancement du serveur ########################################################

@@ -22,6 +22,8 @@ PAGES = os.path.join(PWD, 'pages')
 
 STATIC = 'static'
 
+LNG = 'fr'
+
 MODELES = [
     os.path.join(PWD, 'modeles', 'css'),
     os.path.join(PWD, 'modeles', 'html'),

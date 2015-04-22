@@ -1,0 +1,51 @@
+# coding: utf-8
+"""Gestion des messages, afin de permettre une traduction facile."""
+
+
+class FR:
+    acr = "Accès réservé"
+    admin = "Vous devez être administrateur"
+    crdoc = "Créer document"
+    crdss = "Créer dossier"
+    crprj = "Créer projet"
+    dss = "dossier"
+    Dss = "Dossier"
+    edit = "Éditer"
+    edt = "Réservé aux éditeurs"
+    fch = "fichier"
+    hist = "Historique"
+    lfch = "le fichier "
+    ldss = "le dossier "
+    lprj = "le projet "
+    prj = "projet"
+    Prj = "Projet"
+    prjs = "projets"
+    Prjs = "Projets"
+    prt = "Parent"
+    src = "Source"
+    suppr = "Supprimer"
+    usr = "Utilisateur"
+    usrs = "Utilisateurs"
+    voir = "Aperçu"
+    a = "Il n'y a rien avant la création !"
+    b = "Il n'y a pas encore de modifications à signaler."
+    c = "Extension inconnue : "
+    d = "Ce fichier est illisible."
+    e = "Voici les données de la requète :"
+    f = "Suppression du document "
+    g = "Document supprimé !"
+    h = "Ce type de document n'est pas éditable."
+    i = """Si je ne puis même pas lire ce fichier,
+        comment voulez-vous que je l'édite ?"""
+    j = "Suppression du dossier "
+    k = "Dossier supprimé !"
+    l = "Projet supprimé !"
+    m = "C'est drôle, ce que vous me demandez : il n'y a pas de projet ici !"
+    n = " et tout son contenu ?"
+    o = "Attention : cette opération est irréversible !"
+    p = "Pourriez-vous expliciter votre intention ?"
+    q = "Il n'y a rien ici !"
+
+msg = {
+    'fr': FR
+}
