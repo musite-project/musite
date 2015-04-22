@@ -54,9 +54,9 @@ class Document(txt.Document):
                 )
             except tex.ErreurCompilation:
                 return (template(
-                'erreur',
-                {'sortie': traiter_erreur_compilation(self.dossiertmp)}
-            ))
+                    'erreur',
+                    {'sortie': traiter_erreur_compilation(self.dossiertmp)}
+                ))
         else:
             return txt.Document.afficher(self)
 

@@ -3,6 +3,9 @@
 
 
 class FR:
+    """Messages en français"""
+
+    # Messages susceptibles de servir en plusieurs circonstances
     acr = "Accès réservé"
     Adm = "Administration"
     admin = "Vous devez être administrateur"
@@ -55,6 +58,8 @@ class FR:
     Usr = "Utilisateur"
     Usrs = "Utilisateurs"
     voir = "Aperçu"
+
+    # Messages appelés directement par le serveur
     a = "Il n'y a rien avant la création !"
     b = "Il n'y a pas encore de modifications à signaler."
     c = "Extension inconnue : "
@@ -73,6 +78,8 @@ class FR:
     o = "Attention : cette opération est irréversible !"
     p = "Pourriez-vous expliciter votre intention ?"
     q = "Il n'y a rien ici !"
+
+    # Messages des modules de traitement des divers types de fichiers
     r = """Il y a eu une erreur pendant le traitement du document. Ceci vient
         probablement d'une erreur de syntaxe ; si vous êtes absolument certain
         du contraire, merci de signaler le problème."""
@@ -84,6 +91,8 @@ class FR:
     x = "Déplacement"
     y = "Effacement"
     z = "Êtes-vous sûr de vouloir supprimer"
+
+    # Textes des modèles
     aa = "Nom de"
     ab = "Créer le"
     ac = """
