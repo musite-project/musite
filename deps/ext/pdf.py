@@ -5,6 +5,8 @@ import os
 import HTMLTags as h
 from base64 import b64encode
 from etc import config as cfg
+import gettext
+gettext.install('modules', cfg.I18N)
 
 
 class Document:

@@ -13,6 +13,8 @@ import os.path
 import HTMLTags as h
 import bottle as b
 from etc import config as cfg
+import gettext
+gettext.install('modules', cfg.I18N)
 b.TEMPLATE_PATH += cfg.MODELES
 EXT = __name__.split('.')[-1]
 

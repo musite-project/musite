@@ -18,9 +18,15 @@ PWD = os.sep + os.path.join(
 )
 TMP = os.path.join(PWD, 'tmp')
 DATA = os.path.join(PWD, 'data')
+I18N = os.path.join(PWD, 'i18n')
 PAGES = os.path.join(PWD, 'pages')
 
 STATIC = 'static'
+
+LANGUES = [
+    ('fr', 'français'),
+]
+LANGUE = 'fr'
 
 MODELES = [
     os.path.join(PWD, 'modeles', 'css'),

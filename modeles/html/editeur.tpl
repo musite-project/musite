@@ -1,8 +1,9 @@
+%from etc import config as cfg
 <script language="javascript" type="text/javascript" src="/static/js/edit_area/edit_area_full.js"></script>
 <script language="javascript" type="text/javascript">
     editAreaLoader.init({
         id : "saisie"
-        ,language: "fr"
+        ,language: "{{cfg.LANGUE}}"
         %if ext in ['gabc']:
         ,syntax: "{{ext}}"
         ,show_line_colors: true
@@ -14,15 +15,15 @@
 <div id="zonesaisie">
     <form method="post" action="/{{emplacement}}">
         <!--
-        <input name="titre" label="titre" placeholder="titre">
-        <input name="mode" label="mode" placeholder="mode">
-        <input name="type" label="type" placeholder="type">
+        <input name="titre" label="titre" placeholder="{{_("titre")}}">
+        <input name="mode" label="mode" placeholder="{{_("mode")}}">
+        <input name="type" label="type" placeholder="{{_("type")}}">
         <br>
         -->
-        <textarea name="contenu" id="saisie" placeholder="Texte">{{texte}}</textarea>
+        <textarea name="contenu" id="saisie" placeholder="{{_("Texte")}}">{{texte}}</textarea>
         <br>
-        <button type="submit" name="action" value="enregistrer">Enregistrer</button>
+        <button type="submit" name="action" value="enregistrer">{{_("Enregistrer")}}</button>
         &nbsp
-        <button type="submit" name="action" value="annuler">Annuler</button>
+        <button type="submit" name="action" value="annuler">{{_("Annuler")}}</button>
     </form>
 </div>

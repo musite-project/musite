@@ -18,6 +18,8 @@ import subprocess as sp
 import re
 import HTMLTags as h
 import jrnl as l
+import gettext
+gettext.install('modules', cfg.I18N)
 EXT = __name__.split('.')[-1]
 
 
@@ -53,17 +55,17 @@ class Document(txt.Document):
                     height="100%"
                 )
             except tex.ErreurCompilation:
-                return (
-                    "Il y a eu une erreur pendant le traitement du document. "
-                    + "Ceci vient probablement d'une erreur de syntaxe ; "
-                    + "si vous êtes absolument certain du contraire, merci de "
-                    + "signaler le problème."
-                    + h.BR()
-                    + 'Voici la sortie de la commande :'
-                    + h.BR()
-                    + h.BR()
-                    + traiter_erreur_compilation(self.dossiertmp)
-                )
+                return (markdown(_(
+                """\
+Il y a eu une erreur pendant le traitement du document.
+Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
+certain du contraire, merci de signaler le problème.
+
+Voici la sortie de la commande :
+
+{}
+                """
+            )).format(traiter_erreur_compilation(self.dossiertmp)))
         else:
             return txt.Document.afficher(self)
 
@@ -109,11 +111,11 @@ def compiler_pdf(fichier, environnement={}):
         )
         sortie, erreurs = compilation.communicate()
         l.log(
-            'Sortie :'
+            _('Sortie :')
             + '\n========\n'
             + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
             + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-            + 'Erreurs :'
+            + _('Erreurs :')
             + '\n=========\n'
             + '\n{}\n'.format(erreurs.decode('utf8'))
         )

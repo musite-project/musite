@@ -33,7 +33,7 @@
 
             %try:
             %if len(actions) > 0:  # Même chose pour les actions sur les documents.
-            <b>Actions</b><br>
+            <b>{{_("Actions")}}</b><br>
             <ul>
                 %for action in sorted(actions.keys(), key=lambda s: o.sansaccents(s.lower())):
                 <li><a href=/{{actions[action]}}>{{action}}</a></li>
@@ -44,33 +44,33 @@
             %end
 
             <div id="acces">
-                <b>Accès réservé</b><br>
+                <b>{{_("Accès réservé")}}</b><br>
                 <ul>
                     %try:
                     %if a.authentifier(rq.auth[0], rq.auth[1]) and rq.auth[0] != 'anonyme':
                     <li>
                         <a href=http://anonyme@{{hote}}>
-                            Déconnexion
+                            {{_("Déconnexion")}}
                         </a>
                     </li>
                     %else:
                     <li>
                         <a href=http://{{hote}}/authentification>
-                            S'authentifier
+                            {{_("S'authentifier")}}
                         </a>
                     </li>
                     %end
                     %except TypeError:
                     <li>
                         <a href=http://{{hote}}/authentification>
-                            S'authentifier
+                            {{_("S'authentifier")}}
                         </a>
                     </li>
                     %end
                     %# Liens réservés aux administrateurs.
                     %try:
                     %if a.admin(rq.auth[0], rq.auth[1]):
-                    <li><a href=/admin>Administration</a></li>
+                    <li><a href=/admin>{{_("Administration")}}</a></li>
                     %end
                     %except TypeError: pass
                     %end

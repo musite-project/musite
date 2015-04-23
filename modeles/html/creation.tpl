@@ -1,7 +1,7 @@
 <div id="zonesaisie">
     <form method="post">
-        <input name="nom" label="Nom de {{quoi}} :" placeholder="Nom du {{quoi}}" required>
+        <input name="nom" label="{{_("Nom de")}} {{quoi}} :" placeholder="{{_("Nom de")}} {{quoi}}" required>
         <br>
-        <button type="submit" name="action" value="creer">Créer le {{quoi}}</button>
+        <button type="submit" name="action" value="creer">{{_("Créer le")}} {{quoi}}</button>
     </form>
 </div>

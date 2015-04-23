@@ -1,28 +1,29 @@
 %from deps import auth as a
+%from etc import config as cfg
 %import os
 <div id="utilisateurs">
 
-   <b>Ajout ou modification d'un utilisateur :</b>
+   <b>{{_("Ajout ou modification d'un utilisateur :")}}</b>
    <br>
    <br>
    <form method="post" action="/admin/utilisateurs">
-      <input name="nom" placeholder="Nom"></input>
+      <input name="nom" placeholder="{{_("Nom")}}"></input>
       <br>
-      <input name="mdp" type="password" placeholder="MdP"></input>
+      <input name="mdp" type="password" placeholder="{{_("MdP")}}"></input>
       <br>
-      <input name="mdp_v" type="password" placeholder="MdP (de nouveau)"></input>
+      <input name="mdp_v" type="password" placeholder="{{_("MdP (de nouveau)"}}"></input>
       <br><br>
       <button type="submit">Créer / modifier</button>
    </form>
    <br>
 
-   <b>Utilisateurs :</b>
+   <b>{{_("Utilisateurs :")}}</b>
    <table>
       %for utilisateur in sorted(a.utilisateurs()):
       <tr>
          <td>{{utilisateur}}&nbsp&nbsp&nbsp</td>
          <td><small>
-            <a href=/admin/supprimerutilisateur/{{utilisateur}}>supprimer</a>
+            <a href=/admin/supprimerutilisateur/{{utilisateur}}>{{_("supprimer")}}</a>
             </small>
          </td>
       </tr>
@@ -40,7 +41,7 @@
    <script language="javascript" type="text/javascript">
       editAreaLoader.init({
           id : "fichier"
-          , language: "fr"
+          , language: "{{cfg.LANGUE}}"
           , word_wrap:false
           , show_line_colors:false
           , start_highlight: false
@@ -56,6 +57,6 @@
       <textarea name="texte" id="fichier" cols="40" rows="10">{{groupes}}</textarea>
       %end
       <br>
-      <button type="submit">Enregistrer</button>
+      <button type="submit">{{_("Enregistrer")}}</button>
    </form>
 </div>

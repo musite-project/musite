@@ -14,6 +14,8 @@ import shutil
 import subprocess as sp
 import HTMLTags as h
 import jrnl as l
+import gettext
+gettext.install('modules', cfg.I18N)
 EXT = __name__.split('.')[-1]
 
 
@@ -80,11 +82,11 @@ def compiler_pdf(fichier, environnement={}):
         )
         sortie, erreurs = compilation.communicate()
         l.log(
-            'Sortie :'
+            _('Sortie :')
             + '\n========\n'
             + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
             + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-            + 'Erreurs :'
+            + _('Erreurs :')
             + '\n=========\n'
             + '\n{}\n'.format(erreurs.decode('utf8'))
         )

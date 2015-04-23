@@ -10,10 +10,13 @@ http://gregorio-project.github.io/
 from ext import txt, tex
 from etc import config as cfg
 from outils import motaleatoire
+from mistune import markdown
 import os
 import shutil
 from bottle import template
 import HTMLTags as h
+import gettext
+gettext.install('modules', cfg.I18N)
 EXT = __name__.split('.')[-1]
 
 
@@ -51,17 +54,17 @@ class Document(txt.Document):
                 height="100%"
             )
         except tex.ErreurCompilation:
-            return (
-                "Il y a eu une erreur pendant le traitement du document. "
-                + "Ceci vient probablement d'une erreur de syntaxe ; "
-                + "si vous êtes absolument certain du contraire, merci de "
-                + "signaler le problème."
-                + h.BR()
-                + 'Voici la sortie de la commande :'
-                + h.BR()
-                + h.BR()
-                + tex.traiter_erreur_compilation(self.dossiertmp)
-            )
+            return (markdown(_(
+                """\
+Il y a eu une erreur pendant le traitement du document.
+Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
+certain du contraire, merci de signaler le problème.
+
+Voici la sortie de la commande :
+
+{}
+                """
+            )).format(tex.traiter_erreur_compilation(self.dossiertmp)))
 
     def preparer_pdf(
         self,

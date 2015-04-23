@@ -1,0 +1,179 @@
+# French translations for PACKAGE package
+# Traductions françaises du paquet PACKAGE.
+# Copyright (C) 2015 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Abbé Jacques Peron <cataclop@hotmail.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-04-23 19:46+0200\n"
+"PO-Revision-Date: 2015-04-23 17:31+0200\n"
+"Last-Translator: Abbé Jacques Peron <cataclop@hotmail.com>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: serveur.py:105
+msgid "Il n'y a rien avant la création !"
+msgstr ""
+
+#: serveur.py:119
+msgid "Il n'y a pas encore de modifications à signaler."
+msgstr ""
+
+#: serveur.py:166
+msgid "Aperçu"
+msgstr ""
+
+#: serveur.py:167 serveur.py:470
+msgid "Historique"
+msgstr ""
+
+#: serveur.py:168
+msgid "Source"
+msgstr ""
+
+#: serveur.py:172
+msgid "Éditer"
+msgstr ""
+
+#: serveur.py:173 serveur.py:360 serveur.py:476
+msgid "Supprimer"
+msgstr ""
+
+#: serveur.py:177 serveur.py:365 serveur.py:482
+msgid "Projet"
+msgstr ""
+
+#: serveur.py:178
+msgid "Dossier"
+msgstr ""
+
+#: serveur.py:207 serveur.py:231
+msgid "Extension inconnue : {}."
+msgstr ""
+
+#: serveur.py:211 serveur.py:245
+msgid "Ce fichier est illisible."
+msgstr ""
+
+#: serveur.py:233
+msgid "Voici les données de la requète :"
+msgstr ""
+
+#: serveur.py:264
+msgid "Suppression du document {}"
+msgstr ""
+
+#: serveur.py:267
+msgid "Document supprimé !"
+msgstr ""
+
+#: serveur.py:285 serveur.py:289
+msgid "Ce type de document n'est pas éditable."
+msgstr ""
+
+#: serveur.py:358 serveur.py:474
+msgid "Créer document"
+msgstr ""
+
+#: serveur.py:359 serveur.py:475
+msgid "Créer dossier"
+msgstr ""
+
+#: serveur.py:366
+msgid "Parent"
+msgstr ""
+
+#: serveur.py:449
+msgid "Suppression du dossier {}"
+msgstr ""
+
+#: serveur.py:452
+msgid "Dossier supprimé !"
+msgstr ""
+
+#: serveur.py:479 serveur.py:574 serveur.py:596
+msgid "Créer projet"
+msgstr ""
+
+#: serveur.py:497
+msgid "Ce projet existe déjà !"
+msgstr ""
+
+#: serveur.py:532
+msgid "Projet supprimé !"
+msgstr ""
+
+#: serveur.py:535
+msgid ""
+"C'est drôle, ce que vous me demandez :\n"
+"                il n'y a pas de projet ici !"
+msgstr ""
+
+#: serveur.py:580
+msgid "Projets"
+msgstr ""
+
+#: serveur.py:620
+msgid "Accès réservé"
+msgstr ""
+
+#: serveur.py:626
+msgid "Bonjour, {} !"
+msgstr ""
+
+#: serveur.py:632 serveur.py:647 serveur.py:656
+msgid "Vous devez être administrateur"
+msgstr ""
+
+#: serveur.py:637
+msgid "Utilisateurs"
+msgstr ""
+
+#: serveur.py:693 serveur.py:706 serveur.py:718 serveur.py:728 serveur.py:737
+#: serveur.py:746 serveur.py:756 serveur.py:771 serveur.py:787 serveur.py:803
+#: serveur.py:818 serveur.py:833 serveur.py:859 serveur.py:882 serveur.py:892
+msgid "Réservé aux éditeurs"
+msgstr ""
+
+#: serveur.py:701
+msgid "fichier"
+msgstr ""
+
+#: serveur.py:723
+msgid "dossier"
+msgstr ""
+
+#: serveur.py:742
+msgid "projet"
+msgstr ""
+
+#: serveur.py:766
+msgid "le fichier {}/{}"
+msgstr ""
+
+#: serveur.py:826
+msgid "le projet {} et tout son contenu ? "
+msgstr ""
+
+#: serveur.py:827
+msgid "Attention : cette opération est irréversible !"
+msgstr ""
+
+#: serveur.py:956
+msgid "Pourriez-vous expliciter votre intention ?"
+msgstr ""
+
+#: serveur.py:979
+msgid "Accès réservé !"
+msgstr ""
+
+#: serveur.py:990
+msgid "Il n'y a rien ici !"
+msgstr ""

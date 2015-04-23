@@ -1,0 +1,101 @@
+# French translations for PACKAGE package
+# Traductions françaises du paquet PACKAGE.
+# Copyright (C) 2015 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Abbé Jacques Peron <cataclop@hotmail.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-04-23 17:44+0200\n"
+"PO-Revision-Date: 2015-04-23 17:25+0200\n"
+"Last-Translator: Abbé Jacques Peron <cataclop@hotmail.com>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: modeles/html/creation.tpl:5
+msgid "Créer le"
+msgstr ""
+
+#: modeles/html/editeur.tpl:25 modeles/html/utilisateurs.tpl:60
+msgid "Enregistrer"
+msgstr ""
+
+#: modeles/html/editeur.tpl:27
+msgid "Annuler"
+msgstr ""
+
+#: modeles/html/historique.tpl:4
+msgid ""
+"Les <em class='suppr'><del>suppressions</del></em> sont en italique,\n"
+"les <strong class='add'>additions</strong> en gras.\n"
+"Seules sont affichées les parties concernées par les changements."
+msgstr ""
+
+#: modeles/html/historique.tpl:8
+msgid ""
+"Les <em class='suppr'>[- -]</em> et les <strong class='add'>{+ +}</strong>\n"
+"ne font pas partie de la suppression ou de l'addition, mais servent à les\n"
+"mettre davantage en évidence."
+msgstr ""
+
+#: modeles/html/historique.tpl:13
+msgid "Changements apportés par la modification {{commit}} :"
+msgstr ""
+
+#: modeles/html/historique.tpl:21
+msgid "Changements effectués depuis cette modification :"
+msgstr ""
+
+#: modeles/html/historique.tpl:32
+msgid "Revenir à cette version"
+msgstr ""
+
+#: modeles/html/page.tpl:36
+msgid "Actions"
+msgstr ""
+
+#: modeles/html/page.tpl:47
+msgid "Accès réservé"
+msgstr ""
+
+#: modeles/html/page.tpl:53
+msgid "Déconnexion"
+msgstr ""
+
+#: modeles/html/page.tpl:59 modeles/html/page.tpl:66
+msgid "S'authentifier"
+msgstr ""
+
+#: modeles/html/page.tpl:73
+msgid "Administration"
+msgstr ""
+
+#: modeles/html/suppression.tpl:2
+msgid "Êtes-vous sûr de vouloir supprimer {{quoi}} ?"
+msgstr ""
+
+#: modeles/html/suppression.tpl:4
+msgid "Oui, je suis sûr"
+msgstr ""
+
+#: modeles/html/suppression.tpl:6
+msgid "Non, je me suis trompé"
+msgstr ""
+
+#: modeles/html/utilisateurs.tpl:6
+msgid "Ajout ou modification d'un utilisateur :"
+msgstr ""
+
+#: modeles/html/utilisateurs.tpl:20
+msgid "Utilisateurs :"
+msgstr ""
+
+#: modeles/html/utilisateurs.tpl:26
+msgid "supprimer"
+msgstr ""

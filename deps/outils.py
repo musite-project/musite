@@ -13,6 +13,7 @@ import random as rd
 from string import ascii_lowercase
 import unicodedata as ud
 import jrnl as l
+from etc import config as cfg
 
 
 class Depot():
@@ -26,7 +27,8 @@ class Depot():
         try:
             resultat = subprocess.check_output(ligne)
         except subprocess.CalledProcessError as e:
-            print(e.output)
+            if cfg.DEVEL:
+                print(e.output)
             raise
         return resultat.decode('utf-8')
 
