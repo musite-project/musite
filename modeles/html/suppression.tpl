@@ -1,9 +1,8 @@
-%from outils import msg
 <div id="zonesaisie">
-    {{msg.z}} {{quoi}} ?
+    Êtes-vous sûr de vouloir supprimer {{quoi}} ?
     <form method="post">
-        <button type="submit" name="action" value="supprimer">{{msg.cf}}</button>
+        <button type="submit" name="action" value="supprimer">Oui, je suis sûr</button>
         &nbsp
-        <button type="submit" name="action" value="annuler">{{msg.rf}}</button>
+        <button type="submit" name="action" value="annuler">Non, je me suis trompé</button>
     </form>
 </div>

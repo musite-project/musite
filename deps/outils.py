@@ -13,9 +13,6 @@ import random as rd
 from string import ascii_lowercase
 import unicodedata as ud
 import jrnl as l
-from etc import config as cfg
-from etc.messages import msg
-msg = msg[cfg.LNG]
 
 
 class Depot():
@@ -43,7 +40,7 @@ class Depot():
 
     @property
     def journalcomplet(self):
-        entete = [['Id', msg.auteur, msg.date, msg.msg]]
+        entete = [['Id', 'auteur', 'date', 'message']]
         historique = [
             re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
             for entree in self.journal().split('commit ')
@@ -54,7 +51,7 @@ class Depot():
         return entete + historique
 
     def journalfichier(self, fichier):
-        entete = [['Id', msg.auteur, msg.date, msg.msg]]
+        entete = [['Id', 'auteur', 'date', 'message']]
         historique = [
             re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
             for entree
@@ -109,9 +106,9 @@ class Depot():
                 version + '..HEAD'
             ])
         self.sauvegardecomplete(
-            msg.t.format(
-                msg.dfch + fichier.nom if fichier else ''
-            )
+            'Retour '
+            + ('du fichier {} '.format(fichier.nom) if fichier else '')
+            + 'à la version '
             + version,
             auteur
         )
@@ -146,7 +143,7 @@ class Depot():
             auteur
         )
 
-    def sauvegardecomplete(self, message=msg.u, auteur=None):
+    def sauvegardecomplete(self, message='Sauvegarde complète', auteur=None):
             self.sauvegarde('-A', message, auteur)
 
 
@@ -154,7 +151,7 @@ class Dossier():
     def __init__(self, dossier):
         self.dossier = dossier
         if not os.path.isdir(dossier):
-            raise TypeError(dossier + msg.v)
+            raise TypeError(dossier + " n'est pas un dossier")
 
     def lister(self, profondeur=1):
         liste = {
@@ -217,13 +214,13 @@ class Fichier():
             l.log('Erreur l. 758 :', type(e))
             pass
         shutil.copy(self.chemin, fin.chemin)
-        depot.sauvegardecomplete(msg.w)
+        depot.sauvegardecomplete('Clonage')
 
     def deplacer(self, fin):
         fin.creerdossier()
         os.rename(self.chemin, fin.chemin)
         self.effacerdossier()
-        depot.sauvegardecomplete(msg.x)
+        depot.sauvegardecomplete('Déplacement')
 
     def creerdossier(self):
         try:
@@ -283,7 +280,7 @@ class Fichier():
                     pass
             self.effacer()
         self.effacerdossier()
-        depot.sauvegardecomplete(msg.y)
+        depot.sauvegardecomplete('Effacement')
 
     def supprimer(self):
         os.remove(self.chemin)

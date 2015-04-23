@@ -2,7 +2,6 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 %from deps import auth as a
 %from deps import outils as o
-%msg = o.msg
 %from etc import config as cfg
 %hote = rq.headers['Host']
     <head>
@@ -51,27 +50,27 @@
                     %if a.authentifier(rq.auth[0], rq.auth[1]) and rq.auth[0] != 'anonyme':
                     <li>
                         <a href=http://anonyme@{{hote}}>
-                            {{msg.Dc}}
+                            Déconnexion
                         </a>
                     </li>
                     %else:
                     <li>
                         <a href=http://{{hote}}/authentification>
-                            {{msg.auth}}
+                            S'authentifier
                         </a>
                     </li>
                     %end
                     %except TypeError:
                     <li>
                         <a href=http://{{hote}}/authentification>
-                            {{msg.auth}}
+                            S'authentifier
                         </a>
                     </li>
                     %end
                     %# Liens réservés aux administrateurs.
                     %try:
                     %if a.admin(rq.auth[0], rq.auth[1]):
-                    <li><a href=/admin>{{msg.Adm}}</a></li>
+                    <li><a href=/admin>Administration</a></li>
                     %end
                     %except TypeError: pass
                     %end

@@ -1,8 +1,7 @@
-%from outils import msg
 <div id="zonesaisie">
     <form method="post">
-        <input name="nom" label="{{msg.aa}} {{quoi}} :" placeholder="{{msg.aa}} {{quoi}}" required>
+        <input name="nom" label="Nom de {{quoi}} :" placeholder="Nom du {{quoi}}" required>
         <br>
-        <button type="submit" name="action" value="creer">{{msg.ab}} {{quoi}}</button>
+        <button type="submit" name="action" value="creer">Créer le {{quoi}}</button>
     </form>
 </div>

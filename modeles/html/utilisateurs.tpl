@@ -1,29 +1,28 @@
 %from deps import auth as a
-%from outils import msg
 %import os
 <div id="utilisateurs">
 
-   <b>{{msg.af}}</b>
+   <b>Ajout ou modification d'un utilisateur :</b>
    <br>
    <br>
    <form method="post" action="/admin/utilisateurs">
-      <input name="nom" placeholder="{{msg.Nm}}"></input>
+      <input name="nom" placeholder="Nom"></input>
       <br>
-      <input name="mdp" type="password" placeholder="{{msg.mdp}}"></input>
+      <input name="mdp" type="password" placeholder="MdP"></input>
       <br>
-      <input name="mdp_v" type="password" placeholder="{{msg.mdp}} {{msg.ag}}"></input>
+      <input name="mdp_v" type="password" placeholder="MdP (de nouveau)"></input>
       <br><br>
-      <button type="submit">{{msg.Cr}} / {{msg.mdf}}</button>
+      <button type="submit">Créer / modifier</button>
    </form>
    <br>
 
-   <b>{{msg.Usrs}} :</b>
+   <b>Utilisateurs :</b>
    <table>
       %for utilisateur in sorted(a.utilisateurs()):
       <tr>
          <td>{{utilisateur}}&nbsp&nbsp&nbsp</td>
          <td><small>
-            <a href=/admin/supprimerutilisateur/{{utilisateur}}>{{msg.suppr}}</a>
+            <a href=/admin/supprimerutilisateur/{{utilisateur}}>supprimer</a>
             </small>
          </td>
       </tr>
@@ -48,7 +47,7 @@
       });
    </script>
 
-   <b>{{msg.Grps}} :</b>
+   <b>Groupes :</b>
    <br>
    <br>
    <form method="post" action="/admin/groupes">
@@ -57,6 +56,6 @@
       <textarea name="texte" id="fichier" cols="40" rows="10">{{groupes}}</textarea>
       %end
       <br>
-      <button type="submit">{{msg.Enrg}}</button>
+      <button type="submit">Enregistrer</button>
    </form>
 </div>
