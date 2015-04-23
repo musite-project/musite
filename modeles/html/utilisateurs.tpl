@@ -11,7 +11,7 @@
       <br>
       <input name="mdp" type="password" placeholder="{{_("MdP")}}"></input>
       <br>
-      <input name="mdp_v" type="password" placeholder="{{_("MdP (de nouveau)"}}"></input>
+      <input name="mdp_v" type="password" placeholder="{{_("MdP (de nouveau)")}}"></input>
       <br><br>
       <button type="submit">Créer / modifier</button>
    </form>
