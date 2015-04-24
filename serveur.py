@@ -581,14 +581,14 @@ def accueil():
         with open(os.path.join(
             cfg.PAGES,
             'md',
-            'Accueil.{}.md'.format(i18n_path('').replace('/', ''))), 'r'
-        ) as f:
+            'Accueil.{}.md'.format(i18n_path('/').replace('/', ''))
+        ), 'r') as f:
             corps = markdown(f.read(-1))
     except FileNotFoundError:
         with open(os.path.join(cfg.PAGES, 'md', 'Accueil.fr.md'), 'r') as f:
             corps = markdown(f.read(-1))
     return {
-        'corps': _(corps),
+        'corps': corps,
         'actions': actions,
         'liens': liens
     }
@@ -647,8 +647,10 @@ def admin(action=''):
     else:
         try:
             with open(os.path.join(
-                cfg.PAGES, 'md', 'Admin.{}.md'.format(cfg.LANGUE)), 'r'
-            ) as f:
+                cfg.PAGES,
+                'md',
+                'Admin.{}.md'.format(i18n_path('/').replace('/', ''))
+            ), 'r') as f:
                 retour['corps'] = markdown(f.read(-1))
         except FileNotFoundError:
             with open(os.path.join(cfg.PAGES, 'md', 'Admin.fr.md'), 'r') as f:
