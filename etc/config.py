@@ -26,6 +26,7 @@ STATIC = 'static'
 
 LANGUES = [
     ('fr', 'français'),
+    ('en', 'english'),
 ]
 LANGUE = 'fr'
 

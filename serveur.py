@@ -31,11 +31,10 @@ import utilisateurs as u
 import bottle as b
 from bottle import request as rq
 import HTMLTags as h
-from deps.i18n import I18NPlugin as Traduction
+from deps.i18n import \
+    I18NPlugin as Traduction, lazy_ngettext as ngettext, lazy_gettext as _
 from mistune import markdown
 from etc import config as cfg
-import gettext
-gettext.install(__appname__, cfg.I18N)
 
 
 # Paramètres bottle ###########################################################
@@ -472,7 +471,8 @@ class Projet(Dossier):
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 if not suppression:
                     actions[_('Créer document')] = '_creer/' + self.chemin
-                    actions[_('Créer dossier')] = '_creerdossier/' + self.chemin
+                    actions[_('Créer dossier')] = \
+                        '_creerdossier/' + self.chemin
                     actions[_('Supprimer')] = \
                         '_supprimerprojet/' + self.chemin
                 else:
@@ -835,8 +835,9 @@ def projet_supprimer_confirmation(nom):
     return {'corps': b.template(
         'suppression',
         {
-            'quoi': _('le projet {} et tout son contenu ? ').format(nom)
-                    + _('Attention : cette opération est irréversible !')
+            'quoi':
+            _('le projet {} et tout son contenu ? ').format(nom)
+            + _('Attention : cette opération est irréversible !')
         }
     )}
 
@@ -1009,7 +1010,7 @@ webapp = Traduction(
     langs=cfg.LANGUES,
     default_locale=cfg.LANGUE,
     locale_dir=cfg.I18N,
-    domain='gabarits'
+    domain='musite'
 )
 
 # Lancement du serveur ########################################################

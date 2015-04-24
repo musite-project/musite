@@ -1,0 +1,277 @@
+# French translations for PACKAGE package
+# Traductions françaises du paquet PACKAGE.
+# Copyright (C) 2015 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Abbé Jacques Peron <cataclop@hotmail.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-04-24 16:23+0200\n"
+"PO-Revision-Date: 2015-04-24 16:23+0200\n"
+"Last-Translator: Abbé Jacques Peron <cataclop@hotmail.com>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: serveur.py:104
+msgid "Il n'y a rien avant la création !"
+msgstr ""
+
+#: serveur.py:118
+msgid "Il n'y a pas encore de modifications à signaler."
+msgstr ""
+
+#: serveur.py:165
+msgid "Aperçu"
+msgstr ""
+
+#: serveur.py:166 serveur.py:469
+msgid "Historique"
+msgstr ""
+
+#: serveur.py:167
+msgid "Source"
+msgstr ""
+
+#: serveur.py:171
+msgid "Éditer"
+msgstr ""
+
+#: serveur.py:172 serveur.py:359 serveur.py:476
+msgid "Supprimer"
+msgstr ""
+
+#: serveur.py:176 serveur.py:364 serveur.py:482
+msgid "Projet"
+msgstr ""
+
+#: serveur.py:177
+msgid "Dossier"
+msgstr ""
+
+#: serveur.py:206 serveur.py:230
+msgid "Extension inconnue : {}."
+msgstr ""
+
+#: serveur.py:210 serveur.py:244
+msgid "Ce fichier est illisible."
+msgstr ""
+
+#: serveur.py:232
+msgid "Voici les données de la requète :"
+msgstr ""
+
+#: serveur.py:263
+msgid "Suppression du document {}"
+msgstr ""
+
+#: serveur.py:266
+msgid "Document supprimé !"
+msgstr ""
+
+#: serveur.py:284 serveur.py:288
+msgid "Ce type de document n'est pas éditable."
+msgstr ""
+
+#: serveur.py:357 serveur.py:473
+msgid "Créer document"
+msgstr ""
+
+#: serveur.py:358 serveur.py:474
+msgid "Créer dossier"
+msgstr ""
+
+#: serveur.py:365
+msgid "Parent"
+msgstr ""
+
+#: serveur.py:448
+msgid "Suppression du dossier {}"
+msgstr ""
+
+#: serveur.py:451
+msgid "Dossier supprimé !"
+msgstr ""
+
+#: serveur.py:479 serveur.py:574 serveur.py:602
+msgid "Créer projet"
+msgstr ""
+
+#: serveur.py:497
+msgid "Ce projet existe déjà !"
+msgstr ""
+
+#: serveur.py:532
+msgid "Projet supprimé !"
+msgstr ""
+
+#: serveur.py:535
+msgid ""
+"C'est drôle, ce que vous me demandez :\n"
+"                il n'y a pas de projet ici !"
+msgstr ""
+
+#: serveur.py:580
+msgid "Projets"
+msgstr ""
+
+#: serveur.py:626 modeles/html/page.tpl:47
+msgid "Accès réservé"
+msgstr ""
+
+#: serveur.py:632
+msgid "Bonjour, {} !"
+msgstr ""
+
+#: serveur.py:638 serveur.py:659 serveur.py:668
+msgid "Vous devez être administrateur"
+msgstr ""
+
+#: serveur.py:643
+msgid "Utilisateurs"
+msgstr ""
+
+#: serveur.py:705 serveur.py:718 serveur.py:730 serveur.py:740 serveur.py:749
+#: serveur.py:758 serveur.py:768 serveur.py:783 serveur.py:799 serveur.py:815
+#: serveur.py:830 serveur.py:846 serveur.py:872 serveur.py:895 serveur.py:905
+msgid "Réservé aux éditeurs"
+msgstr ""
+
+#: serveur.py:713
+msgid "fichier"
+msgstr ""
+
+#: serveur.py:735
+msgid "dossier"
+msgstr ""
+
+#: serveur.py:754
+msgid "projet"
+msgstr ""
+
+#: serveur.py:778
+msgid "le fichier {}/{}"
+msgstr ""
+
+#: serveur.py:839
+msgid "le projet {} et tout son contenu ? "
+msgstr ""
+
+#: serveur.py:840
+msgid "Attention : cette opération est irréversible !"
+msgstr ""
+
+#: serveur.py:969
+msgid "Pourriez-vous expliciter votre intention ?"
+msgstr ""
+
+#: serveur.py:992
+msgid "Accès réservé !"
+msgstr ""
+
+#: serveur.py:1003
+msgid "Il n'y a rien ici !"
+msgstr ""
+
+#: deps/ext/gabc.py:58 deps/ext/tex.py:59
+msgid ""
+"Il y a eu une erreur pendant le traitement du document.\n"
+"Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument\n"
+"certain du contraire, merci de signaler le problème.\n"
+"\n"
+"Voici la sortie de la commande :\n"
+"\n"
+"{}\n"
+"                "
+msgstr ""
+
+#: deps/ext/ly.py:85 deps/ext/tex.py:114
+msgid "Sortie :"
+msgstr ""
+
+#: deps/ext/ly.py:89 deps/ext/tex.py:118
+msgid "Erreurs :"
+msgstr ""
+
+#: modeles/html/creation.tpl:5
+msgid "Créer le"
+msgstr ""
+
+#: modeles/html/editeur.tpl:25 modeles/html/utilisateurs.tpl:60
+msgid "Enregistrer"
+msgstr ""
+
+#: modeles/html/editeur.tpl:27
+msgid "Annuler"
+msgstr ""
+
+#: modeles/html/historique.tpl:4
+msgid ""
+"Les <em class='suppr'><del>suppressions</del></em> sont en italique,\n"
+"les <strong class='add'>additions</strong> en gras.\n"
+"Seules sont affichées les parties concernées par les changements."
+msgstr ""
+
+#: modeles/html/historique.tpl:8
+msgid ""
+"Les <em class='suppr'>[- -]</em> et les <strong class='add'>{+ +}</strong>\n"
+"ne font pas partie de la suppression ou de l'addition, mais servent à les\n"
+"mettre davantage en évidence."
+msgstr ""
+
+#: modeles/html/historique.tpl:13
+msgid "Changements apportés par la modification {} :"
+msgstr ""
+
+#: modeles/html/historique.tpl:21
+msgid "Changements effectués depuis cette modification :"
+msgstr ""
+
+#: modeles/html/historique.tpl:32
+msgid "Revenir à cette version"
+msgstr ""
+
+#: modeles/html/page.tpl:36
+msgid "Actions"
+msgstr ""
+
+#: modeles/html/page.tpl:53
+msgid "Déconnexion"
+msgstr ""
+
+#: modeles/html/page.tpl:59 modeles/html/page.tpl:66
+msgid "S'authentifier"
+msgstr ""
+
+#: modeles/html/page.tpl:73
+msgid "Administration"
+msgstr ""
+
+#: modeles/html/suppression.tpl:2
+msgid "Êtes-vous sûr de vouloir supprimer {{quoi}} ?"
+msgstr ""
+
+#: modeles/html/suppression.tpl:4
+msgid "Oui, je suis sûr"
+msgstr ""
+
+#: modeles/html/suppression.tpl:6
+msgid "Non, je me suis trompé"
+msgstr ""
+
+#: modeles/html/utilisateurs.tpl:6
+msgid "Ajout ou modification d'un utilisateur :"
+msgstr ""
+
+#: modeles/html/utilisateurs.tpl:20
+msgid "Utilisateurs :"
+msgstr ""
+
+#: modeles/html/utilisateurs.tpl:26
+msgid "supprimer"
+msgstr ""

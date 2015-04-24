@@ -10,7 +10,7 @@ ne font pas partie de la suppression ou de l'addition, mais servent à les
 mettre davantage en évidence.""")}}
 </p>
 
-<h2>{{_("""Changements apportés par la modification {{commit}} :""")}}</h2>
+<h2>{{_("""Changements apportés par la modification {} :""").format(commit)}}</h2>
 
 <code>
 {{!modifications}}
