@@ -12,10 +12,9 @@ from outils import motaleatoire
 import os
 import shutil
 import subprocess as sp
+from deps.i18n import lazy_gettext as _
 import HTMLTags as h
 import jrnl as l
-import gettext
-gettext.install('modules', cfg.I18N)
 EXT = __name__.split('.')[-1]
 
 

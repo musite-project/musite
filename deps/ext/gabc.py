@@ -14,9 +14,8 @@ from mistune import markdown
 import os
 import shutil
 from bottle import template
+from deps.i18n import lazy_gettext as _
 import HTMLTags as h
-import gettext
-gettext.install('modules', cfg.I18N)
 EXT = __name__.split('.')[-1]
 
 
@@ -54,7 +53,7 @@ class Document(txt.Document):
                 height="100%"
             )
         except tex.ErreurCompilation:
-            return (markdown(_(
+            return (markdown(str(_(
                 """\
 Il y a eu une erreur pendant le traitement du document.
 Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
@@ -62,9 +61,9 @@ certain du contraire, merci de signaler le problème.
 
 Voici la sortie de la commande :
 
-{}
                 """
-            )).format(tex.traiter_erreur_compilation(self.dossiertmp)))
+            ))) + tex.traiter_erreur_compilation(self.dossiertmp)
+            )
 
     def preparer_pdf(
         self,

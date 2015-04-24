@@ -31,8 +31,7 @@ import utilisateurs as u
 import bottle as b
 from bottle import request as rq
 import HTMLTags as h
-from deps.i18n import \
-    I18NPlugin as Traduction, lazy_ngettext as ngettext, lazy_gettext as _
+from deps.i18n import I18NPlugin as Traduction, lazy_gettext as _, i18n_path
 from mistune import markdown
 from etc import config as cfg
 
@@ -304,7 +303,7 @@ class Document:
                 cfg.DATA, self.projet
             )
         ).sauvegardefichier(f.Fichier(self.fichier), rq.auth[0])
-        b.redirect('/' + self.chemin)
+        b.redirect(i18n_path('/' + self.chemin))
 
     @property
     def historique(self):
@@ -332,7 +331,7 @@ class Document:
         """Retour en arrière jusqu'à une version donnée
         """
         self.depot.retablir(commit, f.Fichier(self.fichier), rq.auth[0])
-        b.redirect('/_historique/' + self.chemin)
+        b.redirect(i18n_path('/_historique/' + self.chemin))
 
 
 class Dossier:
@@ -522,7 +521,7 @@ class Projet(Dossier):
         """Retour en arrière jusqu'à une version donnée
         """
         self.depot.retablir(commit, auteur=rq.auth[0])
-        b.redirect('/_historique/' + self.chemin)
+        b.redirect(i18n_path('/_historique/' + self.chemin))
 
     def supprimer(self):
         """Suppression du projet
@@ -580,7 +579,9 @@ def accueil():
     liens = {_('Projets'): '_projets'}
     try:
         with open(os.path.join(
-            cfg.PAGES, 'md', 'Accueil.{}.md'.format(cfg.LANGUE)), 'r'
+            cfg.PAGES,
+            'md',
+            'Accueil.{}.md'.format(i18n_path('').replace('/', ''))), 'r'
         ) as f:
             corps = markdown(f.read(-1))
     except FileNotFoundError:
@@ -661,7 +662,7 @@ def utilisateur_suppression(nom):
     """Suppression d'un utilisateur
     """
     u.Utilisateur(nom).supprimer()
-    b.redirect('/admin/utilisateurs')
+    b.redirect(i18n_path('/admin/utilisateurs'))
 
 
 @app.post('/admin/utilisateurs')
@@ -671,7 +672,7 @@ def utilisateur_ajout():
     """
     if rq.forms.mdp == rq.forms.mdp_v:
         u.Utilisateur(rq.forms.nom, rq.forms.mdp).ajouter()
-    b.redirect('/admin/utilisateurs')
+    b.redirect(i18n_path('/admin/utilisateurs'))
 
 
 #   3. Fichiers statiques
@@ -792,7 +793,7 @@ def document_supprimer(nom, element=False):
             element, ext = os.path.splitext(element)
             return Document(nom, element, ext[1:]).supprimer()
         else:
-            b.redirect('/{}/{}'.format(nom, element))
+            b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
 @app.get('/_supprimerdossier/<nom>/<element:path>')
@@ -823,7 +824,7 @@ def dossier_supprimer(nom, element=False):
         if rq.forms.action == 'supprimer':
             return Dossier(nom, element).supprimer()
         else:
-            b.redirect('/{}/{}'.format(nom, element))
+            b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
 @app.get('/_supprimerprojet/<nom>')
@@ -851,7 +852,7 @@ def projet_supprimer(nom):
     if rq.forms.action == 'supprimer':
         return Projet(nom).supprimer()
     else:
-        b.redirect('/{}'.format(nom))
+        b.redirect(i18n_path('/{}'.format(nom)))
 
 
 # Historique d'un document
@@ -940,14 +941,16 @@ def document_afficher(nom, element=None, ext=None):
         # Cette exception est levée s'il ne s'agit pas d'un dossier.
         try:
             return Document(nom, element, ext).contenu
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             # Cette exception est levée s'il n'y a pas de document, ce qui
             # arrive notamment lorsque l'on renonce à créer un nouveau
             # document.
-            b.redirect('/' + nom)
-        except TypeError:
+            b.redirect(i18n_path('/' + nom))
+            print(e)
+        except TypeError as e:
             # Cette exception est levée si l'on tente d'accéder à un
             # emplacement inexistant.
+            raise
             b.abort(404)
 
 
@@ -960,11 +963,11 @@ def document_enregistrer(nom, element='', ext=''):
     if rq.forms.action == 'enregistrer':
         Document(nom, element, ext).enregistrer(rq.forms.contenu)
     elif rq.forms.action == 'annuler':
-        b.redirect(
+        b.redirect(i18n_path(
             '/' + nom
             + ('/' + element if element else '')
             + ('.' + ext if ext else '')
-        )
+        ))
     else:
         return {'corps': _('Pourriez-vous expliciter votre intention ?')}
 

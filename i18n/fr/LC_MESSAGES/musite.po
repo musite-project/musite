@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-24 16:23+0200\n"
+"POT-Creation-Date: 2015-04-24 18:03+0200\n"
 "PO-Revision-Date: 2015-04-24 16:23+0200\n"
 "Last-Translator: Abbé Jacques Peron <cataclop@hotmail.com>\n"
 "Language-Team: French\n"
@@ -18,167 +18,167 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: serveur.py:104
+#: serveur.py:103
 msgid "Il n'y a rien avant la création !"
 msgstr ""
 
-#: serveur.py:118
+#: serveur.py:117
 msgid "Il n'y a pas encore de modifications à signaler."
 msgstr ""
 
-#: serveur.py:165
+#: serveur.py:164
 msgid "Aperçu"
 msgstr ""
 
-#: serveur.py:166 serveur.py:469
+#: serveur.py:165 serveur.py:468
 msgid "Historique"
 msgstr ""
 
-#: serveur.py:167
+#: serveur.py:166
 msgid "Source"
 msgstr ""
 
-#: serveur.py:171
+#: serveur.py:170
 msgid "Éditer"
 msgstr ""
 
-#: serveur.py:172 serveur.py:359 serveur.py:476
+#: serveur.py:171 serveur.py:358 serveur.py:475
 msgid "Supprimer"
 msgstr ""
 
-#: serveur.py:176 serveur.py:364 serveur.py:482
+#: serveur.py:175 serveur.py:363 serveur.py:481
 msgid "Projet"
 msgstr ""
 
-#: serveur.py:177
+#: serveur.py:176
 msgid "Dossier"
 msgstr ""
 
-#: serveur.py:206 serveur.py:230
+#: serveur.py:205 serveur.py:229
 msgid "Extension inconnue : {}."
 msgstr ""
 
-#: serveur.py:210 serveur.py:244
+#: serveur.py:209 serveur.py:243
 msgid "Ce fichier est illisible."
 msgstr ""
 
-#: serveur.py:232
+#: serveur.py:231
 msgid "Voici les données de la requète :"
 msgstr ""
 
-#: serveur.py:263
+#: serveur.py:262
 msgid "Suppression du document {}"
 msgstr ""
 
-#: serveur.py:266
+#: serveur.py:265
 msgid "Document supprimé !"
 msgstr ""
 
-#: serveur.py:284 serveur.py:288
+#: serveur.py:283 serveur.py:287
 msgid "Ce type de document n'est pas éditable."
 msgstr ""
 
-#: serveur.py:357 serveur.py:473
+#: serveur.py:356 serveur.py:472
 msgid "Créer document"
 msgstr ""
 
-#: serveur.py:358 serveur.py:474
+#: serveur.py:357 serveur.py:473
 msgid "Créer dossier"
 msgstr ""
 
-#: serveur.py:365
+#: serveur.py:364
 msgid "Parent"
 msgstr ""
 
-#: serveur.py:448
+#: serveur.py:447
 msgid "Suppression du dossier {}"
 msgstr ""
 
-#: serveur.py:451
+#: serveur.py:450
 msgid "Dossier supprimé !"
 msgstr ""
 
-#: serveur.py:479 serveur.py:574 serveur.py:602
+#: serveur.py:478 serveur.py:573 serveur.py:603
 msgid "Créer projet"
 msgstr ""
 
-#: serveur.py:497
+#: serveur.py:496
 msgid "Ce projet existe déjà !"
 msgstr ""
 
-#: serveur.py:532
+#: serveur.py:531
 msgid "Projet supprimé !"
 msgstr ""
 
-#: serveur.py:535
+#: serveur.py:534
 msgid ""
 "C'est drôle, ce que vous me demandez :\n"
 "                il n'y a pas de projet ici !"
 msgstr ""
 
-#: serveur.py:580
+#: serveur.py:579
 msgid "Projets"
 msgstr ""
 
-#: serveur.py:626 modeles/html/page.tpl:47
+#: serveur.py:627 modeles/html/page.tpl:47
 msgid "Accès réservé"
 msgstr ""
 
-#: serveur.py:632
+#: serveur.py:633
 msgid "Bonjour, {} !"
 msgstr ""
 
-#: serveur.py:638 serveur.py:659 serveur.py:668
+#: serveur.py:639 serveur.py:660 serveur.py:669
 msgid "Vous devez être administrateur"
 msgstr ""
 
-#: serveur.py:643
+#: serveur.py:644
 msgid "Utilisateurs"
 msgstr ""
 
-#: serveur.py:705 serveur.py:718 serveur.py:730 serveur.py:740 serveur.py:749
-#: serveur.py:758 serveur.py:768 serveur.py:783 serveur.py:799 serveur.py:815
-#: serveur.py:830 serveur.py:846 serveur.py:872 serveur.py:895 serveur.py:905
+#: serveur.py:706 serveur.py:719 serveur.py:731 serveur.py:741 serveur.py:750
+#: serveur.py:759 serveur.py:769 serveur.py:784 serveur.py:800 serveur.py:816
+#: serveur.py:831 serveur.py:847 serveur.py:873 serveur.py:896 serveur.py:906
 msgid "Réservé aux éditeurs"
 msgstr ""
 
-#: serveur.py:713
+#: serveur.py:714
 msgid "fichier"
 msgstr ""
 
-#: serveur.py:735
+#: serveur.py:736
 msgid "dossier"
 msgstr ""
 
-#: serveur.py:754
+#: serveur.py:755
 msgid "projet"
 msgstr ""
 
-#: serveur.py:778
+#: serveur.py:779
 msgid "le fichier {}/{}"
 msgstr ""
 
-#: serveur.py:839
+#: serveur.py:840
 msgid "le projet {} et tout son contenu ? "
 msgstr ""
 
-#: serveur.py:840
+#: serveur.py:841
 msgid "Attention : cette opération est irréversible !"
 msgstr ""
 
-#: serveur.py:969
+#: serveur.py:972
 msgid "Pourriez-vous expliciter votre intention ?"
 msgstr ""
 
-#: serveur.py:992
+#: serveur.py:995
 msgid "Accès réservé !"
 msgstr ""
 
-#: serveur.py:1003
+#: serveur.py:1006
 msgid "Il n'y a rien ici !"
 msgstr ""
 
-#: deps/ext/gabc.py:58 deps/ext/tex.py:59
+#: deps/ext/gabc.py:57
 msgid ""
 "Il y a eu une erreur pendant le traitement du document.\n"
 "Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument\n"
@@ -186,16 +186,26 @@ msgid ""
 "\n"
 "Voici la sortie de la commande :\n"
 "\n"
-"{}\n"
 "                "
 msgstr ""
 
-#: deps/ext/ly.py:85 deps/ext/tex.py:114
+#: deps/ext/ly.py:84 deps/ext/tex.py:114
 msgid "Sortie :"
 msgstr ""
 
-#: deps/ext/ly.py:89 deps/ext/tex.py:118
+#: deps/ext/ly.py:88 deps/ext/tex.py:118
 msgid "Erreurs :"
+msgstr ""
+
+#: deps/ext/tex.py:58
+msgid ""
+"Il y a eu une erreur pendant le traitement du document.\n"
+"Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument\n"
+"certain du contraire, merci de signaler le problème.\n"
+"\n"
+"Voici la sortie de la commande :\n"
+"\n"
+"                    "
 msgstr ""
 
 #: modeles/html/creation.tpl:5
@@ -234,6 +244,10 @@ msgstr ""
 
 #: modeles/html/historique.tpl:32
 msgid "Revenir à cette version"
+msgstr ""
+
+#: modeles/html/page.tpl:24
+msgid "Liens"
 msgstr ""
 
 #: modeles/html/page.tpl:36

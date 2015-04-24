@@ -17,9 +17,8 @@ import shutil
 import subprocess as sp
 import re
 import HTMLTags as h
+from deps.i18n import lazy_gettext as _
 import jrnl as l
-import gettext
-gettext.install('modules', cfg.I18N)
 EXT = __name__.split('.')[-1]
 
 
@@ -54,18 +53,18 @@ class Document(txt.Document):
                     width="100%",
                     height="100%"
                 )
-            except tex.ErreurCompilation:
-                return (markdown(_(
-                """\
+            except ErreurCompilation:
+                return (markdown(str(_(
+                    """\
 Il y a eu une erreur pendant le traitement du document.
 Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
 certain du contraire, merci de signaler le problème.
 
 Voici la sortie de la commande :
 
-{}
-                """
-            )).format(traiter_erreur_compilation(self.dossiertmp)))
+                    """
+                    ))) + traiter_erreur_compilation(self. dossiertmp)
+                )
         else:
             return txt.Document.afficher(self)
 
@@ -110,15 +109,18 @@ def compiler_pdf(fichier, environnement={}):
             stderr=sp.PIPE
         )
         sortie, erreurs = compilation.communicate()
-        l.log(
-            _('Sortie :')
-            + '\n========\n'
-            + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
-            + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-            + _('Erreurs :')
-            + '\n=========\n'
-            + '\n{}\n'.format(erreurs.decode('utf8'))
-        )
+        try:
+            l.log(
+                _('Sortie :')
+                + '\n========\n'
+                + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
+                + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
+                + _('Erreurs :')
+                + '\n=========\n'
+                + '\n{}\n'.format(erreurs.decode('utf8'))
+            )
+        except UnicodeDecodeError:
+            raise FichierIllisible
         if compilation.returncode:
             raise ErreurCompilation
     finally:

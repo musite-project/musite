@@ -12,9 +12,8 @@ user des mécanismes d'héritage de Python en vous basant sur ce module.
 import os.path
 import HTMLTags as h
 import bottle as b
+from deps.i18n import lazy_gettext as _
 from etc import config as cfg
-import gettext
-gettext.install('modules', cfg.I18N)
 b.TEMPLATE_PATH += cfg.MODELES
 EXT = __name__.split('.')[-1]
 

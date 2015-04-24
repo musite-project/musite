@@ -17,7 +17,7 @@ NOM="musite"
 shift 3
 FICHIERS="./serveur.py deps/*.py deps/ext/*.py modeles/**/*.tpl"
 #echo $FICHIERS ; exit 0
-LANGUES=$(ls -d ./i18n/??)
+LANGUES=$(ls -d ./i18n/??/LC_MESSAGES)
 
 mkdir -p "$LANGUE"
 
@@ -37,9 +37,9 @@ elif [ $ACTION = "majtt" ] ; then
 		--from-code=utf-8 \
 		--output=./i18n/"$NOM".pot \
 		./serveur.py deps/*.py deps/ext/*.py modeles/**/*.tpl
-	msgmerge --update "$LANGUE"/"$NOM".po ./i18n/"$NOM".pot
 	for LANGUE in $LANGUES ; do
-		msgfmt "$NOM".po --output-file "$NOM".mo
+		msgmerge --update "$LANGUE"/"$NOM".po ./i18n/"$NOM".pot
+		msgfmt "$LANGUE"/"$NOM".po --output-file "$LANGUE"/"$NOM".mo
 	done
 fi
 

@@ -21,7 +21,7 @@
         <div id="menu">
             %try:
             %if len(liens) > 0:  # S'il y a des liens à afficher, on en fait la liste.
-            <b>Liens</b><br>
+            <b>{{_("Liens")}}</b><br>
             <ul>
                 %for lien in sorted(liens.keys(), key=lambda s: o.sansaccents(s.lower())):
                 <li><a href={{i18n_path('/' + liens[lien])}}>{{lien}}</a></li>
