@@ -16,6 +16,7 @@ PORT = 8080
 PWD = os.sep + os.path.join(
         *os.path.dirname(os.path.realpath(__file__)).split(os.sep)[:-1]
 )
+ETC = os.path.join(PWD, 'etc')
 TMP = os.path.join(PWD, 'tmp')
 DATA = os.path.join(PWD, 'data')
 I18N = os.path.join(PWD, 'i18n')

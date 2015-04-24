@@ -52,7 +52,7 @@
    <br>
    <br>
    <form method="post" action="/admin/groupes">
-      %with open(os.path.join('etc', 'groupes'), 'r') as fichier:
+      %with open(os.path.join(cfg.ETC, 'groupes'), 'r') as fichier:
       %groupes = fichier.read(-1)
       <textarea name="texte" id="fichier" cols="40" rows="10">{{groupes}}</textarea>
       %end
