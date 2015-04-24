@@ -17,6 +17,11 @@
         <div id="entete">
             <h1 id='titre'><a href={{i18n_path('/')}}>{{cfg.TITRE}}</a></h1>
         </div>
+        <div id="langues">
+            %for langue in sorted(langue[0] for langue in languages):
+            <a href="{{str(i18n_path()).replace(str(i18n_path('/')), '/{}/'.format(langue))}}">{{langue}}</a>&nbsp;
+            %end
+        </div>
 
         <div id="menu">
             %try:

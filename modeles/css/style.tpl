@@ -11,7 +11,7 @@ font-size:14pt;
 }
 
 #logo {
-position:absolute:;
+position:absolute;
 top:0px;
 left:0px;
 margin: 0px;
@@ -30,8 +30,15 @@ padding: 5px;
 font-size: 108%;
 margin-left:100px;
 padding-left:20px;
-min-width: 904px;
+min-width: 804px;
 height:40px;
+}
+
+#langues {
+position:absolute;
+top:10px;
+right:0px;
+padding-right:20px;
 }
 
 #menu {
