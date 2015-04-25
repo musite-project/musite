@@ -16,28 +16,35 @@ Musite est prévu pour être le plus simple *possible* à installer, c'est pourq
 
 #### Sous Debian
 
-La commande suivante devrait installer le nécessaire, Gregorio mis à part :
+Les commandes suivantes devraient installer le nécessaire :
 
-    apt-get install python3 lilypond git texlive texlive-latex-extra texlive-xetex texlive-lang-latin texlive-lang-french texlive-humanities texlive-extra-utils latex-xcolor texlive-fonts-extra fonts-linuxlibertine lmodern gregorio gregoriotex
-
-Quant à Gregorio :
-
-- si vous ne craignez pas d'activer les dépôts *sid* (ce qui suppose que vous sachiez ce que vous faites) :
-
-    `apt-get install gregorio gregoriotex`
-
-- option recommandée : suivez les [instructions du site de Gregorio](http://gregorio-project.github.io/installation.html).
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE42299E
+    echo deb http://ppa.launchpad.net/gregorio-project/gregorio/ubuntu trusty main >> /etc/apt/sources.list
+    apt-get -y update ; apt-get -y dist-upgrade
+    apt-get -y --force-yes install --no-install-recommends \
+    texlive texlive-latex-extra texlive-xetex texlive-luatex \
+    texlive-lang-latin texlive-lang-french \
+    texlive-humanities texlive-extra-utils latex-xcolor \
+    texlive-fonts-extra fonts-linuxlibertine lmodern \
+    lilypond gregorio gregoriotex
+    apt-get -y install git python3
 
 
 ### Installation
 
-Clonez le dépôt de musite :
+Clonez le dépôt de musite (si vous voulez avoir tout l'historique des changements, enlevez `--depth=1` :
 
-    git clone https://github.com/jperon/musite
+    git clone --depth=1 https://github.com/jperon/musite
 
-Puis placez-vous dans le dossier musite obtenu ; créez un dossier *tmp* pour les fichiers temporaires et un dossier *data* pour les données. Ce qui donne, sous Linux :
+Puis placez-vous dans le dossier musite obtenu ; créez un dossier *tmp* pour les fichiers temporaires et un dossier *data* pour les données, puis renommez les modèles de fichiers utilisateurs/groupes. Ce qui donne, sous Linux :
 
     cd musite ; mkdir tmp data
+    mv etc/utilisateurs.sample etc/utilisateurs
+    mv etc/groupes.sample etc/groupes
+
+Configurez votre nom d'utilisateur et votre courriel pour git :
+
+    git config --global user.email "VOTRE@COURRIEL" && git config --global user.name "VOTRE NOM"
 
 
 ## Mise en route
