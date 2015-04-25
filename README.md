@@ -63,3 +63,16 @@ Et voilà !
 ## Configuration
 
 Vous pouvez définir certains paramètres dans le fichier *etc/config.py*. En particulier, il est recommandé de définir l'adresse d'écoute sur l'adresse de la carte réseau où vous voulez rendre l'interface accessible. Si ceci vous semble du chinois, remplacez *0.0.0.0* par *127.0.0.1*. De même, pour une utilisation ordinaire, définissez le paramètre *DEVEL* à *False*.
+
+
+## Translating
+
+If you want to translate this program in your language, you can do it thanks to gettext. First type this command (replacing `en` by your language code in two letters) :
+
+    ./traduction.sh creer en
+
+Then edit the file `i18n/YOUR_LANGUAGE/LC_MESSAGES/musite.po`. When done, type this command :
+
+    ./traduction maj en
+
+You're done ! If you'd like to share your work, your pull requests are welcome !
