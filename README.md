@@ -73,6 +73,6 @@ If you want to translate this program in your language, you can do it thanks to 
 
 Then edit the file `i18n/YOUR_LANGUAGE/LC_MESSAGES/musite.po`. When done, type this command :
 
-    ./traduction maj en
+    ./traduction.sh maj en
 
 You're done ! If you'd like to share your work, your pull requests are welcome !
