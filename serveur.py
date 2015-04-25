@@ -408,9 +408,9 @@ class Dossier:
                 liste = [
                     h.A(
                         '../',
-                        href='/{}'.format(
+                        href=i18n_path('/{}'.format(
                             '/'.join(self.chemin.split('/')[:-1])
-                        )
+                        ))
                     )
                 ]
             else:
@@ -439,18 +439,18 @@ class Dossier:
         liste += [
             h.A(
                 dossier,
-                href='/{}/{}/{}'.format(
+                href=i18n_path('/{}/{}/{}'.format(
                     self.projet, self.nom, dossier
-                ).replace('//', '/')
+                ).replace('//', '/'))
             )
             for dossier in listedossiers
         ]
         liste += [
             h.A(
                 fichier,
-                href='/{}/{}/{}'.format(
+                href=i18n_path('/{}/{}/{}'.format(
                     self.projet, self.nom, fichier
-                ).replace('//', '/')
+                ).replace('//', '/'))
             )
             for fichier in listefichiers
         ]
@@ -631,7 +631,7 @@ def lister_projets():
     # Formatage de la liste des fichiers.
     liste = [
         h.A(
-            projet, href='/{}'.format(projet)
+            projet, href=i18n_path('/{}'.format(projet))
         )
         for projet in sorted(listefichiers[cfg.DATA])
         if os.path.isdir(os.path.join(cfg.DATA, projet))
@@ -769,7 +769,10 @@ def dossier_creer_infos(nom, element=''):
 def dossier_creer(nom, element=''):
     """ Création effective du dossier
     """
-    return Dossier(nom, '/'.join((element, rq.forms.nom))).creer()
+    if rq.forms.action == 'creer':
+        return Dossier(nom, '/'.join((element, rq.forms.nom))).creer()
+    else:
+        b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
 @app.get('/_creerprojet')
@@ -787,7 +790,10 @@ def projet_creer_infos():
 def projet_creer():
     """ Création effective du projet
     """
-    return Projet(rq.forms.nom).creer()
+    if rq.forms.action == 'creer':
+        return Projet(rq.forms.nom).creer()
+    else:
+        b.redirect(i18n_path('/'))
 
 
 # Suppression d'un document
