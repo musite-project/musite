@@ -176,9 +176,14 @@ class Document:
             _('Projet'): self.projet,
             _('Dossier'): '/'.join(self.chemin.split('/')[:-1])
         }
+        exports = {
+            fmt: self.chemin + '?fmt=' + fmt
+            for fmt in EXT[self.ext].Document(self.chemin).fmt
+        }
         return {
             'corps': contenu,
             'actions': actions,
+            'exports': exports,
             'liens': liens,
         }
 
@@ -305,6 +310,21 @@ class Document:
             )
         ).sauvegardefichier(f.Fichier(self.fichier), rq.auth[0])
         b.redirect(i18n_path('/' + self.chemin))
+
+    def exporter(self, fmt, proprietes):
+        proprietes = {fmt: proprietes}
+        b.redirect(
+            i18n_path(EXT[self.ext]\
+                .Document(self.chemin, proprietes=proprietes)\
+                .pdf(f.motaleatoire(3))
+            )
+        )
+
+    def exporter_infos(self, fmt):
+        return self.afficher(b.template(
+            'export',
+            {'proprietes': EXT[self.ext].Document(self.chemin).listeproprietes[fmt]}
+        ))
 
     @property
     def historique(self):
@@ -724,9 +744,12 @@ def document_creer_infos(nom, element=None, ext=None):
 def document_creer(nom, element=''):
     """ Création effective du document
     """
-    doc = rq.forms.nom.split('.')
-    element, ext = element + '.'.join((doc[:-1])), doc[-1]
-    return Document(nom, element, ext).creer()
+    if rq.forms.action == 'creer':
+        doc = rq.forms.nom.split('.')
+        element, ext = element + '.'.join((doc[:-1])), doc[-1]
+        return Document(nom, element, ext).creer()
+    else:
+        b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
 @app.get('/_creerdossier/<nom>')
@@ -914,6 +937,25 @@ def document_editer(nom, element='', ext=''):
     return Document(nom, element, ext).editer()
 
 
+# Export d'un document
+@app.get('/_exporter/<nom>/<element:path>.<ext>')
+@page
+def document_exporter_infos(nom, element='', ext=''):
+    """ Page où l'utilisateur définit les propriétés du document à exporter"""
+    return Document(nom, element, ext).exporter_infos(rq.query.fmt)
+
+
+@app.post('/_exporter/<nom>/<element:path>.<ext>')
+@page
+def document_exporter(nom, element='', ext=''):
+    """ Page où l'utilisateur définit les propriétés du document à exporter"""
+    print({item for item in rq.forms.items()})
+    if rq.forms.action == 'exporter':
+        return Document(nom, element, ext).exporter(rq.query.fmt, rq.forms)
+    else:
+        b.redirect(i18n_path('/{}/{}'.format(nom, element)))
+
+
 # Affichage de la source d'un document
 @app.get('/_src/<nom>/<element:path>.<ext>')
 @page
@@ -972,7 +1014,12 @@ def document_enregistrer(nom, element='', ext=''):
             + ('.' + ext if ext else '')
         ))
     else:
-        return {'corps': _('Pourriez-vous expliciter votre intention ?')}
+        return {
+            'corps':
+                _('Pourriez-vous expliciter votre intention ?')
+                + '<br><br>'
+                + '<br>'.join(':'.join(item) for item in rq.forms.items())
+        }
 
 
 # III. Feuilles de style ########

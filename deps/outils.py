@@ -313,7 +313,7 @@ def sansaccents(entree):
     return "".join([c for c in nkfd_form if not ud.combining(c)])
 
 
-def motaleatoire(longueur, source=ascii_lowercase):
+def motaleatoire(longueur=6, source=ascii_lowercase):
     return ''.join(rd.choice(source) for i in range(longueur))
 
 

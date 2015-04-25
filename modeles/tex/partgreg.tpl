@@ -1,51 +1,64 @@
 \documentclass[%
-a5paper%                       Taille de page.
-,<<<proprietes['taille_police']>>>pt%                         Taille de police.
-,DIV=15%                       Plus grand => des marges plus petites.
+<<<proprietes['papier']>>>paper%         Taille de page.
+,<<<proprietes['taille_police']>>>pt%    Taille de police.
+,DIV=15%                                 Plus grand => des marges plus petites.
 ]{scrartcl}
 
 \usepackage[autocompile]{gregoriotex}
 \usepackage{libertine}
 \usepackage{xcolor}
 
-%if proprietes['couleur']:
-\definecolor{rubrum}{rgb}{.6,0,0}
+\setgrefactor{<<<proprietes['taille_notes']>>>}
+
+\grechangedim{spacelinestext}{<<<proprietes['espace_lignes_texte']>>>}{0}
+
+\definecolor{rubrum}{rgb}{%
+    <<<','.join(str(p) for p in proprietes['couleur'])>>>%
+}
 \def\rubrum{\color{rubrum}}
+%if proprietes['couleur_initiale']:
+\let\rubrinit\rubrum
 %else:
-\definecolor{rubrum}{rgb}{0,0,0}
-\def\rubrum{\color{rubrum}}
+\def\rubrinit{}
 %end
+%if proprietes['couleur_lignes']:
+\grecoloredlines{<<<'}{'.join(str(int(255 * c)) for c in proprietes['couleur'])>>>}
+%end
+%if proprietes['couleur_symboles']:
+\let\rubrsym\rubrum
+%else:
+\def\rubrsym{}
+%end
+
 
 \def\greinitialformat#1{{%
     \fontsize{%
         <<<proprietes['taille_initiale']>>>%
     }{%
-        <<<proprietes['taille_initiale']>>>}\selectfont #1%
+        <<<proprietes['taille_initiale']>>>}\selectfont{}%
+    \rubrinit #1%
 }}
 
 \let\Vbar\Vbarsmall
 \let\Rbar\Rbarsmall
 \catcode`\℣=\active \def ℣#1{%
-        {\rubrum \Vbar\hspace{-.25ex}#1}
+        {\rubrsym \Vbar\hspace{-.25ex}#1}
 }
 \catcode`\℟=\active \def ℟#1{%
-        {\rubrum \Rbar\hspace{-.25ex}#1}
+        {\rubrsym \Rbar\hspace{-.25ex}#1}
 }
 \catcode`\†=\active \def †{%
-    {\rubrum\gredagger}%
+    {\rubrsym \gredagger}%
 }
 \catcode`\✠=\active \def ✠{%
-    {\rubrum\grecross}%
+    {\rubrsym \grecross}%
 }
 \renewcommand{\grestar}{%
-    {\rubrum\gresixstar}%
+    {\rubrsym \gresixstar}%
 }
 \renewcommand{\greheightstar}{\grestar}
 
-\setstafflinethickness{20}
-%if proprietes['couleur']:
-\grecoloredlines{154}{0}{0}
-%end
+\setstafflinethickness{<<<proprietes['epaisseur_lignes']>>>}
 
 
 \begin{document}

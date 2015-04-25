@@ -16,8 +16,6 @@
     <form method="post" action="{{i18n_path('/' + emplacement)}}">
         <!--
         <input name="titre" label="titre" placeholder="{{_("titre")}}">
-        <input name="mode" label="mode" placeholder="{{_("mode")}}">
-        <input name="type" label="type" placeholder="{{_("type")}}">
         <br>
         -->
         <textarea name="contenu" id="saisie" placeholder="{{_("Texte")}}">{{texte}}</textarea>

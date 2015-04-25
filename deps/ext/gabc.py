@@ -25,7 +25,7 @@ templatetex = templateperso()
 
 
 class Document(txt.Document):
-    def __init__(self, chemin, ext=EXT):
+    def __init__(self, chemin, ext=EXT, proprietes=False):
         txt.Document.__init__(self, chemin, ext)
         # Chemin absolu des fichiers temporaires
         self.rd = os.path.join(cfg.TMP, motaleatoire(6))
@@ -39,20 +39,63 @@ class Document(txt.Document):
         )
         self.fichiertmppdf = os.path.join(self.rd, self.fichierrelatifpdf)
 
-    @property
-    def pdf(self):
+        # Formats d'export possibles
+        self.fmt = ['pdf']
+
+        # Propriétés du document
+        # self.listeproprietes contient la liste des propriétés, avec leur
+        # description et leur valeur par défaut.
+        # self.proprietes contient les propriétés définies par l'utilisateur,
+        # ou à défaut les valeurs par défaut.
+        self.listeproprietes = {}
+        self.proprietes = {}
+        self.listeproprietes['pdf'] = {
+            'couleur':              (_("Couleur (R,V,B)"), (.6, .0, .0)),
+            'couleur_initiale':     (_("Initiale en couleur"), False),
+            'couleur_lignes':       (_("Lignes en couleur"), True),
+            'couleur_symboles':     (_("Symboles en couleur"), True),
+            'epaisseur_lignes':     (_("Épaisseur des lignes"), 20),
+            'espace_lignes_texte':  (_("Espacement sous la portée"), '6 mm'),
+            'papier':               (_("Taille de la page"), 'a5'),
+            'taille_initiale':      (_("Taille de l'initiale"), 43),
+            'taille_notes':         (_("Taille des notes"), 17),
+            'taille_police':        (_("Taille de la police"), 12),
+        }
+        self.proprietes['pdf'] = {
+            prop: val[1]
+            for prop, val in self.listeproprietes['pdf'].items()
+        }
+        if proprietes and 'pdf' in proprietes:
+            for prop, val in proprietes['pdf'].items():
+                if prop in self.listeproprietes['pdf']:
+                    t = type(self.listeproprietes['pdf'][prop][1])
+                    if t in (str, int, float):
+                        self.proprietes['pdf'][prop] = t(val)
+                    elif t is bool:
+                        self.proprietes['pdf'][prop] = t(int(val))
+                    elif t == tuple or t == list:
+                        v = val.split(',')
+                        for i, pr in enumerate(self.listeproprietes['pdf'][prop][1]):
+                            t = type(pr)
+                            v[i] = t(v[i])
+                        self.proprietes['pdf'][prop] = v
+
+
+    def pdf(self, suffixe=''):
+        fichierpdf = self.fichierpdf.replace('.pdf', '-{}.pdf'.format(suffixe))
+        cheminpdf = self.cheminpdf.replace('.pdf', '-{}.pdf'.format(suffixe))
         if (
-            not os.path.isfile(self.fichierpdf)
-            or os.path.getmtime(self.fichierpdf)
+            not os.path.isfile(fichierpdf)
+            or os.path.getmtime(fichierpdf)
                 < os.path.getmtime(self.fichier)
         ):
-            self.preparer_pdf()
-        return '/' + cfg.STATIC + '/pdf/' + self.cheminpdf
+            self.preparer_pdf(fichierpdf)
+        return '/' + cfg.STATIC + '/pdf/' + cheminpdf
 
     def afficher(self):
         try:
             return h.OBJECT(
-                data="{}".format(self.pdf),
+                data="{}".format(self.pdf()),
                 Type="application/pdf",
                 width="100%",
                 height="100%"
@@ -73,11 +116,6 @@ Voici la sortie de la commande :
     def preparer_pdf(
         self,
         destination=False,
-        proprietes={
-            'taille_initiale':      '43',
-            'taille_police':        '12',
-            'couleur':              True,
-        },
         environnement={}
     ):
         fichiertmp = 'main'
@@ -92,7 +130,7 @@ Voici la sortie de la commande :
                 'partgreg',
                 {
                     'partition': self.nom,
-                    'proprietes': proprietes
+                    'proprietes': self.proprietes['pdf']
                 },
             ))
         compiler_pdf(textmp, environnement)

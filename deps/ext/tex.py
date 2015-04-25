@@ -47,7 +47,7 @@ class Document(txt.Document):
         if documentmaitre():
             try:
                 return h.OBJECT(
-                    data="{}".format(self.pdf),
+                    data="{}".format(self.pdf()),
                     Type="application/pdf",
                     width="100%",
                     height="100%"
@@ -67,7 +67,6 @@ Voici la sortie de la commande :
         else:
             return txt.Document.afficher(self)
 
-    @property
     def pdf(self):
         if (
             not os.path.isfile(self.fichierpdf)

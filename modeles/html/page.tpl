@@ -48,6 +48,18 @@
             %except NameError: pass
             %end
 
+            %try:
+            %if len(exports) > 0:  # Même chose pour les actions sur les documents.
+            <b>{{_("Export")}}</b><br>
+            <ul>
+                %for export in sorted(exports.keys(), key=lambda s: o.sansaccents(s.lower())):
+                <li><a href={{i18n_path('/_exporter/' + exports[export])}}>{{export}}</a></li>
+                %end
+            </ul>
+            %end
+            %except NameError: pass
+            %end
+
             <div id="acces">
                 <b>{{_("Accès réservé")}}</b><br>
                 <ul>
