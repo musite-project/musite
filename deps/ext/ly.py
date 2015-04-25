@@ -8,11 +8,10 @@ http://www.lilypond.org
 """
 import ext.txt as txt
 from etc import config as cfg
-from outils import motaleatoire
+from outils import motaleatoire, _
 import os
 import shutil
 import subprocess as sp
-from deps.i18n import lazy_gettext as _
 import HTMLTags as h
 import jrnl as l
 EXT = __name__.split('.')[-1]

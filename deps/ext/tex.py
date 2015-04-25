@@ -11,13 +11,12 @@ https://elzevir.fr/imj/latex/
 """
 import ext.txt as txt
 from etc import config as cfg
-from outils import motaleatoire
+from outils import motaleatoire, _
 import os
 import shutil
 import subprocess as sp
 import re
 import HTMLTags as h
-from deps.i18n import lazy_gettext as _
 import jrnl as l
 EXT = __name__.split('.')[-1]
 
@@ -54,7 +53,7 @@ class Document(txt.Document):
                     height="100%"
                 )
             except ErreurCompilation:
-                return (markdown(str(_(
+                return (markdown(_(
                     """\
 Il y a eu une erreur pendant le traitement du document.
 Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
@@ -63,7 +62,7 @@ certain du contraire, merci de signaler le problème.
 Voici la sortie de la commande :
 
                     """
-                    ))) + traiter_erreur_compilation(self. dossiertmp)
+                    )) + traiter_erreur_compilation(self. dossiertmp)
                 )
         else:
             return txt.Document.afficher(self)

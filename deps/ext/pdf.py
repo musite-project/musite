@@ -5,7 +5,7 @@ import os
 import HTMLTags as h
 from base64 import b64encode
 from etc import config as cfg
-from deps.i18n import lazy_gettext as _
+from outils import _
 
 
 class Document:

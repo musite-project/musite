@@ -1071,5 +1071,6 @@ def markdown(text, **kwargs):
     :param escape: if set to True, all html tags will be escaped.
     :param use_xhtml: output with xhtml tags.
     """
+    text = str(text)
     m = Markdown(**kwargs)
     return m.parse(text)

@@ -14,6 +14,7 @@ from string import ascii_lowercase
 import unicodedata as ud
 import jrnl as l
 from etc import config as cfg
+from deps.i18n import lazy_gettext as _, i18n_path
 
 
 class Depot():

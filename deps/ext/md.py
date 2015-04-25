@@ -10,7 +10,7 @@ http://fr.wikipedia.org/wiki/Markdown
 from mistune import markdown
 import ext.txt as txt
 from etc import config as cfg
-from deps.i18n import lazy_gettext as _
+from outils import _
 EXT = __name__.split('.')[-1]
 
 

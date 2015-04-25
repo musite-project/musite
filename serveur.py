@@ -26,12 +26,13 @@ from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 import outils as f
+from outils import i18n_path, _
 import auth as a
 import utilisateurs as u
 import bottle as b
 from bottle import request as rq
 import HTMLTags as h
-from deps.i18n import I18NPlugin as Traduction, lazy_gettext as _, i18n_path
+from deps.i18n import I18NPlugin as Traduction
 from mistune import markdown
 from etc import config as cfg
 
