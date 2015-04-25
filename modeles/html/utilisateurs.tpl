@@ -6,7 +6,7 @@
    <b>{{_("Ajout ou modification d'un utilisateur :")}}</b>
    <br>
    <br>
-   <form method="post" action="/admin/utilisateurs">
+   <form method="post" action="{{i18n_path('/admin/utilisateurs')}}">
       <input name="nom" placeholder="{{_("Nom")}}"></input>
       <br>
       <input name="mdp" type="password" placeholder="{{_("MdP")}}"></input>
@@ -23,7 +23,7 @@
       <tr>
          <td>{{utilisateur}}&nbsp&nbsp&nbsp</td>
          <td><small>
-            <a href=/admin/supprimerutilisateur/{{utilisateur}}>{{_("supprimer")}}</a>
+            <a href={{i18n_path('/admin/supprimerutilisateur/' + utilisateur)}}>{{_("supprimer")}}</a>
             </small>
          </td>
       </tr>
@@ -51,7 +51,7 @@
    <b>Groupes :</b>
    <br>
    <br>
-   <form method="post" action="/admin/groupes">
+   <form method="post" action="{{i18n_path('/admin/groupes')}}">
       %with open(os.path.join(cfg.ETC, 'groupes'), 'r') as fichier:
       %groupes = fichier.read(-1)
       <textarea name="texte" id="fichier" cols="40" rows="10">{{groupes}}</textarea>

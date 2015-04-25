@@ -13,7 +13,7 @@
     });
 </script>
 <div id="zonesaisie">
-    <form method="post" action="/{{emplacement}}">
+    <form method="post" action="{{i18n_path('/' + emplacement)}}">
         <!--
         <input name="titre" label="titre" placeholder="{{_("titre")}}">
         <input name="mode" label="mode" placeholder="{{_("mode")}}">
