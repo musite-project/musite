@@ -13,6 +13,8 @@ import random as rd
 from string import ascii_lowercase
 import unicodedata as ud
 import jrnl as l
+import functools
+from bottle import SimpleTemplate, template
 from etc import config as cfg
 from deps.i18n import lazy_gettext as _, i18n_path
 
@@ -313,3 +315,10 @@ def sansaccents(entree):
 
 def motaleatoire(longueur, source=ascii_lowercase):
     return ''.join(rd.choice(source) for i in range(longueur))
+
+
+def templateperso(syntaxe='<% %> % <<< >>>'):
+    class Adaptateur(SimpleTemplate):
+        def __init__(self, syntax=syntaxe, *args, **settings):
+            SimpleTemplate.__init__(self, syntax=syntax, *args, **settings)
+    return functools.partial(template, template_adapter=Adaptateur)

@@ -9,13 +9,19 @@ http://gregorio-project.github.io/
 """
 from ext import txt, tex
 from etc import config as cfg
-from outils import motaleatoire, _
+from outils import templateperso, motaleatoire, _
 from mistune import markdown
 import os
 import shutil
 from bottle import template
 import HTMLTags as h
 EXT = __name__.split('.')[-1]
+
+
+# Ce qui suit est nécessaire pour modifier les délimiteurs dans les gabarits.
+# Comme LaTeX fait un usage constant des accolades, on utilise les symboles
+# <<< et >>>
+templatetex = templateperso()
 
 
 class Document(txt.Document):
@@ -67,6 +73,11 @@ Voici la sortie de la commande :
     def preparer_pdf(
         self,
         destination=False,
+        proprietes={
+            'taille_initiale':      '43',
+            'taille_police':        '12',
+            'couleur':              True,
+        },
         environnement={}
     ):
         fichiertmp = 'main'
@@ -77,10 +88,17 @@ Voici la sortie de la commande :
         os.makedirs(self.dossiertmp, exist_ok=True)
         shutil.copy2(self.fichier, self.fichiertmp)
         with open(textmp, 'w') as f:
-            f.write(template('partgreg', {'partition': self.nom}))
+            f.write(templatetex(
+                'partgreg',
+                {
+                    'partition': self.nom,
+                    'proprietes': proprietes
+                },
+            ))
         compiler_pdf(textmp, environnement)
         os.renames(orig, dest)
-        shutil.rmtree(self.rd, ignore_errors=True)
+        if not cfg.DEVEL:
+                shutil.rmtree(self.rd, ignore_errors=True)
 
 
 def compiler_pdf(fichier, environnement={}):

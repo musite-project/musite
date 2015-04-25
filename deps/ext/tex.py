@@ -88,7 +88,8 @@ Voici la sortie de la commande :
         shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
         compiler_pdf(self.fichiertmp, environnement)
         os.renames(orig, dest)
-        shutil.rmtree(self.rd, ignore_errors=True)
+        if not cfg.DEVEL:
+            shutil.rmtree(self.rd, ignore_errors=True)
 
 
 def compiler_pdf(fichier, environnement={}):
