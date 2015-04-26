@@ -8,7 +8,7 @@ http://www.lilypond.org
 """
 import ext.txt as txt
 from etc import config as cfg
-from outils import motaleatoire, _
+from outils import motaleatoire, url, _
 import os
 import shutil
 import subprocess as sp
@@ -20,43 +20,40 @@ EXT = __name__.split('.')[-1]
 class Document(txt.Document):
     def __init__(self, chemin, ext=EXT):
         txt.Document.__init__(self, chemin, ext)
-        # Chemin absolu des fichiers temporaires
-        self.rd = os.path.join(cfg.TMP, motaleatoire(6))
-        self.fichiertmp = os.path.join(self.rd, self.fichierrelatif)
-        self.dossiertmp = os.path.join(self.rd, self.dossierrelatif)
-        # Chemins des pdf
-        self.cheminpdf = os.path.splitext(self.chemin)[0] + '.pdf'
-        self.fichierrelatifpdf = self.cheminpdf.replace('/', os.path.sep)
-        self.fichierpdf = os.path.join(
-            cfg.PWD, cfg.STATIC, 'pdf', self.fichierrelatifpdf
-        )
-        self.fichiertmppdf = os.path.join(self.rd, self.fichierrelatifpdf)
 
     def afficher(self):
         return h.OBJECT(
-            data="{}".format(self.pdf),
+            data="{}".format(self.pdf()),
             Type="application/pdf",
             width="100%",
             height="100%"
         )
 
-    @property
-    def pdf(self):
+    def pdf(self, chemin=False, indice=''):
+        chemin = chemin if chemin else 'pdf'
+        fichierpdf = self._fichier('pdf')
+        cheminpdf = self._chemin('pdf')
+        if chemin:
+            fichierpdf = fichierpdf.replace(
+                '/pdf/',
+                '/{}/{}/'.format(chemin, indice).replace('//', '/')
+            )
+            cheminpdf = cheminpdf.replace(
+                '/pdf/',
+                '/{}/{}/'.format(chemin, indice).replace('//', '/')
+            )
         if (
-            not os.path.isfile(self.fichierpdf)
-            or os.path.getmtime(self.fichierpdf)
+            not os.path.isfile(self._fichier('pdf'))
+            or os.path.getmtime(self._fichier('pdf'))
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_pdf()
-        return '/' + cfg.STATIC + '/pdf/' + self.cheminpdf
+        return url(fichierpdf)
 
-    def preparer_pdf(
-        self,
-        destination=False,
-        environnement={}
-    ):
-        orig = self.fichiertmppdf
-        dest = destination if destination else self.fichierpdf
+    def preparer_pdf(self, destination=False, environnement={}):
+        orig = self._fichiertmp('pdf')
+        dest = destination if destination else self._fichier('pdf')
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
         shutil.rmtree(self.rd, ignore_errors=True)
         shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
         compiler_pdf(self.fichiertmp, environnement)

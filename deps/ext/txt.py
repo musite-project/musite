@@ -52,10 +52,7 @@ class Document:
         )
 
     def _fichiertmp(self, ext):
-        return os.path.join(self.rd, self.fichierrelatif(ext))
-
-    def _url(self, fichier):
-        return fichier.replace(cfg.PWD, '').replace(os.sep, '/')
+        return os.path.join(self.rd, self._fichierrelatif(ext))
 
     def afficher(self):
         """Affichage du contenu du document

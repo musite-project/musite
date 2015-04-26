@@ -322,3 +322,7 @@ def templateperso(syntaxe='<% %> % <<< >>>'):
         def __init__(self, syntax=syntaxe, *args, **settings):
             SimpleTemplate.__init__(self, syntax=syntax, *args, **settings)
     return functools.partial(template, template_adapter=Adaptateur)
+
+
+def url(fichier):
+    return fichier.replace(cfg.PWD, '').replace(os.sep, '/')

@@ -11,7 +11,7 @@ https://elzevir.fr/imj/latex/
 """
 import ext.txt as txt
 from etc import config as cfg
-from outils import motaleatoire, _
+from outils import motaleatoire, url, _
 import os
 import shutil
 import subprocess as sp
@@ -56,20 +56,28 @@ Voici la sortie de la commande :
         else:
             return txt.Document.afficher(self)
 
-    def pdf(self):
+    def pdf(self, chemin=False, indice=''):
+        chemin = chemin if chemin else 'pdf'
+        fichierpdf = self._fichier('pdf')
+        cheminpdf = self._chemin('pdf')
+        if chemin:
+            fichierpdf = fichierpdf.replace(
+                '/pdf/',
+                '/{}/{}/'.format(chemin, indice).replace('//', '/')
+            )
+            cheminpdf = cheminpdf.replace(
+                '/pdf/',
+                '/{}/{}/'.format(chemin, indice).replace('//', '/')
+            )
         if (
             not os.path.isfile(self._fichier('pdf'))
             or os.path.getmtime(self._fichier('pdf'))
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_pdf()
-        return '/' + cfg.STATIC + '/pdf/' + self._chemin('pdf')
+        return url(fichierpdf)
 
-    def preparer_pdf(
-        self,
-        destination=False,
-        environnement={}
-    ):
+    def preparer_pdf(self, destination=False, environnement={}):
         orig = self.fichiertmppdf
         dest = destination if destination else self._fichier('pdf')
         shutil.rmtree(self.rd, ignore_errors=True)

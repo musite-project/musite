@@ -9,7 +9,7 @@ http://gregorio-project.github.io/
 """
 from ext import txt, tex
 from etc import config as cfg
-from outils import templateperso,  _
+from outils import templateperso, url,  _
 from gabctk import Gabc, Lily, Midi, Partition
 from mistune import markdown
 import os
@@ -129,7 +129,7 @@ Voici la sortie de la commande :
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_pdf(fichierpdf)
-        return self._url(fichierpdf)
+        return url(fichierpdf)
 
     def gabc(self, fmt, chemin=False, indice=''):
         chemin = chemin if chemin else fmt
@@ -145,7 +145,7 @@ Voici la sortie de la commande :
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_gabc(fmt, fichier)
-        return self._url(fichier)
+        return url(fichier)
 
     def ly(self, chemin=False, indice=''):
         return self.gabc('ly', chemin, indice)
