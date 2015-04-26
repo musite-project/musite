@@ -24,17 +24,6 @@ EXT = __name__.split('.')[-1]
 class Document(txt.Document):
     def __init__(self, chemin, ext=EXT):
         txt.Document.__init__(self, chemin, ext)
-        # Chemin absolu des fichiers temporaires
-        self.rd = os.path.join(cfg.TMP, motaleatoire(6))
-        self.fichiertmp = os.path.join(self.rd, self.fichierrelatif)
-        self.dossiertmp = os.path.join(self.rd, self.dossierrelatif)
-        # Chemins des pdf
-        self.cheminpdf = os.path.splitext(self.chemin)[0] + '.pdf'
-        self.fichierrelatifpdf = self.cheminpdf.replace('/', os.path.sep)
-        self.fichierpdf = os.path.join(
-            cfg.PWD, cfg.STATIC, 'pdf', self.fichierrelatifpdf
-        )
-        self.fichiertmppdf = os.path.join(self.rd, self.fichierrelatifpdf)
 
     def afficher(self):
         def documentmaitre():
@@ -69,12 +58,12 @@ Voici la sortie de la commande :
 
     def pdf(self):
         if (
-            not os.path.isfile(self.fichierpdf)
-            or os.path.getmtime(self.fichierpdf)
+            not os.path.isfile(self._fichier('pdf'))
+            or os.path.getmtime(self._fichier('pdf'))
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_pdf()
-        return '/' + cfg.STATIC + '/pdf/' + self.cheminpdf
+        return '/' + cfg.STATIC + '/pdf/' + self._chemin('pdf')
 
     def preparer_pdf(
         self,
@@ -82,7 +71,7 @@ Voici la sortie de la commande :
         environnement={}
     ):
         orig = self.fichiertmppdf
-        dest = destination if destination else self.fichierpdf
+        dest = destination if destination else self._fichier('pdf')
         shutil.rmtree(self.rd, ignore_errors=True)
         shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
         compiler_pdf(self.fichiertmp, environnement)

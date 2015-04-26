@@ -12,7 +12,7 @@ user des mécanismes d'héritage de Python en vous basant sur ce module.
 import os.path
 import HTMLTags as h
 import bottle as b
-from outils import _
+from outils import motaleatoire, _
 from etc import config as cfg
 b.TEMPLATE_PATH += cfg.MODELES
 EXT = __name__.split('.')[-1]
@@ -34,6 +34,28 @@ class Document:
             self.fichierrelatif
         )
         self.dossier = os.path.dirname(self.fichier)
+        # Chemin absolu des fichiers temporaires
+        self.rd = os.path.join(cfg.TMP, motaleatoire(6))
+        self.fichiertmp = os.path.join(self.rd, self.fichierrelatif)
+        self.dossiertmp = os.path.join(self.rd, self.dossierrelatif)
+
+    def _chemin(self, ext):
+        return os.path.splitext(self.chemin)[0] + '.' + ext
+
+    def _fichierrelatif(self, ext):
+        return self._chemin(ext).replace('/', os.path.sep)
+
+    def _fichier(self, ext):
+        return os.path.join(
+            cfg.PWD, cfg.STATIC, ext,
+            self._fichierrelatif(ext)
+        )
+
+    def _fichiertmp(self, ext):
+        return os.path.join(self.rd, self.fichierrelatif(ext))
+
+    def _url(self, fichier):
+        return fichier.replace(cfg.PWD, '').replace(os.sep, '/')
 
     def afficher(self):
         """Affichage du contenu du document

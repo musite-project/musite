@@ -176,10 +176,15 @@ class Document:
             _('Projet'): self.projet,
             _('Dossier'): '/'.join(self.chemin.split('/')[:-1])
         }
-        exports = {
-            fmt: self.chemin + '?fmt=' + fmt
-            for fmt in EXT[self.ext].Document(self.chemin).fmt
-        }
+        try:
+            exports = {
+                fmt: self.chemin + '?fmt=' + fmt
+                for fmt in EXT[self.ext].Document(self.chemin).fmt
+            }
+        except AttributeError:
+            # Cette exception est levée quand le module concerné ne définit pas
+            # de format d'export.
+            exports = {}
         return {
             'corps': contenu,
             'actions': actions,
@@ -317,7 +322,7 @@ class Document:
             b.redirect(
                 i18n_path(EXT[self.ext]\
                     .Document(self.chemin, proprietes=proprietes)\
-                    .pdf('tmp', f.motaleatoire(3))
+                    .exporter(fmt)('tmp', f.motaleatoire(3))
                 + '?action=telecharger'
                 )
             )
