@@ -181,7 +181,7 @@ class Document:
                 fmt: self.chemin + '?fmt=' + fmt
                 for fmt in EXT[self.ext].Document(self.chemin).fmt
             }
-        except AttributeError:
+        except (AttributeError, KeyError):
             # Cette exception est levée quand le module concerné ne définit pas
             # de format d'export.
             exports = {}
