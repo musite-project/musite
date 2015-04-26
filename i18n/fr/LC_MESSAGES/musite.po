@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-24 18:03+0200\n"
+"POT-Creation-Date: 2015-04-26 20:29+0200\n"
 "PO-Revision-Date: 2015-04-24 16:23+0200\n"
 "Last-Translator: Abbé Jacques Peron <cataclop@hotmail.com>\n"
 "Language-Team: French\n"
@@ -18,167 +18,224 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: serveur.py:103
+#: serveur.py:104
 msgid "Il n'y a rien avant la création !"
 msgstr ""
 
-#: serveur.py:117
+#: serveur.py:118
 msgid "Il n'y a pas encore de modifications à signaler."
 msgstr ""
 
-#: serveur.py:164
+#: serveur.py:165
 msgid "Aperçu"
 msgstr ""
 
-#: serveur.py:165 serveur.py:468
+#: serveur.py:166 serveur.py:506
 msgid "Historique"
 msgstr ""
 
-#: serveur.py:166
+#: serveur.py:167
 msgid "Source"
 msgstr ""
 
-#: serveur.py:170
+#: serveur.py:171
 msgid "Éditer"
 msgstr ""
 
-#: serveur.py:171 serveur.py:358 serveur.py:475
+#: serveur.py:172 serveur.py:396 serveur.py:513
 msgid "Supprimer"
 msgstr ""
 
-#: serveur.py:175 serveur.py:363 serveur.py:481
+#: serveur.py:176 serveur.py:401 serveur.py:519
 msgid "Projet"
 msgstr ""
 
-#: serveur.py:176
+#: serveur.py:177
 msgid "Dossier"
 msgstr ""
 
-#: serveur.py:205 serveur.py:229
+#: serveur.py:216 serveur.py:240
 msgid "Extension inconnue : {}."
 msgstr ""
 
-#: serveur.py:209 serveur.py:243
+#: serveur.py:220 serveur.py:254
 msgid "Ce fichier est illisible."
 msgstr ""
 
-#: serveur.py:231
+#: serveur.py:242
 msgid "Voici les données de la requète :"
 msgstr ""
 
-#: serveur.py:262
+#: serveur.py:273
 msgid "Suppression du document {}"
 msgstr ""
 
-#: serveur.py:265
+#: serveur.py:276
 msgid "Document supprimé !"
 msgstr ""
 
-#: serveur.py:283 serveur.py:287
+#: serveur.py:294 serveur.py:298
 msgid "Ce type de document n'est pas éditable."
 msgstr ""
 
-#: serveur.py:356 serveur.py:472
+#: serveur.py:332
+msgid ""
+"Il y a eu une erreur pendant le traitement du document.\n"
+"Ceci vient probablement d'une erreur de syntaxe ou d'une erreur dans vos\n"
+"paramètres ; si vous êtes absolument certain du contraire,\n"
+"merci de signaler le problème.\n"
+"                    "
+msgstr ""
+
+#: serveur.py:394 serveur.py:510
 msgid "Créer document"
 msgstr ""
 
-#: serveur.py:357 serveur.py:473
+#: serveur.py:395 serveur.py:511
 msgid "Créer dossier"
 msgstr ""
 
-#: serveur.py:364
+#: serveur.py:402
 msgid "Parent"
 msgstr ""
 
-#: serveur.py:447
+#: serveur.py:485
 msgid "Suppression du dossier {}"
 msgstr ""
 
-#: serveur.py:450
+#: serveur.py:488
 msgid "Dossier supprimé !"
 msgstr ""
 
-#: serveur.py:478 serveur.py:573 serveur.py:603
+#: serveur.py:516 serveur.py:611 serveur.py:641
 msgid "Créer projet"
 msgstr ""
 
-#: serveur.py:496
+#: serveur.py:534
 msgid "Ce projet existe déjà !"
 msgstr ""
 
-#: serveur.py:531
+#: serveur.py:569
 msgid "Projet supprimé !"
 msgstr ""
 
-#: serveur.py:534
+#: serveur.py:572
 msgid ""
 "C'est drôle, ce que vous me demandez :\n"
 "                il n'y a pas de projet ici !"
 msgstr ""
 
-#: serveur.py:579
+#: serveur.py:617
 msgid "Projets"
 msgstr ""
 
-#: serveur.py:627 modeles/html/page.tpl:47
+#: serveur.py:665 modeles/html/page.tpl:64
 msgid "Accès réservé"
 msgstr ""
 
-#: serveur.py:633
+#: serveur.py:671
 msgid "Bonjour, {} !"
 msgstr ""
 
-#: serveur.py:639 serveur.py:660 serveur.py:669
+#: serveur.py:677 serveur.py:700 serveur.py:709
 msgid "Vous devez être administrateur"
 msgstr ""
 
-#: serveur.py:644
+#: serveur.py:682
 msgid "Utilisateurs"
 msgstr ""
 
-#: serveur.py:706 serveur.py:719 serveur.py:731 serveur.py:741 serveur.py:750
-#: serveur.py:759 serveur.py:769 serveur.py:784 serveur.py:800 serveur.py:816
-#: serveur.py:831 serveur.py:847 serveur.py:873 serveur.py:896 serveur.py:906
+#: serveur.py:746 serveur.py:759 serveur.py:774 serveur.py:784 serveur.py:796
+#: serveur.py:805 serveur.py:818 serveur.py:833 serveur.py:849 serveur.py:865
+#: serveur.py:880 serveur.py:896 serveur.py:922 serveur.py:945 serveur.py:955
 msgid "Réservé aux éditeurs"
 msgstr ""
 
-#: serveur.py:714
+#: serveur.py:754
 msgid "fichier"
 msgstr ""
 
-#: serveur.py:736
+#: serveur.py:779
 msgid "dossier"
 msgstr ""
 
-#: serveur.py:755
+#: serveur.py:801
 msgid "projet"
 msgstr ""
 
-#: serveur.py:779
+#: serveur.py:828
 msgid "le fichier {}/{}"
 msgstr ""
 
-#: serveur.py:840
+#: serveur.py:889
 msgid "le projet {} et tout son contenu ? "
 msgstr ""
 
-#: serveur.py:841
+#: serveur.py:890
 msgid "Attention : cette opération est irréversible !"
 msgstr ""
 
-#: serveur.py:972
+#: serveur.py:1041
 msgid "Pourriez-vous expliciter votre intention ?"
 msgstr ""
 
-#: serveur.py:995
+#: serveur.py:1067
 msgid "Accès réservé !"
 msgstr ""
 
-#: serveur.py:1006
+#: serveur.py:1078
 msgid "Il n'y a rien ici !"
 msgstr ""
 
+#: deps/ext/gabc.py:50
+msgid "Tempo"
+msgstr ""
+
+#: deps/ext/gabc.py:51
+msgid "Transposition"
+msgstr ""
+
+#: deps/ext/gabc.py:54
+msgid "Couleur (R,V,B)"
+msgstr ""
+
+#: deps/ext/gabc.py:55
+msgid "Initiale en couleur"
+msgstr ""
+
+#: deps/ext/gabc.py:56
+msgid "Lignes en couleur"
+msgstr ""
+
 #: deps/ext/gabc.py:57
+msgid "Symboles en couleur"
+msgstr ""
+
+#: deps/ext/gabc.py:58
+msgid "Épaisseur des lignes"
+msgstr ""
+
+#: deps/ext/gabc.py:59
+msgid "Espacement sous la portée"
+msgstr ""
+
+#: deps/ext/gabc.py:60
+msgid "Taille de la page"
+msgstr ""
+
+#: deps/ext/gabc.py:61
+msgid "Taille de l'initiale"
+msgstr ""
+
+#: deps/ext/gabc.py:62
+msgid "Taille des notes"
+msgstr ""
+
+#: deps/ext/gabc.py:63
+msgid "Taille de la police"
+msgstr ""
+
+#: deps/ext/gabc.py:99
 msgid ""
 "Il y a eu une erreur pendant le traitement du document.\n"
 "Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument\n"
@@ -189,15 +246,15 @@ msgid ""
 "                "
 msgstr ""
 
-#: deps/ext/ly.py:84 deps/ext/tex.py:114
+#: deps/ext/ly.py:80 deps/ext/tex.py:110
 msgid "Sortie :"
 msgstr ""
 
-#: deps/ext/ly.py:88 deps/ext/tex.py:118
+#: deps/ext/ly.py:84 deps/ext/tex.py:114
 msgid "Erreurs :"
 msgstr ""
 
-#: deps/ext/tex.py:58
+#: deps/ext/tex.py:46
 msgid ""
 "Il y a eu une erreur pendant le traitement du document.\n"
 "Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument\n"
@@ -212,12 +269,20 @@ msgstr ""
 msgid "Créer le"
 msgstr ""
 
-#: modeles/html/editeur.tpl:25 modeles/html/utilisateurs.tpl:60
+#: modeles/html/creation.tpl:7 modeles/html/editeur.tpl:25
+msgid "Annuler"
+msgstr ""
+
+#: modeles/html/editeur.tpl:23 modeles/html/utilisateurs.tpl:60
 msgid "Enregistrer"
 msgstr ""
 
-#: modeles/html/editeur.tpl:27
-msgid "Annuler"
+#: modeles/html/export.tpl:53
+msgid "Exporter"
+msgstr ""
+
+#: modeles/html/export.tpl:55
+msgid "Retour"
 msgstr ""
 
 #: modeles/html/historique.tpl:4
@@ -246,23 +311,27 @@ msgstr ""
 msgid "Revenir à cette version"
 msgstr ""
 
-#: modeles/html/page.tpl:24
+#: modeles/html/page.tpl:29
 msgid "Liens"
 msgstr ""
 
-#: modeles/html/page.tpl:36
+#: modeles/html/page.tpl:41
 msgid "Actions"
 msgstr ""
 
 #: modeles/html/page.tpl:53
+msgid "Export"
+msgstr ""
+
+#: modeles/html/page.tpl:70
 msgid "Déconnexion"
 msgstr ""
 
-#: modeles/html/page.tpl:59 modeles/html/page.tpl:66
+#: modeles/html/page.tpl:76 modeles/html/page.tpl:83
 msgid "S'authentifier"
 msgstr ""
 
-#: modeles/html/page.tpl:73
+#: modeles/html/page.tpl:90
 msgid "Administration"
 msgstr ""
 
