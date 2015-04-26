@@ -34,8 +34,9 @@ class Document(txt.Document):
         # Chemins des pdf
         self.cheminpdf = os.path.splitext(self.chemin)[0] + '.pdf'
         self.fichierrelatifpdf = self.cheminpdf.replace('/', os.path.sep)
+        self.dossierpdf = 'pdf'
         self.fichierpdf = os.path.join(
-            cfg.PWD, cfg.STATIC, 'pdf', self.fichierrelatifpdf
+            cfg.PWD, cfg.STATIC, self.dossierpdf, self.fichierrelatifpdf
         )
         self.fichiertmppdf = os.path.join(self.rd, self.fichierrelatifpdf)
 
@@ -50,7 +51,7 @@ class Document(txt.Document):
         self.listeproprietes = {}
         self.proprietes = {}
         self.listeproprietes['pdf'] = {
-            'couleur':              (_("Couleur (R,V,B)"), (.6, .0, .0)),
+            'couleur':              (_("Couleur (R,V,B)"), (154, 0, 0)),
             'couleur_initiale':     (_("Initiale en couleur"), False),
             'couleur_lignes':       (_("Lignes en couleur"), True),
             'couleur_symboles':     (_("Symboles en couleur"), True),
@@ -73,24 +74,33 @@ class Document(txt.Document):
                         self.proprietes['pdf'][prop] = t(val)
                     elif t is bool:
                         self.proprietes['pdf'][prop] = t(int(val))
-                    elif t == tuple or t == list:
-                        v = val.split(',')
-                        for i, pr in enumerate(self.listeproprietes['pdf'][prop][1]):
-                            t = type(pr)
-                            v[i] = t(v[i])
-                        self.proprietes['pdf'][prop] = v
+                    elif t in (tuple, list):
+                        self.proprietes['pdf'][prop] = tuple(
+                            type(pr)(i)
+                            for i, pr
+                            in zip(
+                                val.split(','),
+                                self.listeproprietes['pdf'][prop][1]
+                            )
+                        )
 
-
-    def pdf(self, suffixe=''):
-        fichierpdf = self.fichierpdf.replace('.pdf', '-{}.pdf'.format(suffixe))
-        cheminpdf = self.cheminpdf.replace('.pdf', '-{}.pdf'.format(suffixe))
+    def pdf(self, chemin=False, indice=''):
+        chemin = chemin if chemin else self.dossierpdf
+        fichierpdf = self.fichierpdf.replace(
+            '/{}/'.format(self.dossierpdf),
+            '/{}/{}/'.format(chemin, indice)
+        )
+        cheminpdf = self.cheminpdf.replace(
+            '/{}/'.format(self.dossierpdf),
+            '/{}/{}/'.format(chemin, indice)
+        )
         if (
             not os.path.isfile(fichierpdf)
             or os.path.getmtime(fichierpdf)
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_pdf(fichierpdf)
-        return '/' + cfg.STATIC + '/pdf/' + cheminpdf
+        return fichierpdf.replace(cfg.PWD, '').replace(os.sep, '/')
 
     def afficher(self):
         try:
@@ -144,3 +154,5 @@ def compiler_pdf(fichier, environnement={}):
 
 
 FichierIllisible = txt.FichierIllisible
+
+ErreurCompilation = tex.ErreurCompilation

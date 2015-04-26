@@ -8,12 +8,14 @@
 \usepackage{libertine}
 \usepackage{xcolor}
 
-\setgrefactor{<<<proprietes['taille_notes']>>>}
+\pagestyle{empty}
 
+\setgrefactor{<<<proprietes['taille_notes']>>>}
+\setstafflinethickness{<<<proprietes['epaisseur_lignes']>>>}
 \grechangedim{spacelinestext}{<<<proprietes['espace_lignes_texte']>>>}{0}
 
 \definecolor{rubrum}{rgb}{%
-    <<<','.join(str(p) for p in proprietes['couleur'])>>>%
+    <<<','.join(str(p / 255) for p in proprietes['couleur'])>>>%
 }
 \def\rubrum{\color{rubrum}}
 %if proprietes['couleur_initiale']:
@@ -22,7 +24,7 @@
 \def\rubrinit{}
 %end
 %if proprietes['couleur_lignes']:
-\grecoloredlines{<<<'}{'.join(str(int(255 * c)) for c in proprietes['couleur'])>>>}
+\grecoloredlines{<<<'}{'.join(str(int(c)) for c in proprietes['couleur'])>>>}
 %end
 %if proprietes['couleur_symboles']:
 \let\rubrsym\rubrum
@@ -57,8 +59,6 @@
     {\rubrsym \gresixstar}%
 }
 \renewcommand{\greheightstar}{\grestar}
-
-\setstafflinethickness{<<<proprietes['epaisseur_lignes']>>>}
 
 
 \begin{document}

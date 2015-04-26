@@ -313,12 +313,24 @@ class Document:
 
     def exporter(self, fmt, proprietes):
         proprietes = {fmt: proprietes}
-        b.redirect(
-            i18n_path(EXT[self.ext]\
-                .Document(self.chemin, proprietes=proprietes)\
-                .pdf(f.motaleatoire(3))
+        try:
+            b.redirect(
+                i18n_path(EXT[self.ext]\
+                    .Document(self.chemin, proprietes=proprietes)\
+                    .pdf('tmp', f.motaleatoire(3))
+                + '?action=telecharger'
+                )
             )
-        )
+        except EXT[self.ext].ErreurCompilation:
+            return self.afficher(
+                markdown(_(
+                    """\
+Il y a eu une erreur pendant le traitement du document.
+Ceci vient probablement d'une erreur de syntaxe ou d'une erreur dans vos
+paramètres ; si vous êtes absolument certain du contraire,
+merci de signaler le problème.
+                    """
+            )))
 
     def exporter_infos(self, fmt):
         return self.afficher(b.template(
@@ -955,11 +967,10 @@ def document_exporter_infos(nom, element='', ext=''):
 @page
 def document_exporter(nom, element='', ext=''):
     """ Page où l'utilisateur définit les propriétés du document à exporter"""
-    print({item for item in rq.forms.items()})
     if rq.forms.action == 'exporter':
         return Document(nom, element, ext).exporter(rq.query.fmt, rq.forms)
     else:
-        b.redirect(i18n_path('/{}/{}'.format(nom, element)))
+        b.redirect(i18n_path('/{}/{}.{}'.format(nom, element, ext)))
 
 
 # Affichage de la source d'un document

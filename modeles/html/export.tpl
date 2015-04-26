@@ -52,6 +52,6 @@
         </table>
         <button type="submit" name="action" value="exporter">{{_("Exporter")}}</button>
         &nbsp
-        <button type="submit" name="action" value="annuler">{{_("Annuler")}}</button>
+        <button type="submit" name="action" value="annuler">{{_("Retour")}}</button>
     </form>
 </div>
