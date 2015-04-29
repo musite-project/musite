@@ -77,14 +77,17 @@ class Document(txt.Document):
                         elif t is bool:
                             self.proprietes[fmt][prop] = t(int(val))
                         elif t in (tuple, list):
-                            self.proprietes[fmt][prop] = tuple(
-                                type(pr)(i)
-                                for i, pr
-                                in zip(
-                                    val.split(','),
-                                    self.listeproprietes[fmt][prop][1]
+                            if type(val) in (tuple, list):
+                                self.proprietes[fmt][prop] = val
+                            else:
+                                self.proprietes[fmt][prop] = tuple(
+                                    type(pr)(i)
+                                    for i, pr
+                                    in zip(
+                                        val.split(','),
+                                        self.listeproprietes[fmt][prop][1]
+                                    )
                                 )
-                            )
 
     def afficher(self):
         try:
