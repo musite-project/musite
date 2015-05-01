@@ -148,7 +148,7 @@ class Depot():
             auteur
         )
 
-    def sauvegardecomplete(self, message='Sauvegarde complète', auteur=None):
+    def sauvegardecomplete(self, message=_("Sauvegarde complète"), auteur=None):
             self.sauvegarde('-A', message, auteur)
 
 
@@ -156,7 +156,7 @@ class Dossier():
     def __init__(self, dossier):
         self.dossier = dossier
         if not os.path.isdir(dossier):
-            raise TypeError(dossier + " n'est pas un dossier")
+            raise TypeError(dossier + _(" n'est pas un dossier"))
 
     def lister(self, profondeur=1):
         liste = {
@@ -219,13 +219,13 @@ class Fichier():
             l.log('Erreur l. 758 :', type(e))
             pass
         shutil.copy(self.chemin, fin.chemin)
-        depot.sauvegardecomplete('Clonage')
+        depot.sauvegardecomplete(_("Clonage"))
 
     def deplacer(self, fin):
         fin.creerdossier()
         os.rename(self.chemin, fin.chemin)
         self.effacerdossier()
-        depot.sauvegardecomplete('Déplacement')
+        depot.sauvegardecomplete(_("Déplacement"))
 
     def creerdossier(self):
         try:
@@ -285,7 +285,7 @@ class Fichier():
                     pass
             self.effacer()
         self.effacerdossier()
-        depot.sauvegardecomplete('Effacement')
+        depot.sauvegardecomplete(_("Effacement"))
 
     def supprimer(self):
         os.remove(self.chemin)

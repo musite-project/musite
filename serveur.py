@@ -145,6 +145,12 @@ class Depot:
         """
         self.depot.retablir(commit, fichier, auteur)
 
+    def sauvegarder(self, fichier=None, message=_("Sauvegarde complète")):
+        if fichier:
+            self.depot.sauvegardefichier(fichier, rq.auth[0])
+        else:
+            self.depot.sauvegardecomplete(message, rq.auth[0])
+
 
 class Document:
     """Gestion des documents
@@ -290,13 +296,8 @@ class Document:
             if cfg.DEVEL:
                 print(e)
             txt.Document(self.chemin).supprimer()
-        f.Depot(
-            os.path.join(
-                cfg.DATA, self.projet
-            )
-        ).sauvegardecomplete(
-            _('Suppression du document {}').format(self.chemin),
-            rq.auth[0]
+        self.depot.sauvegarder(
+            message = _('Suppression du document {}').format(self.chemin)
         )
         return self.afficher(_('Document supprimé !'))
 
@@ -417,6 +418,7 @@ class Dossier:
         self.nom = element
         self.chemin = '/'.join((projet, element))
         self.dossier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
+        self.depot = Depot(self.projet)
 
     def afficher(self, contenu):
         """Propriétés communes des pages de gestion de dossiers
@@ -457,6 +459,11 @@ class Dossier:
     def envoyer_fichier(self, fichier, ecraser=False):
         try:
             fichier.save(self.dossier, int(ecraser))
+            self.depot.sauvegarder(
+                message = str(_(
+                    "Envoi du fichier {}".format(fichier.filename)
+                ))
+            )
             b.redirect(i18n_path('/' + self.chemin))
         except OSError as e:
             if cfg.DEVEL:

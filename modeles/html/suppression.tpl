@@ -1,5 +1,5 @@
 <div id="zonesaisie">
-    {{_("Êtes-vous sûr de vouloir supprimer {{quoi}} ?")}}
+    {{_("Êtes-vous sûr de vouloir supprimer {} ?".format(quoi))}}
     <form method="post">
         <button type="submit" name="action" value="supprimer">{{_("Oui, je suis sûr")}}</button>
         &nbsp
