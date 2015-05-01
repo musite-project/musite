@@ -101,9 +101,9 @@ def compiler_pdf(fichier, environnement={'TEXINPUTS': 'lib:'}):
             '-shell-escape',
             fichier
         ]
-        print(environnement)
         environnement = dict(os.environ, **environnement)
-        print(environnement)
+        if cfg.DEVEL:
+            print(environnement)
         compilation = sp.Popen(
             commande,
             env=environnement,
