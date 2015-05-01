@@ -17,6 +17,7 @@ import shutil
 import subprocess as sp
 import re
 import HTMLTags as h
+from mistune import markdown
 import jrnl as l
 EXT = __name__.split('.')[-1]
 
@@ -77,8 +78,11 @@ Voici la sortie de la commande :
             self.preparer_pdf()
         return url(fichierpdf)
 
-    def preparer_pdf(self, destination=False, environnement={}):
-        orig = self.fichiertmppdf
+    def preparer_pdf(
+        self, destination=False,
+        environnement={'TEXINPUTS': 'lib:'}
+    ):
+        orig = self._fichiertmp('pdf')
         dest = destination if destination else self._fichier('pdf')
         shutil.rmtree(self.rd, ignore_errors=True)
         shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
@@ -88,7 +92,7 @@ Voici la sortie de la commande :
             shutil.rmtree(self.rd, ignore_errors=True)
 
 
-def compiler_pdf(fichier, environnement={}):
+def compiler_pdf(fichier, environnement={'TEXINPUTS': 'lib:'}):
     try:
         os.chdir(os.path.dirname(fichier))
         commande = [
@@ -97,7 +101,9 @@ def compiler_pdf(fichier, environnement={}):
             '-shell-escape',
             fichier
         ]
+        print(environnement)
         environnement = dict(os.environ, **environnement)
+        print(environnement)
         compilation = sp.Popen(
             commande,
             env=environnement,

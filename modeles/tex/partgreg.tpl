@@ -41,8 +41,6 @@
     \rubrinit #1%
 }}
 
-\let\Vbar\Vbarsmall
-\let\Rbar\Rbarsmall
 \catcode`\℣=\active \def ℣#1{%
         {\rubrsym \Vbar\hspace{-.25ex}#1}
 }
