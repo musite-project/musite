@@ -178,6 +178,7 @@ class Document:
         }
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
+                actions[_('Copier')] = '_copier/' + self.chemin
                 actions[_('Déplacer')] = '_deplacer/' + self.chemin
                 actions[_('Éditer')] = '_editer/' + self.chemin
                 actions[_('Supprimer')] = '_supprimer/' + self.chemin
@@ -353,6 +354,30 @@ class Document:
         ).sauvegardefichier(f.Fichier(self.fichier), rq.auth[0])
         b.redirect(i18n_path('/' + self.chemin))
 
+    def copier(self, destination, ecraser=False):
+        """Copie d'un dossier
+        """
+        dest = os.path.join(cfg.DATA, destination)
+        if not os.path.exists(dest) or ecraser:
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            print(self.fichier, dest)
+            shutil.copy2(self.fichier, dest)
+            self.depot.sauvegarder(
+                message=_('copie')
+                        + ' ' + '/'.join(self.chemin.split('/')[1:])
+                        + ' -> ' + '/'.join(destination.split('/')[1:])
+                )
+            b.redirect(i18n_path('/' + destination))
+        else:
+            return self.afficher(markdown(_(
+                "Il y a déjà quelque chose à cet emplacement.\n\n"
+                "- Si vous désirez copier un fichier ou un dossier au sein"
+                " d'un autre dossier, merci de spécifier le chemin complet de"
+                " la destination.\n"
+                "- Si vous désirez remplacer un fichier existant, supprimez-le"
+                " auparavant."
+            )))
+
     def exporter(self, fmt, proprietes):
         proprietes = {fmt: proprietes}
         try:
@@ -435,6 +460,7 @@ class Dossier:
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 actions[_('Créer document')] = '_creer/' + self.chemin
                 actions[_('Créer dossier')] = '_creerdossier/' + self.chemin
+                actions[_('Copier')] = '_copier/' + self.chemin
                 actions[_('Déplacer')] = '_deplacer/' + self.chemin
                 actions[_('Envoyer fichier')] = '_envoyer/' + self.chemin
                 actions[_('Supprimer')] = \
@@ -460,17 +486,34 @@ class Dossier:
         os.makedirs(self.dossier, exist_ok=True)
         return self.lister()
 
-    def deplacer(self, destination):
-        """Renommage d'un projet
+    def deplacer(self, destination, ecraser=False):
+        """Déplacement/renommage d'un dossier (ou document)
         """
         dest = os.path.join(cfg.DATA, destination)
-        if not os.path.exists(dest):
+        if not os.path.exists(dest) or ecraser:
             shutil.move(self.dossier, dest)
+            self.depot.sauvegarder(
+                message=self.nom
+                        + ' -> ' + '/'.join(destination.split('/')[1:])
+                )
+            b.redirect(i18n_path('/' + destination))
+
+    def copier(self, destination, ecraser=False):
+        """Copie d'un dossier
+        """
+        dest = os.path.join(cfg.DATA, destination)
+        if not os.path.exists(dest) or ecraser:
+            shutil.copytree(self.dossier, dest)
+            self.depot.sauvegarder(
+                message=_('copie')
+                        + ' ' + self.nom
+                        + ' -> ' + '/'.join(destination.split('/')[1:])
+                )
             b.redirect(i18n_path('/' + destination))
         else:
             return self.afficher(markdown(_(
                 "Il y a déjà quelque chose à cet emplacement.\n\n"
-                "- Si vous désirez déplacer un fichier ou un dossier au sein"
+                "- Si vous désirez copier un fichier ou un dossier au sein"
                 " d'un autre dossier, merci de spécifier le chemin complet de"
                 " la destination.\n"
                 "- Si vous désirez remplacer un fichier existant, supprimez-le"
@@ -594,6 +637,7 @@ class Projet(Dossier):
                     actions[_('Créer document')] = '_creer/' + self.chemin
                     actions[_('Créer dossier')] = \
                         '_creerdossier/' + self.chemin
+                    actions[_('Copier')] = '_copier/' + self.chemin
                     actions[_('Envoyer fichier')] = '_envoyer/' + self.chemin
                     actions[_('Renommer')] = '_deplacer/' + self.chemin
                     actions[_('Supprimer')] = \
@@ -628,6 +672,16 @@ class Projet(Dossier):
         dest = os.path.join(cfg.DATA, destination)
         if not os.path.exists(dest):
             shutil.move(self.dossier, dest)
+            b.redirect(i18n_path('/' + destination))
+        else:
+            return self.afficher(_('Il y a déjà un projet portant ce nom !'))
+
+    def copier(self, destination):
+        """Copie d'un projet
+        """
+        dest = os.path.join(cfg.DATA, destination)
+        if not os.path.exists(dest):
+            shutil.copytree(self.dossier, dest)
             b.redirect(i18n_path('/' + destination))
         else:
             return self.afficher(_('Il y a déjà un projet portant ce nom !'))
@@ -872,7 +926,7 @@ def document_creer(nom, element=''):
     """
     if rq.forms.action == 'creer':
         doc = rq.forms.nom.split('.')
-        element, ext = element + '.'.join((doc[:-1])), doc[-1]
+        element, ext = element + '/' + '.'.join((doc[:-1])), doc[-1]
         return Document(nom, element, ext).creer()
     else:
         b.redirect(i18n_path('/{}/{}'.format(nom, element)))
@@ -941,13 +995,13 @@ def deplacer_infos(nom, element=None):
         'deplacement',
         {
             'deplacement': _('Nouvel emplacement'),
-            'action': _('Déplacer'),
+            'action': ('deplacer', _('Déplacer')),
             'destination': nom + '/' + element
         }
         if element else
         {
             'deplacement': _('Nouveau nom'),
-            'action': _('Renommer'),
+            'action': ('deplacer', _('Renommer')),
             'destination': nom
         }
     )}
@@ -962,10 +1016,62 @@ def deplacer(nom, element=None):
     """
     if rq.forms.action == "deplacer":
         if element:
-            print(rq.forms.ecraser)
-            return Dossier(nom, element).deplacer(rq.forms.destination)
+            return Dossier(nom, element).deplacer(
+                rq.forms.destination,
+                ecraser=bool(rq.forms.ecraser)
+            )
         else:
             return Projet(nom).renommer(rq.forms.destination)
+    else:
+        b.redirect(i18n_path(
+            '/' + nom
+            + ('/' + element if element else '')
+        ))
+
+
+# Déplacement d'un projet, dossier ou document
+@app.get('/_copier/<nom>')
+@app.get('/_copier/<nom>/<element:path>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def copier_infos(nom, element=None):
+    """ Page de création d'un document
+    """
+    return {'corps': b.template(
+        'deplacement',
+        {
+            'deplacement': _('Destination'),
+            'action': ('copier', _('Copier')),
+            'destination': nom + ('/' + element if element else '')
+        }
+    )}
+
+
+@app.post('/_copier/<nom>')
+@app.post('/_copier/<nom>/<element:path>')
+@app.post('/_copier/<nom>/<element:path>.<ext>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def copier(nom, element=None, ext=None):
+    """ Page de création d'un document
+    """
+    if rq.forms.action == "copier":
+        if element:
+            try:
+                return Dossier(nom, element).copier(
+                    rq.forms.destination,
+                    ecraser=bool(rq.forms.ecraser)
+                )
+            except (NotADirectoryError, FileNotFoundError) as e:
+                if cfg.DEVEL:
+                    print(type(e), e)
+                print(nom, element, ext)
+                return Document(nom, element, ext).copier(
+                    rq.forms.destination,
+                    ecraser=bool(rq.forms.ecraser)
+                )
+        else:
+            return Projet(nom).copier(rq.forms.destination)
     else:
         b.redirect(i18n_path(
             '/' + nom
