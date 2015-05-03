@@ -102,7 +102,7 @@ class Depot:
             return h.CODE(modification)
         except CalledProcessError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             return _("Il n'y a rien avant la création !")
 
     def historique(self, fichier=None):
@@ -118,7 +118,7 @@ class Depot:
                 tableau = self.depot.journalcomplet
         except CalledProcessError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             return _("Il n'y a pas encore de modifications à signaler.")
         for element in tableau[1:]:
             element[0] = h.A(element[0], href='?commit=' + element[0])
@@ -178,11 +178,12 @@ class Document:
         }
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
+                actions[_('Déplacer')] = '_deplacer/' + self.chemin
                 actions[_('Éditer')] = '_editer/' + self.chemin
                 actions[_('Supprimer')] = '_supprimer/' + self.chemin
         except TypeError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
         liens = {
             _('Projet'): self.projet,
             _('Dossier'): '/'.join(self.chemin.split('/')[:-1])
@@ -194,7 +195,7 @@ class Document:
             }
         except (AttributeError, KeyError) as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             # Cette exception est levée quand le module concerné ne définit pas
             # de format d'export.
             exports = {}
@@ -221,7 +222,7 @@ class Document:
             )
         except (KeyError, AttributeError) as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage,
             # on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
@@ -229,15 +230,15 @@ class Document:
                 return self.afficher(txt.Document(self.chemin).afficher())
             except txt.FichierIllisible as e:
                 if cfg.DEVEL:
-                    print(e)
+                    print(type(e), e)
                 return self.afficher(_("Extension inconnue : {}.").format(e))
             except FileNotFoundError as e:
                 if cfg.DEVEL:
-                    print(e)
+                    print(type(e), e)
                 b.abort(404)
         except EXT[self.ext].FichierIllisible as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             return self.afficher(_("Ce fichier est illisible."))
 
     @property
@@ -250,7 +251,7 @@ class Document:
             )
         except (KeyError, AttributeError) as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage
             # de la source, on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
@@ -260,7 +261,7 @@ class Document:
                 )
             except txt.FichierIllisible as e:
                 if cfg.DEVEL:
-                    print(e)
+                    print(type(e), e)
                 return self.afficher(
                     _("Extension inconnue : {}.").format(e)
                     + h.BR()
@@ -275,11 +276,11 @@ class Document:
                 )
             except NameError as e:
                 if cfg.DEVEL:
-                    print(e)
+                    print(type(e), e)
                 b.abort(404)
         except EXT[self.ext].FichierIllisible as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             return self.afficher(_("Ce fichier est illisible."))
 
     def creer(self):
@@ -294,10 +295,10 @@ class Document:
             EXT[self.ext].Document(self.chemin).supprimer()
         except KeyError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             txt.Document(self.chemin).supprimer()
         self.depot.sauvegarder(
-            message = _('Suppression du document {}').format(self.chemin)
+            message=_('Suppression du document {}').format(self.chemin)
         )
         return self.afficher(_('Document supprimé !'))
 
@@ -310,7 +311,7 @@ class Document:
             )
         except KeyError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             # Si le type de document est inconnu, on essaie de le traiter
             # comme un document texte. Sinon, on abandonne.
             try:
@@ -319,18 +320,18 @@ class Document:
                 )
             except txt.FichierIllisible as e:
                 if cfg.DEVEL:
-                    print(e)
+                    print(type(e), e)
                 return self.afficher(
                     _("Ce type de document n'est pas éditable.")
                 )
         except AttributeError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             # Si le type de document ne prévoit pas d'édition, on abandonne.
             return self.afficher(_("Ce type de document n'est pas éditable."))
         except EXT[self.ext].FichierIllisible as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             return self.afficher(
                 '''Si je ne puis même pas lire ce fichier,
                 comment voulez-vous que je l'édite ?'''
@@ -343,7 +344,7 @@ class Document:
             EXT[self.ext].Document(self.chemin).enregistrer(contenu)
         except AttributeError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             txt.Document(self.chemin).enregistrer(self.chemin)
         f.Depot(
             os.path.join(
@@ -356,15 +357,16 @@ class Document:
         proprietes = {fmt: proprietes}
         try:
             b.redirect(
-                i18n_path(EXT[self.ext]\
-                    .Document(self.chemin, proprietes=proprietes)\
-                    .exporter(fmt)('tmp', f.motaleatoire(3))
-                + '?action=telecharger'
+                i18n_path(
+                    EXT[self.ext].Document(
+                        self.chemin, proprietes=proprietes
+                    ).exporter(fmt)('tmp', f.motaleatoire(3))
+                    + '?action=telecharger'
                 )
             )
         except EXT[self.ext].ErreurCompilation as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             return self.afficher(
                 markdown(_(
                     """\
@@ -373,12 +375,13 @@ Ceci vient probablement d'une erreur de syntaxe ou d'une erreur dans vos
 paramètres ; si vous êtes absolument certain du contraire,
 merci de signaler le problème.
                     """
-            )))
+                )))
 
     def exporter_infos(self, fmt):
         return self.afficher(b.template(
             'export',
-            {'proprietes': EXT[self.ext].Document(self.chemin).listeproprietes[fmt]}
+            {'proprietes':
+                EXT[self.ext].Document(self.chemin).listeproprietes[fmt]}
         ))
 
     @property
@@ -432,12 +435,13 @@ class Dossier:
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 actions[_('Créer document')] = '_creer/' + self.chemin
                 actions[_('Créer dossier')] = '_creerdossier/' + self.chemin
+                actions[_('Déplacer')] = '_deplacer/' + self.chemin
                 actions[_('Envoyer fichier')] = '_envoyer/' + self.chemin
                 actions[_('Supprimer')] = \
                     '_supprimerdossier/' + self.chemin
         except TypeError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
         liens = {
             _('Projet'): self.projet,
             _('Parent'): self.projet + (
@@ -456,18 +460,35 @@ class Dossier:
         os.makedirs(self.dossier, exist_ok=True)
         return self.lister()
 
+    def deplacer(self, destination):
+        """Renommage d'un projet
+        """
+        dest = os.path.join(cfg.DATA, destination)
+        if not os.path.exists(dest):
+            shutil.move(self.dossier, dest)
+            b.redirect(i18n_path('/' + destination))
+        else:
+            return self.afficher(markdown(_(
+                "Il y a déjà quelque chose à cet emplacement.\n\n"
+                "- Si vous désirez déplacer un fichier ou un dossier au sein"
+                " d'un autre dossier, merci de spécifier le chemin complet de"
+                " la destination.\n"
+                "- Si vous désirez remplacer un fichier existant, supprimez-le"
+                " auparavant."
+            )))
+
     def envoyer_fichier(self, fichier, ecraser=False):
         try:
             fichier.save(self.dossier, int(ecraser))
             self.depot.sauvegarder(
-                message = str(_(
+                message=str(_(
                     "Envoi du fichier {}".format(fichier.filename)
                 ))
             )
             b.redirect(i18n_path('/' + self.chemin))
         except OSError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             return self.afficher(_(
                 "Le fichier existe déjà. Si vous voulez l'écraser, merci de "
                 "cocher la case correspondante."
@@ -496,7 +517,7 @@ class Dossier:
         # Si cette exception est levée, c'est que l'on est à la racine.
         except ValueError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             liste = []
         # Liste des dossiers, puis des fichiers
         listedossiers = sorted(
@@ -574,13 +595,14 @@ class Projet(Dossier):
                     actions[_('Créer dossier')] = \
                         '_creerdossier/' + self.chemin
                     actions[_('Envoyer fichier')] = '_envoyer/' + self.chemin
+                    actions[_('Renommer')] = '_deplacer/' + self.chemin
                     actions[_('Supprimer')] = \
                         '_supprimerprojet/' + self.chemin
                 else:
                     actions[_('Créer projet')] = '_creerprojet'
         except TypeError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
         liens = {_('Projet'): self.projet}
         return {
             'corps': contenu,
@@ -597,8 +619,18 @@ class Projet(Dossier):
             return self.lister()
         except FileExistsError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             return self.afficher(_('Ce projet existe déjà !'))
+
+    def renommer(self, destination):
+        """Renommage d'un projet
+        """
+        dest = os.path.join(cfg.DATA, destination)
+        if not os.path.exists(dest):
+            shutil.move(self.dossier, dest)
+            b.redirect(i18n_path('/' + destination))
+        else:
+            return self.afficher(_('Il y a déjà un projet portant ce nom !'))
 
     @property
     def historique(self):
@@ -636,7 +668,7 @@ class Projet(Dossier):
             return self.afficher(_('Projet supprimé !'), suppression=True)
         except FileNotFoundError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             # Cette exception est levée quand le projet n'existe pas.
             return self.afficher(_('''C'est drôle, ce que vous me demandez :
                 il n'y a pas de projet ici !'''), suppression=True)
@@ -682,7 +714,7 @@ def accueil():
             else {}
     except TypeError as e:
         if cfg.DEVEL:
-            print(e)
+            print(type(e), e)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
     liens = {_('Projets'): '_projets'}
@@ -695,7 +727,7 @@ def accueil():
             corps = markdown(f.read(-1))
     except FileNotFoundError as e:
         if cfg.DEVEL:
-            print(e)
+            print(type(e), e)
         with open(os.path.join(cfg.PAGES, 'md', 'Accueil.fr.md'), 'r') as f:
             corps = markdown(f.read(-1))
     return {
@@ -716,7 +748,7 @@ def lister_projets():
             else {}
     except TypeError as e:
         if cfg.DEVEL:
-            print(e)
+            print(type(e), e)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
     listefichiers = f.Dossier(cfg.DATA).lister(1)
@@ -767,7 +799,7 @@ def admin(action=''):
                 retour['corps'] = markdown(f.read(-1))
         except FileNotFoundError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             with open(os.path.join(cfg.PAGES, 'md', 'Admin.fr.md'), 'r') as f:
                 retour['corps'] = markdown(f.read(-1))
     return retour
@@ -850,10 +882,13 @@ def document_creer(nom, element=''):
 @app.get('/_creerdossier/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def dossier_creer_infos(nom, element=''):
+def dossier_creer_infos(nom, element=None, *args):
     """ Page de création d'un dossier
     """
-    return {'corps': b.template('creation', {'quoi': _('dossier')})}
+    if element:
+        return Dossier(nom, element).creer()
+    else:
+        return {'corps': b.template('creation', {'quoi': _('dossier')})}
 
 
 @app.post('/_creerdossier/<nom>')
@@ -870,12 +905,16 @@ def dossier_creer(nom, element=''):
 
 
 @app.get('/_creerprojet')
+@app.get('/_creerprojet/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def projet_creer_infos():
+def projet_creer_infos(nom=None, *args):
     """ Page de création d'un projet
     """
-    return {'corps': b.template('creation', {'quoi': _('projet')})}
+    if nom:
+        return Projet(nom).creer()
+    else:
+        return {'corps': b.template('creation', {'quoi': _('projet')})}
 
 
 @app.post('/_creerprojet')
@@ -888,6 +927,50 @@ def projet_creer():
         return Projet(rq.forms.nom).creer()
     else:
         b.redirect(i18n_path('/'))
+
+
+# Déplacement d'un projet, dossier ou document
+@app.get('/_deplacer/<nom>')
+@app.get('/_deplacer/<nom>/<element:path>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def deplacer_infos(nom, element=None):
+    """ Page de création d'un document
+    """
+    return {'corps': b.template(
+        'deplacement',
+        {
+            'deplacement': _('Nouvel emplacement'),
+            'action': _('Déplacer'),
+            'destination': nom + '/' + element
+        }
+        if element else
+        {
+            'deplacement': _('Nouveau nom'),
+            'action': _('Renommer'),
+            'destination': nom
+        }
+    )}
+
+
+@app.post('/_deplacer/<nom>')
+@app.post('/_deplacer/<nom>/<element:path>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def deplacer(nom, element=None):
+    """ Page de création d'un document
+    """
+    if rq.forms.action == "deplacer":
+        if element:
+            print(rq.forms.ecraser)
+            return Dossier(nom, element).deplacer(rq.forms.destination)
+        else:
+            return Projet(nom).renommer(rq.forms.destination)
+    else:
+        b.redirect(i18n_path(
+            '/' + nom
+            + ('/' + element if element else '')
+        ))
 
 
 # Suppression d'un document
@@ -953,6 +1036,34 @@ def dossier_supprimer(nom, element=False):
             b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
+@app.get('/_supprimerprojet/<nom>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_supprimer_confirmation(nom):
+    """Page de confirmation avant de supprimer un projet
+    """
+    return {'corps': b.template(
+        'suppression',
+        {
+            'quoi':
+            _('le projet {} et tout son contenu ? ').format(nom)
+            + _('Attention : cette opération est irréversible !')
+        }
+    )}
+
+
+@app.post('/_supprimerprojet/<nom>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_supprimer(nom):
+    """Suppression effective du projet
+    """
+    if rq.forms.action == 'supprimer':
+        return Projet(nom).supprimer()
+    else:
+        b.redirect(i18n_path('/{}'.format(nom)))
+
+
 # Envoi d'un fichier
 @app.get('/_envoyer/<nom>')
 @app.get('/_envoyer/<nom>/<element:path>')
@@ -988,32 +1099,31 @@ def document_envoyer(nom, element=''):
         }
 
 
-@app.get('/_supprimerprojet/<nom>')
-@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+# Emplacement inexistant
+@app.get('/_inexistant/<nom>')
+@app.get('/_inexistant/<nom>/<element:path>')
+@app.get('/_inexistant/<nom>/<element:path>.<ext>')
 @page
-def projet_supprimer_confirmation(nom):
-    """Page de confirmation avant de supprimer un projet
-    """
-    return {'corps': b.template(
-        'suppression',
-        {
-            'quoi':
-            _('le projet {} et tout son contenu ? ').format(nom)
-            + _('Attention : cette opération est irréversible !')
-        }
-    )}
+def inexistant(nom, element=None, ext=None):
+    return {
+        'corps': b.template('inexistant', {'element': element})
+    }
 
 
-@app.post('/_supprimerprojet/<nom>')
-@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
-@page
-def projet_supprimer(nom):
-    """Suppression effective du projet
-    """
-    if rq.forms.action == 'supprimer':
-        return Projet(nom).supprimer()
-    else:
-        b.redirect(i18n_path('/{}'.format(nom)))
+@app.post('/_inexistant/<nom>')
+@app.post('/_inexistant/<nom>/<element:path>')
+@app.post('/_inexistant/<nom>/<element:path>.<ext>')
+def inexistant_creer(nom, element=None, ext=None):
+    try:
+        return {
+            'dossier':  dossier_creer_infos,
+            'document': document_creer_infos,
+            'projet':   projet_creer_infos
+        }[rq.forms.action](nom, element, ext)
+    except KeyError as e:
+        if cfg.DEVEL:
+            print(type(e), e)
+        b.redirect(i18n_path('/'))
 
 
 # Historique d'un document
@@ -1118,23 +1228,28 @@ def document_afficher(nom, element=None, ext=None):
             return Dossier(nom, element).lister()
     except TypeError as e:
         if cfg.DEVEL:
-            print(e)
+            print(type(e), e)
         # Cette exception est levée s'il ne s'agit pas d'un dossier.
         try:
             return Document(nom, element, ext).contenu
         except FileNotFoundError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             # Cette exception est levée s'il n'y a pas de document, ce qui
             # arrive notamment lorsque l'on renonce à créer un nouveau
             # document.
             b.redirect(i18n_path('/' + nom))
-            print(e)
         except TypeError as e:
             if cfg.DEVEL:
-                print(e)
+                print(type(e), e)
             # Cette exception est levée si l'on tente d'accéder à un
             # emplacement inexistant.
+            b.redirect(i18n_path(
+                '/_inexistant/'
+                + nom
+                + ('/' + element if element else "")
+                + ('.' + ext if ext else "")
+            ))
             raise
             b.abort(404)
 
