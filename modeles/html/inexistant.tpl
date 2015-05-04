@@ -1,5 +1,5 @@
 <div id="zonesaisie">
-    Il n'y a rien à cet emplacement. Si vous le désirez, vous pouvez :
+    {{_("Il n'y a rien à cet emplacement. Si vous le désirez, vous pouvez :")}}
     <form method="post">
         %if element is None:
         <button type="submit" name="action" value="projet">{{_("Créer un projet")}}</button>
