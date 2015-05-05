@@ -98,10 +98,14 @@ def compiler_pdf(fichier, environnement={'TEXINPUTS': 'lib:'}):
         commande = [
             'lualatex',
             '-interaction=nonstopmode',
-            '-shell-escape',
+            '-shell-restricted',
             fichier
         ]
         environnement = dict(os.environ, **environnement)
+        environnement['shell_escape_commands'] = (
+            "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
+            "gregorio,lilypond"
+        )
         if cfg.DEVEL:
             print(environnement)
         compilation = sp.Popen(
