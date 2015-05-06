@@ -66,6 +66,7 @@ def compiler_pdf(fichier, environnement={}):
         os.chdir(os.path.dirname(fichier))
         commande = [
             'lilypond',
+            '-dsafe',
             fichier
         ]
         environnement = dict(os.environ, **environnement)
