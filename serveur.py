@@ -343,7 +343,7 @@ class Document:
         """
         try:
             EXT[self.ext].Document(self.chemin).enregistrer(contenu)
-        except AttributeError as e:
+        except (AttributeError, KeyError) as e:
             if cfg.DEVEL:
                 print(type(e), e)
             txt.Document(self.chemin).enregistrer(self.chemin)
