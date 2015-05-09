@@ -8,7 +8,7 @@
         ,syntax: "{{ext}}"
         ,show_line_colors: true
         ,start_highlight: true
-        ,word_wrap: true
+        ,word_wrap: false
     });
 </script>
 %end
