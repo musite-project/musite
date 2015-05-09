@@ -36,3 +36,8 @@ class Document:
         fichier = os.path.join(self.fichier)
         with open(self.fichier, "rb") as f:
             return b64encode(f.read()).decode('ascii')
+
+    def supprimer(self):
+        """Suppression du document
+        """
+        os.remove(self.fichier)
