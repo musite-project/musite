@@ -2,7 +2,7 @@
 
 html,body {
 width:100%;
-min-width:1024px;
+min-width:624px;
 min-height:600px;
 margin: 0px;
 padding: 0px;
@@ -30,7 +30,7 @@ padding: 5px;
 font-size: 108%;
 margin-left:100px;
 padding-left:20px;
-min-width: 804px;
+min-width: 404px;
 height:40px;
 }
 
@@ -80,7 +80,7 @@ top:80px;
 bottom:0px;
 left:0;
 right:10px;
-min-width:906px;
+min-width:506px;
 min-height:540px;
 overflow:auto;
 padding: 4px;
