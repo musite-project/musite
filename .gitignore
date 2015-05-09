@@ -1,4 +1,5 @@
 # Fichiers de musite dont la connaissance doit rester privée.
+data
 data/
 etc/groupes
 etc/utilisateurs
