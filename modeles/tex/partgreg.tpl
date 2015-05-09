@@ -14,10 +14,10 @@
 \setstafflinethickness{<<<proprietes['epaisseur_lignes']>>>}
 \grechangedim{spacelinestext}{<<<proprietes['espace_lignes_texte']>>>}{0}
 
-\definecolor{rubrum}{rgb}{%
+\definecolor{gregoriocolor}{rgb}{%
     <<<','.join(str(p / 255) for p in proprietes['couleur'])>>>%
 }
-\def\rubrum{\color{rubrum}}
+\def\rubrum{\color{gregoriocolor}}
 %if proprietes['couleur_initiale']:
 \let\rubrinit\rubrum
 %else:
