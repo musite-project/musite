@@ -202,7 +202,6 @@ class Document:
             exports = {}
         try:
             midi = EXT[self.ext].Document(self.chemin).midi()
-            print(midi)
         except AttributeError as e:
             if cfg.DEVEL:
                 print(type(e), e)
