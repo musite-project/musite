@@ -21,11 +21,12 @@ TMP = os.path.join(PWD, 'tmp')
 DATA = os.path.join(PWD, 'data')
 I18N = os.path.join(PWD, 'i18n')
 PAGES = os.path.join(PWD, 'pages')
+PANDOC = os.path.join(PWD, 'modeles', 'pandoc')
 
 STATIC = 'static'
 
 LANGUES = [
-    ('fr', 'français'),
+    ('fr', 'french'),
     ('en', 'english'),
 ]
 LANGUE = 'fr'
