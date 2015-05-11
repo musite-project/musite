@@ -8,9 +8,38 @@
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
     <link rel="stylesheet" href="/css">
     <title>{{cfg.TITRE}}</title>
+    %try:
+    %if midi:
+    <script src="/static/js/midi/midi.min.js"></script>
+    <script type="text/javascript">
+    var mp;
+    function init() {
+        mp = new MidiPlayer("{{midi}}", 'btnmidi');
+    }
+    function doPlay(m, btnmidi) {
+        if (btnmidi.value == '▶') {
+            m.play();
+            btnmidi.value = '■';
+        }
+        else {
+            m.stop();
+            btnmidi.value = '▶';
+        }
+    }
+    %end
+    %except NameError: pass
+    %end
+    </script>
     </head>
+    %try:
+    %if midi:
+    <body onload="javascript:init();">
+    %else:
     <body>
-
+    %end
+    %except NameError:
+    <body>
+    %end
         <div id="logo">
             <a href={{i18n_path('/')}}><img src="/static/img/logo.png" width="150px" alt="Musite"></a>
         </div>
@@ -24,6 +53,14 @@
         </div>
 
         <div id="menu">
+            %try:
+            %if midi:
+            <input type="button" value="▶" id='btnmidi' onclick="doPlay(mp, this);"/>
+            <br><br>
+            %end
+            %except NameError: pass
+            %end
+
             %try:
             %if len(liens) > 0:  # S'il y a des liens à afficher, on en fait la liste.
             <b>{{_("Liens")}}</b><br>

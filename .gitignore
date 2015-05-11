@@ -4,7 +4,8 @@ data/
 etc/groupes
 etc/utilisateurs
 log
-pdf/
+static/pdf/
+static/midi/
 tmp/
 test.py
 

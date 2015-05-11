@@ -200,11 +200,21 @@ class Document:
             # Cette exception est levée quand le module concerné ne définit pas
             # de format d'export.
             exports = {}
+        try:
+            midi = EXT[self.ext].Document(self.chemin).midi()
+            print(midi)
+        except AttributeError as e:
+            if cfg.DEVEL:
+                print(type(e), e)
+            # Cette exception est levée quand le module concerné ne définit pas
+            # de fichier midi.
+            midi = None
         return {
             'corps': contenu,
             'actions': actions,
             'exports': exports,
             'liens': liens,
+            'midi': midi,
         }
 
     @property
