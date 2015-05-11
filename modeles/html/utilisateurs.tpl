@@ -54,7 +54,7 @@
    <form method="post" action="{{i18n_path('/admin/groupes')}}">
       %with open(os.path.join(cfg.ETC, 'groupes'), 'r') as fichier:
       %groupes = fichier.read(-1)
-      <textarea name="texte" id="fichier" cols="40" rows="10">{{groupes}}</textarea>
+      <textarea name="groupes" id="fichier" cols="40" rows="10">{{groupes}}</textarea>
       %end
       <br>
       <button type="submit">{{_("Enregistrer")}}</button>

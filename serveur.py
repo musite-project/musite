@@ -868,6 +868,14 @@ def admin(action=''):
     return retour
 
 
+@app.post('/admin/groupes')
+@b.auth_basic(a.admin, _('Vous devez être administrateur'))
+def groupes():
+    with open(os.path.join(cfg.ETC, 'groupes'), 'w') as f:
+        f.write(rq.forms.groupes)
+    b.redirect(i18n_path('/admin/utilisateurs'))
+
+
 @app.get('/admin/supprimerutilisateur/<nom>')
 @b.auth_basic(a.admin, _('Vous devez être administrateur'))
 def utilisateur_suppression(nom):
