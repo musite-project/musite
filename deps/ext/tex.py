@@ -129,6 +129,30 @@ def compiler_pdf(fichier, environnement={'TEXINPUTS': 'lib:'}):
             raise FichierIllisible
         if compilation.returncode:
             raise ErreurCompilation
+        if os.path.exists(os.path.splitext(fichier)[0] + '.toc'):
+            if cfg.DEVEL:
+                print('Table des matières : 2e compilation')
+            compilation = sp.Popen(
+                commande,
+                env=environnement,
+                stdout=sp.PIPE,
+                stderr=sp.PIPE
+            )
+            sortie, erreurs = compilation.communicate()
+            try:
+                l.log(
+                    _('Sortie :')
+                    + '\n========\n'
+                    + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
+                    + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
+                    + _('Erreurs :')
+                    + '\n=========\n'
+                    + '\n{}\n'.format(erreurs.decode('utf8'))
+                )
+            except UnicodeDecodeError:
+                raise FichierIllisible
+            if compilation.returncode:
+                raise ErreurCompilation
     finally:
         os.chdir(cfg.PWD)
 
