@@ -11,7 +11,7 @@ correspondant aux urls saisies dans le navigateur.
 """
 
 __appname__ = 'serveur'
-__license__ = 'GPLv2'
+__license__ = 'MIT'
 
 
 # Import de librairies externes ###############################################
