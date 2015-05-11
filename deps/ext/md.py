@@ -27,7 +27,8 @@ class Document(txt.Document):
         # compilé dans chaque format.
         self.fmt = {
             'pdf':  self.pdf,
-            'reveal.js': self.revealjs
+            'reveal.js': self.revealjs,
+            'beamer': self.beamer,
             }
 
         # Propriétés du document
@@ -37,11 +38,15 @@ class Document(txt.Document):
         # ou à défaut les valeurs par défaut.
         self.listeproprietes = {}
         self.proprietes = {}
+        for fmt in self.fmt:
+            self.listeproprietes[fmt] = {}
         self.listeproprietes['pdf'] = {
             'papier':               (_("Taille de la page"), 'a4'),
             'taillepolice':         (_("Taille de la police"), '12'),
         }
-        self.listeproprietes['reveal.js'] = {}
+        self.listeproprietes['reveal.js'] = {
+            'theme':                (_("Thème"), 'white')
+        }
 
         for fmt in self.fmt:
             self.proprietes[fmt] = {
@@ -76,7 +81,7 @@ class Document(txt.Document):
     def exporter(self, fmt):
         return self.fmt[fmt]
 
-    def pdf(self, chemin=False, indice=''):
+    def pdf(self, chemin=False, indice='', fmt=None):
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichier('pdf')
         cheminpdf = self._chemin('pdf')
@@ -94,8 +99,11 @@ class Document(txt.Document):
             or os.path.getmtime(fichierpdf)
                 < os.path.getmtime(self.fichier)
         ):
-            self.preparer('pdf', fichierpdf)
+            self.preparer('pdf', fichierpdf, fmt)
         return url(fichierpdf)
+
+    def beamer(self, chemin=False, indice=''):
+        return self.pdf(chemin=chemin, indice=indice, fmt='beamer')
 
     def revealjs(self, chemin=False, indice=''):
         chemin = chemin if chemin else 'rj'
@@ -132,7 +140,12 @@ class Document(txt.Document):
                 + 'paper',
             ]
         if ext == 'html':
-            arguments = ['-c', 'reveal.js/css/theme/white.css']
+            arguments = ['-c',
+                'reveal.js/css/theme/{}.css'.format(
+                    self.proprietes['reveal.js']['theme']
+            )]
+            if fmt == 'revealjs':
+                arguments += ['-i',]
         pandoc(self.fichiertmp, destination=orig, fmt=fmt, arguments=arguments)
         os.renames(orig, dest)
         if not cfg.DEVEL:
