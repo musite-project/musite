@@ -7,7 +7,7 @@
     <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
     <link rel="stylesheet" href="/css">
-    <title>{{cfg.TITRE}}</title>
+    <title>{{cfg.TITRE + rq['PATH_INFO']}}</title>
     %try:
     %if midi:
     <script src="/static/js/midi/midi.min.js"></script>

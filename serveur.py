@@ -202,7 +202,7 @@ class Document:
             exports = {}
         try:
             midi = EXT[self.ext].Document(self.chemin).midi()
-        except AttributeError as e:
+        except (AttributeError, KeyError) as e:
             if cfg.DEVEL:
                 print(type(e), e)
             # Cette exception est levée quand le module concerné ne définit pas
@@ -607,7 +607,18 @@ class Dossier:
             )
             for fichier in listefichiers
         ]
-        return self.afficher(b.template('liste', liste=liste))
+        try:
+            with open(os.path.join(self.dossier, 'README.md'), 'r') as r:
+                readme = markdown(r.read(-1))
+        except FileNotFoundError as e:
+            if cfg.DEVEL:
+                print(type(e), e)
+            readme = None
+        return self.afficher(b.template(
+            'liste',
+            liste=liste,
+            readme=readme,
+        ))
 
     def supprimer(self):
         """Suppression d'un dossier et de son contenu
