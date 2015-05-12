@@ -796,7 +796,7 @@ def accueil():
         with open(os.path.join(
             cfg.PAGES,
             'md',
-            'Accueil.{}.md'.format(i18n_path('/').replace('/', ''))
+            'Accueil.{}.md'.format(rq.locale)
         ), 'r') as f:
             corps = markdown(f.read(-1))
     except FileNotFoundError as e:
@@ -849,7 +849,10 @@ def authentifier(action=''):
     """ Page destinée à forcer l'authentification.
     """
     return {
-        'corps': _('Bonjour, {} !').format(rq.auth[0]),
+        'corps':
+            _('Bonjour, {} !').format(rq.auth[0])
+            + h.BR() + h.BR()
+            + h.A(_('Retour à la page précédente'), href=rq['HTTP_REFERER']),
     }
 
 
@@ -868,7 +871,7 @@ def admin(action=''):
             with open(os.path.join(
                 cfg.PAGES,
                 'md',
-                'Admin.{}.md'.format(i18n_path('/').replace('/', ''))
+                'Admin.{}.md'.format(rq.locale)
             ), 'r') as f:
                 retour['corps'] = markdown(f.read(-1))
         except FileNotFoundError as e:
@@ -1431,7 +1434,11 @@ def erreur_accesreserve(erreur):
     Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page
     réservée.
     """
-    return {'corps': _('Accès réservé !')}
+    return {'corps':
+        _('Accès réservé !')
+        + h.BR() + h.BR()
+        + h.A('Retour à la page précédente', href=rq['HTTP_REFERER'])
+    }
 
 
 @app.error(code=404)
