@@ -170,4 +170,18 @@ em.suppr {
 color: red;
 }
 
+#saisie {
+    position: absolute;
+    top:0px;
+    bottom: 50px;
+    left:0px;
+    right:10px;
+}
+
+#boutons_editeur {
+    position: absolute;
+    top:auto;
+    bottom:10px;
+}
+
 {{ext}}

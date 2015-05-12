@@ -1310,6 +1310,7 @@ def projet_retablir_commit(nom):
 
 
 # Édition d'un document
+@app.get('/_editer/<nom>/<element:path>')
 @app.get('/_editer/<nom>/<element:path>.<ext>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
@@ -1392,6 +1393,7 @@ def document_afficher(nom, element=None, ext=None):
 
 
 # Enregistrement des documents après édition
+@app.post('/<nom>/<element:path>')
 @app.post('/<nom>/<element:path>.<ext>')
 @page
 def document_enregistrer(nom, element='', ext=''):
