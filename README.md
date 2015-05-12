@@ -12,6 +12,7 @@ Musite est prévu pour être le plus simple *possible* à installer, c'est pourq
 - une distribution de LaTeX, de préférence [TeXLive](https://www.tug.org/texlive) (la seule qui ait été testée), avec au minimum LuaLaTeX et la police Libertine ; une sélection raisonnable d'extensions est toutefois plus que vivement recommandée ;
 - [Gregorio et GregorioTeX](http://gregorio-project.github.io) pour les partitions grégoriennes ;
 - [LilyPond](http://www.lilypond.org) pour les partitions classiques ;
+- [Pandoc](http://pandoc.org) pour les textes en markdown (et, potentiellement, nombre d'autres usages) ;
 - [Git](http://git-scm.com/) pour la gestion de version (qui vous permettra d'annuler les changements intempestifs).
 
 #### Sous Debian
@@ -26,7 +27,8 @@ Les commandes suivantes devraient installer le nécessaire :
     texlive-lang-latin texlive-lang-french \
     texlive-humanities texlive-extra-utils latex-xcolor \
     texlive-fonts-extra fonts-linuxlibertine lmodern \
-    lilypond gregorio gregoriotex
+    lilypond gregorio gregoriotex \
+    pandoc
     apt-get -y install git python3
 
 

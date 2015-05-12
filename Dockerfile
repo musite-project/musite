@@ -20,7 +20,8 @@ RUN apt-get -y --force-yes install --no-install-recommends \
 	texlive-lang-latin texlive-lang-french \
 	texlive-humanities texlive-extra-utils latex-xcolor \
 	texlive-fonts-extra fonts-linuxlibertine lmodern \
-	lilypond gregorio gregoriotex
+	lilypond gregorio gregoriotex \
+    pandoc
 
 RUN apt-get -y install git python3
 
