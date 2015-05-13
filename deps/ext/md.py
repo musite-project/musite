@@ -140,12 +140,23 @@ class Document(txt.Document):
                 + 'paper',
             ]
         if ext == 'html':
-            arguments = ['-c',
-                'reveal.js/css/theme/{}.css'.format(
-                    self.proprietes['reveal.js']['theme']
-            )]
+            arguments = []
             if fmt == 'revealjs':
-                arguments += ['-i',]
+                arguments = [
+                    '-i',
+                    '-c',
+                    os.path.join(
+                        cfg.PANDOC,
+                        'reveal.js',
+                        'css',
+                        'theme',
+                        self.proprietes['reveal.js']['theme'] + '.css'
+                    ),
+                    '--variable=revealjs-url:' + os.path.join(
+                        cfg.PANDOC,
+                        'reveal.js'
+                    ),
+                ]
         pandoc(self.fichiertmp, destination=orig, fmt=fmt, arguments=arguments)
         os.renames(orig, dest)
         if not cfg.DEVEL:
