@@ -45,7 +45,7 @@ class Document(txt.Document):
             'taillepolice':         (_("Taille de la police"), '12'),
         }
         self.listeproprietes['reveal.js'] = {
-            'theme':                (_("Thème"), 'white')
+            'theme':                (_("Thème"), 'black')
         }
 
         for fmt in self.fmt:
