@@ -169,7 +169,8 @@ def pandoc(fichier, destination, fmt=None, arguments=[]):
         if arguments:
             commande = commande + arguments
         commande.append(fichier)
-        print(commande)
+        if cfg.DEVEL:
+            print(commande)
         environnement = os.environ
         if cfg.DEVEL:
             print(environnement)
