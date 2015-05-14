@@ -9,6 +9,7 @@ http://www.lilypond.org
 import ext.txt as txt
 from etc import config as cfg
 from outils import motaleatoire, url, _
+from mistune import markdown
 import os
 import shutil
 import subprocess as sp
@@ -22,12 +23,29 @@ class Document(txt.Document):
         txt.Document.__init__(self, chemin, ext)
 
     def afficher(self):
-        return h.OBJECT(
-            data="{}".format(self.pdf()),
-            Type="application/pdf",
-            width="100%",
-            height="100%"
-        )
+        try:
+            return h.OBJECT(
+                data="{}".format(self.pdf()),
+                Type="application/pdf",
+                width="100%",
+                height="100%"
+            )
+        except ErreurCompilation:
+            return (markdown(_(
+                """\
+Il y a eu une erreur pendant le traitement du document.
+Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
+certain du contraire, merci de signaler le problème.
+
+Il est aussi possible que vous ayez saisi du code *Scheme* dans votre
+document : par souci de sécurité, `Lilypond` est lancé avec des options plus
+restrictives, qui rendent impossibles certaines opérations.
+
+Voici la sortie de la commande :
+
+                """
+            )) + traiter_erreur_compilation(self.dossiertmp)
+            )
 
     def pdf(self, chemin=False, indice=''):
         chemin = chemin if chemin else 'pdf'
