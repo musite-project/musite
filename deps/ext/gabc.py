@@ -7,25 +7,26 @@ d'extensions, et GregorioTeX.
 Voir plus d'informations à l'adresse :
 http://gregorio-project.github.io/
 """
-from ext import txt, tex
+from . import txt, tex
 from etc import config as cfg
-from outils import templateperso, url,  _
-from gabctk import Gabc, Lily, Midi, Partition
-from mistune import markdown
+from deps.outils import templateperso, url, _
+from deps.gabctk import Gabc, Lily, Midi, Partition
+from deps.mistune import markdown
 import os
 import shutil
-from bottle import template
-import HTMLTags as h
+import deps.HTMLTags as h
 EXT = __name__.split('.')[-1]
 
 
 # Ce qui suit est nécessaire pour modifier les délimiteurs dans les gabarits.
 # Comme LaTeX fait un usage constant des accolades, on utilise les symboles
 # <<< et >>>
-templatetex = templateperso()
+TEMPLATETEX = templateperso()
 
 
 class Document(txt.Document):
+    """Document gabc
+    """
     def __init__(self, chemin, ext=EXT, proprietes=False):
         txt.Document.__init__(self, chemin, ext)
 
@@ -71,12 +72,12 @@ class Document(txt.Document):
             for fmt in proprietes:
                 for prop, val in proprietes[fmt].items():
                     if prop in self.listeproprietes[fmt]:
-                        t = type(self.listeproprietes[fmt][prop][1])
-                        if t in (str, int, float):
-                            self.proprietes[fmt][prop] = t(val)
-                        elif t is bool:
-                            self.proprietes[fmt][prop] = t(int(val))
-                        elif t in (tuple, list):
+                        typ = type(self.listeproprietes[fmt][prop][1])
+                        if typ in (str, int, float):
+                            self.proprietes[fmt][prop] = typ(val)
+                        elif typ is bool:
+                            self.proprietes[fmt][prop] = typ(int(val))
+                        elif typ in (tuple, list):
                             if type(val) in (tuple, list):
                                 self.proprietes[fmt][prop] = val
                             else:
@@ -107,13 +108,16 @@ certain du contraire, merci de signaler le problème.
 Voici la sortie de la commande :
 
                 """
-            )) + tex.traiter_erreur_compilation(self.dossiertmp)
-            )
+            )) + tex.traiter_erreur_compilation(self.dossiertmp))
 
     def exporter(self, fmt):
+        """Export vers d'autres formats
+        """
         return self.fmt[fmt]
 
     def pdf(self, chemin=False, indice=''):
+        """Format pdf
+        """
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichier('pdf')
         cheminpdf = self._chemin('pdf')
@@ -127,14 +131,16 @@ Voici la sortie de la commande :
                 '/{}/{}/'.format(chemin, indice).replace('//', '/')
             )
         if (
-            not os.path.isfile(fichierpdf)
-            or os.path.getmtime(fichierpdf)
+                not os.path.isfile(fichierpdf)
+                or os.path.getmtime(fichierpdf)
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_pdf(fichierpdf)
         return url(fichierpdf)
 
     def gabc(self, fmt, chemin=False, indice=''):
+        """Format gabc
+        """
         chemin = chemin if chemin else fmt
         fichier = self._fichier(fmt)
         if chemin:
@@ -143,20 +149,26 @@ Voici la sortie de la commande :
                 '/{}/{}/'.format(chemin, indice).replace('//', '/')
             )
         if (
-            not os.path.isfile(fichier)
-            or os.path.getmtime(fichier)
+                not os.path.isfile(fichier)
+                or os.path.getmtime(fichier)
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_gabc(fmt, fichier)
         return url(fichier)
 
-    def ly(self, chemin=False, indice=''):
+    def ly(self, chemin=False, indice=''): # pylint: disable=C0103
+        """Format lilypond
+        """
         return self.gabc('ly', chemin, indice)
 
     def midi(self, chemin=False, indice=''):
+        """Format midi
+        """
         return self.gabc('midi', chemin, indice)
 
-    def preparer_pdf(self, destination=False, environnement={}):
+    def preparer_pdf(self, destination=False, environnement=None):
+        """Mise en place du pdf
+        """
         fichiertmp = 'main'
         textmp = os.path.join(self.dossiertmp, fichiertmp + '.tex')
         orig = os.path.join(self.dossiertmp, fichiertmp + '.pdf')
@@ -164,8 +176,8 @@ Voici la sortie de la commande :
         shutil.rmtree(self.rd, ignore_errors=True)
         os.makedirs(self.dossiertmp, exist_ok=True)
         shutil.copy2(self.fichier, self.fichiertmp)
-        with open(textmp, 'w') as f:
-            f.write(templatetex(
+        with open(textmp, 'w') as tmp:
+            tmp.write(TEMPLATETEX(
                 'partgreg',
                 {
                     'partition': self.nom,
@@ -175,15 +187,17 @@ Voici la sortie de la commande :
         compiler_pdf(textmp, environnement)
         os.renames(orig, dest)
         if not cfg.DEVEL:
-                shutil.rmtree(self.rd, ignore_errors=True)
+            shutil.rmtree(self.rd, ignore_errors=True)
 
     def preparer_gabc(self, fmt, destination=False):
+        """Mise en place du gabc
+        """
         dest = destination if destination else self._fichier(fmt)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        with open(self.fichier, 'r') as f:
-            g = Gabc(f.read(-1))
+        with open(self.fichier, 'r') as fch:
+            gabc = Gabc(fch.read(-1))
             partition = Partition(
-                gabc=g.partition,
+                gabc=gabc.partition,
                 transposition=self.proprietes[fmt]['transposition']
             )
             fichier = {
@@ -193,7 +207,9 @@ Voici la sortie de la commande :
             fichier.ecrire(dest)
 
 
-def compiler_pdf(fichier, environnement={}):
+def compiler_pdf(fichier, environnement=None):
+    """Compilation en pdf
+    """
     tex.compiler_pdf(fichier, environnement)
 
 

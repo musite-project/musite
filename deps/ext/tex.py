@@ -9,28 +9,32 @@ Les pages de M. Pégourié-Gonnard peuvent être de quelque utilité pour un bon
 point de départ :
 https://elzevir.fr/imj/latex/
 """
-import ext.txt as txt
+from . import txt as txt
 from etc import config as cfg
-from outils import motaleatoire, url, _
+from deps.outils import url, _
 import os
 import shutil
 import subprocess as sp
 import re
-import HTMLTags as h
-from mistune import markdown
-import jrnl as l
+from deps import HTMLTags as h
+from deps.mistune import markdown
+from deps import jrnl as l
 EXT = __name__.split('.')[-1]
 
 
 class Document(txt.Document):
+    """Document tex
+    """
     def __init__(self, chemin, ext=EXT):
         txt.Document.__init__(self, chemin, ext)
 
     def afficher(self):
         def documentmaitre():
+            """Test pour savoir s'il s'agit d'un document maître
+            """
             entete = re.compile('\\\\documentclass')
-            with open(self.fichier) as f:
-                for ligne in f:
+            with open(self.fichier) as doc:
+                for ligne in doc:
                     if entete.match(ligne):
                         return True
             return False
@@ -52,12 +56,13 @@ certain du contraire, merci de signaler le problème.
 Voici la sortie de la commande :
 
                     """
-                    )) + traiter_erreur_compilation(self. dossiertmp)
-                )
+                    )) + traiter_erreur_compilation(self. dossiertmp))
         else:
             return txt.Document.afficher(self)
 
     def pdf(self, chemin=False, indice=''):
+        """Format pdf
+        """
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichier('pdf')
         cheminpdf = self._chemin('pdf')
@@ -71,17 +76,21 @@ Voici la sortie de la commande :
                 '/{}/{}/'.format(chemin, indice).replace('//', '/')
             )
         if (
-            not os.path.isfile(self._fichier('pdf'))
-            or os.path.getmtime(self._fichier('pdf'))
+                not os.path.isfile(self._fichier('pdf'))
+                or os.path.getmtime(self._fichier('pdf'))
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_pdf()
         return url(fichierpdf)
 
     def preparer_pdf(
-        self, destination=False,
-        environnement={'TEXINPUTS': 'lib:'}
+            self, destination=False,
+            environnement=None
     ):
+        """Mise en place du pdf
+        """
+        environnement = \
+            environnement if environnement else {'TEXINPUTS': 'lib:'}
         orig = self._fichiertmp('pdf')
         dest = destination if destination else self._fichier('pdf')
         shutil.rmtree(self.rd, ignore_errors=True)
@@ -92,7 +101,10 @@ Voici la sortie de la commande :
             shutil.rmtree(self.rd, ignore_errors=True)
 
 
-def compiler_pdf(fichier, environnement={'TEXINPUTS': 'lib:'}):
+def compiler_pdf(fichier, environnement=None):
+    """Compilation en pdf
+    """
+    environnement = environnement if environnement else {'TEXINPUTS': 'lib:'}
     try:
         os.chdir(os.path.dirname(fichier))
         commande = [
@@ -144,7 +156,7 @@ def compiler_pdf(fichier, environnement={'TEXINPUTS': 'lib:'}):
                     _('Sortie :')
                     + '\n========\n'
                     + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
-                    + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
+                    + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
                     + _('Erreurs :')
                     + '\n=========\n'
                     + '\n{}\n'.format(erreurs.decode('utf8'))
@@ -158,6 +170,8 @@ def compiler_pdf(fichier, environnement={'TEXINPUTS': 'lib:'}):
 
 
 def traiter_erreur_compilation(dossier):
+    """Réaction en cas d'erreur de compilation
+    """
     return txt.Document(dossier.replace(os.path.sep, '/') + '/log').afficher()
 
 
@@ -165,4 +179,6 @@ FichierIllisible = txt.FichierIllisible
 
 
 class ErreurCompilation(Exception):
+    """Exception levée en cas d'erreur de compilation
+    """
     pass

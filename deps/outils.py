@@ -35,6 +35,16 @@ class Depot():
             raise
         return resultat.decode('utf-8')
 
+    def cloner(self, depot):
+        cmd = ['git', 'clone', depot, self.dossier]
+        try:
+            resultat = subprocess.check_output(cmd)
+        except subprocess.CalledProcessError as e:
+            if cfg.DEVEL:
+                print(e.output)
+            raise
+        return resultat.decode('utf-8')
+
     def initialiser(self):
         self.commande(['init'])
 

@@ -10,9 +10,9 @@ comporter au moins les méthodes documentées ici. Le cas échéant, vous pouvez
 user des mécanismes d'héritage de Python en vous basant sur ce module.
 """
 import os.path
-import HTMLTags as h
-import bottle as b
-from outils import motaleatoire, _
+from deps import HTMLTags as h
+from deps import bottle as b
+from deps.outils import motaleatoire
 from etc import config as cfg
 b.TEMPLATE_PATH += cfg.MODELES
 EXT = __name__.split('.')[-1]
@@ -35,24 +35,32 @@ class Document:
         )
         self.dossier = os.path.dirname(self.fichier)
         # Chemin absolu des fichiers temporaires
-        self.rd = os.path.join(cfg.TMP, motaleatoire(6))
-        self.fichiertmp = os.path.join(self.rd, self.fichierrelatif)
-        self.dossiertmp = os.path.join(self.rd, self.dossierrelatif)
+        self.rnd = os.path.join(cfg.TMP, motaleatoire(6))
+        self.fichiertmp = os.path.join(self.rnd, self.fichierrelatif)
+        self.dossiertmp = os.path.join(self.rnd, self.dossierrelatif)
 
     def _chemin(self, ext):
+        """Url vers un fichier portant ce nom avec une autre extension
+        """
         return os.path.splitext(self.chemin)[0] + '.' + ext
 
     def _fichierrelatif(self, ext):
+        """Chemin vers un fichier portant ce nom avec une autre extension
+        """
         return self._chemin(ext).replace('/', os.path.sep)
 
     def _fichier(self, ext):
+        """Chemin absolu
+        """
         return os.path.join(
             cfg.PWD, cfg.STATIC, ext,
             self._fichierrelatif(ext)
         )
 
     def _fichiertmp(self, ext):
-        return os.path.join(self.rd, self._fichierrelatif(ext))
+        """Fichier temporaire
+        """
+        return os.path.join(self.rnd, self._fichierrelatif(ext))
 
     def afficher(self):
         """Affichage du contenu du document
@@ -68,8 +76,8 @@ class Document:
         """Contenu du document
         """
         try:
-            with open(self.fichier) as f:
-                return f.read(-1)
+            with open(self.fichier) as doc:
+                return doc.read(-1)
         except UnicodeDecodeError:
             raise FichierIllisible(self.fichier)
 
@@ -89,19 +97,19 @@ class Document:
         except FileNotFoundError:
             if creation:
                 return b.template(
-                'editeur',
-                emplacement=self.chemin,
-                texte='',
-                ext=self.ext
-            )
+                    'editeur',
+                    emplacement=self.chemin,
+                    texte='',
+                    ext=self.ext
+                )
             else:
                 b.abort(404)
 
     def enregistrer(self, contenu):
         """Enregistrement du document
         """
-        with open(self.fichier, 'w') as f:
-            f.write(contenu)
+        with open(self.fichier, 'w') as doc:
+            doc.write(contenu)
 
     def supprimer(self):
         """Suppression du document

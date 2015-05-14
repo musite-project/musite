@@ -25,22 +25,22 @@ import re
 from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
-import outils as f
-from outils import i18n_path, _
-import auth as a
-import utilisateurs as u
-import bottle as b
-from bottle import request as rq
-import HTMLTags as h
+from deps import outils as f
+from deps.outils import i18n_path, _
+from deps import auth as a
+from deps import utilisateurs as u
+from deps import bottle as b
+from deps.bottle import request as rq
+from deps import HTMLTags as h
 from deps.i18n import I18NPlugin as Traduction
-from mistune import markdown
+from deps.mistune import markdown
 from etc import config as cfg
 
 
 # Paramètres bottle ###########################################################
 
 b.TEMPLATE_PATH += cfg.MODELES
-app = b.Bottle()
+APP = b.Bottle()
 
 
 # Import des modules qui vont traiter chaque extension ########################
@@ -48,8 +48,7 @@ EXT = {
     e[1]: import_module('ext.' + e[1])
     for e in iter_modules(path=[os.path.join(LIB, 'ext')])
 }
-txt = EXT['txt']
-md = EXT['md']
+TXT = EXT['txt']
 
 
 # Classes #####################################################################
@@ -65,8 +64,14 @@ class Depot:
         self.projet = projet
         self.depot = f.Depot(os.path.join(cfg.DATA, projet))
 
+    def cloner(self, depot):
+        """Clonage d'un dépôt existant.
+        """
+        self.depot.cloner(depot)
+
     def initialiser(self):
-        """Initialisation d'un nouveau dépôt."""
+        """Initialisation d'un nouveau dépôt.
+        """
         self.depot.initialiser()
 
     def comparer(self, commit, commitb=None, fichier=''):
@@ -92,7 +97,7 @@ class Depot:
                 'diff.*\n', '\n\n<hr>\n', modification
             )
             modification = re.sub(
-                'index.*\n.*\n\+\+\+ b/(.*)',
+                r'index.*\n.*\n\+\+\+ b/(.*)',
                 str(h.B(h.I('{}'))).format(h.A('\\1', href='\\1')),
                 modification
             )
@@ -100,9 +105,9 @@ class Depot:
                 '(@@.*@@)', '\n{}\n'.format(h.B(h.I('\\1'))), modification
             )
             return h.CODE(modification)
-        except CalledProcessError as e:
+        except CalledProcessError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             return _("Il n'y a rien avant la création !")
 
     def historique(self, fichier=None):
@@ -116,13 +121,13 @@ class Depot:
                 tableau = self.depot.journalfichier(fichier)
             else:
                 tableau = self.depot.journalcomplet
-        except CalledProcessError as e:
+        except CalledProcessError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             return _("Il n'y a pas encore de modifications à signaler.")
         for element in tableau[1:]:
             element[0] = h.A(element[0], href='?commit=' + element[0])
-            element[1] = re.sub('\<.*\>', '', element[1])
+            element[1] = re.sub(r'\<.*\>', '', element[1])
         return b.template('tableau', tableau=tableau)
 
     def annuler(self, commit):
@@ -146,6 +151,11 @@ class Depot:
         self.depot.retablir(commit, fichier, auteur)
 
     def sauvegarder(self, fichier=None, message=_("Sauvegarde complète")):
+        """Sauvegarde du dépôt
+
+        Cette méthode sauvegarde ou un fichier donné,
+        ou le dépôt en son entier.
+        """
         if fichier:
             self.depot.sauvegardefichier(fichier, rq.auth[0])
         else:
@@ -182,9 +192,9 @@ class Document:
                 actions[_('Déplacer')] = '_deplacer/' + self.chemin
                 actions[_('Éditer')] = '_editer/' + self.chemin
                 actions[_('Supprimer')] = '_supprimer/' + self.chemin
-        except TypeError as e:
+        except TypeError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
         liens = {
             _('Projet'): self.projet,
             _('Dossier'): '/'.join(self.chemin.split('/')[:-1])
@@ -194,17 +204,17 @@ class Document:
                 fmt: self.chemin + '?fmt=' + fmt
                 for fmt in EXT[self.ext].Document(self.chemin).fmt
             }
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError) as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Cette exception est levée quand le module concerné ne définit pas
             # de format d'export.
             exports = {}
         try:
             midi = EXT[self.ext].Document(self.chemin).midi()
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError) as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Cette exception est levée quand le module concerné ne définit pas
             # de fichier midi.
             midi = None
@@ -230,25 +240,25 @@ class Document:
             return self.afficher(
                 EXT[self.ext].Document(self.chemin).afficher()
             )
-        except (KeyError, AttributeError) as e:
+        except (KeyError, AttributeError) as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage,
             # on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
             try:
-                return self.afficher(txt.Document(self.chemin).afficher())
-            except txt.FichierIllisible as e:
+                return self.afficher(TXT.Document(self.chemin).afficher())
+            except TXT.FichierIllisible as err:
                 if cfg.DEVEL:
-                    print(type(e), e)
-                return self.afficher(_("Extension inconnue : {}.").format(e))
-            except FileNotFoundError as e:
+                    print(type(err), err)
+                return self.afficher(_("Extension inconnue : {}.").format(err))
+            except FileNotFoundError as err:
                 if cfg.DEVEL:
-                    print(type(e), e)
+                    print(type(err), err)
                 b.abort(404)
-        except EXT[self.ext].FichierIllisible as e:
+        except EXT[self.ext].FichierIllisible as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             return self.afficher(_("Ce fichier est illisible."))
 
     @property
@@ -259,21 +269,21 @@ class Document:
             return self.afficher(
                 EXT[self.ext].Document(self.chemin).afficher_source()
             )
-        except (KeyError, AttributeError) as e:
+        except (KeyError, AttributeError) as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage
             # de la source, on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
             try:
                 return self.afficher(
-                    txt.Document(self.chemin).afficher_source()
+                    TXT.Document(self.chemin).afficher_source()
                 )
-            except txt.FichierIllisible as e:
+            except TXT.FichierIllisible as err:
                 if cfg.DEVEL:
-                    print(type(e), e)
+                    print(type(err), err)
                 return self.afficher(
-                    _("Extension inconnue : {}.").format(e)
+                    _("Extension inconnue : {}.").format(err)
                     + h.BR()
                     + _('Voici les données de la requète :')
                     + h.BR()
@@ -284,13 +294,13 @@ class Document:
                         )
                     )
                 )
-            except NameError as e:
+            except NameError as err:
                 if cfg.DEVEL:
-                    print(type(e), e)
+                    print(type(err), err)
                 b.abort(404)
-        except EXT[self.ext].FichierIllisible as e:
+        except EXT[self.ext].FichierIllisible as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             return self.afficher(_("Ce fichier est illisible."))
 
     def creer(self):
@@ -303,10 +313,10 @@ class Document:
         """
         try:
             EXT[self.ext].Document(self.chemin).supprimer()
-        except KeyError as e:
+        except KeyError as err:
             if cfg.DEVEL:
-                print(type(e), e)
-            txt.Document(self.chemin).supprimer()
+                print(type(err), err)
+            TXT.Document(self.chemin).supprimer()
         self.depot.sauvegarder(
             message=_('Suppression du document {}').format(self.chemin)
         )
@@ -319,29 +329,29 @@ class Document:
             return self.afficher(
                 EXT[self.ext].Document(self.chemin).editer(creation)
             )
-        except KeyError as e:
+        except KeyError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Si le type de document est inconnu, on essaie de le traiter
             # comme un document texte. Sinon, on abandonne.
             try:
                 return self.afficher(
-                    txt.Document(self.chemin).editer(creation)
+                    TXT.Document(self.chemin).editer(creation)
                 )
-            except txt.FichierIllisible as e:
+            except TXT.FichierIllisible as err:
                 if cfg.DEVEL:
-                    print(type(e), e)
+                    print(type(err), err)
                 return self.afficher(
                     _("Ce type de document n'est pas éditable.")
                 )
-        except AttributeError as e:
+        except AttributeError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Si le type de document ne prévoit pas d'édition, on abandonne.
             return self.afficher(_("Ce type de document n'est pas éditable."))
-        except EXT[self.ext].FichierIllisible as e:
+        except EXT[self.ext].FichierIllisible as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             return self.afficher(
                 '''Si je ne puis même pas lire ce fichier,
                 comment voulez-vous que je l'édite ?'''
@@ -352,10 +362,10 @@ class Document:
         """
         try:
             EXT[self.ext].Document(self.chemin).enregistrer(contenu)
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError) as err:
             if cfg.DEVEL:
-                print(type(e), e)
-            txt.Document(self.chemin).enregistrer(self.chemin)
+                print(type(err), err)
+            TXT.Document(self.chemin).enregistrer(self.chemin)
         f.Depot(
             os.path.join(
                 cfg.DATA, self.projet
@@ -372,10 +382,12 @@ class Document:
             print(self.fichier, dest)
             shutil.copy2(self.fichier, dest)
             self.depot.sauvegarder(
-                message=_('copie')
-                        + ' ' + '/'.join(self.chemin.split('/')[1:])
-                        + ' -> ' + '/'.join(destination.split('/')[1:])
+                message=(
+                    _('copie')
+                    + ' ' + '/'.join(self.chemin.split('/')[1:])
+                    + ' -> ' + '/'.join(destination.split('/')[1:])
                 )
+            )
             b.redirect(i18n_path('/' + destination))
         else:
             return self.afficher(markdown(_(
@@ -388,6 +400,8 @@ class Document:
             )))
 
     def exporter(self, fmt, proprietes):
+        """Export d'un document en différents formats
+        """
         proprietes = {fmt: proprietes}
         try:
             b.redirect(
@@ -398,9 +412,9 @@ class Document:
                     + '?action=telecharger'
                 )
             )
-        except EXT[self.ext].ErreurCompilation as e:
+        except EXT[self.ext].ErreurCompilation as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             return self.afficher(
                 markdown(_(
                     """\
@@ -412,10 +426,14 @@ merci de signaler le problème.
                 )))
 
     def exporter_infos(self, fmt):
+        """Informations pour l'export
+        """
         return self.afficher(b.template(
             'export',
-            {'proprietes':
-                EXT[self.ext].Document(self.chemin).listeproprietes[fmt]}
+            {
+                'proprietes':
+                    EXT[self.ext].Document(self.chemin).listeproprietes[fmt]
+            }
         ))
 
     @property
@@ -457,7 +475,7 @@ class Dossier:
         self.dossier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
         self.depot = Depot(self.projet)
 
-    def afficher(self, contenu):
+    def afficher(self, contenu, suppression=False):
         """Propriétés communes des pages de gestion de dossiers
 
         Cette méthode définit en particulier ce qui apparaît dans le menu.
@@ -466,7 +484,7 @@ class Dossier:
         """
         actions = {}
         try:
-            if a.authentifier(rq.auth[0], rq.auth[1]):
+            if a.authentifier(rq.auth[0], rq.auth[1]) and not suppression:
                 actions[_('Créer document')] = '_creer/' + self.chemin
                 actions[_('Créer dossier')] = '_creerdossier/' + self.chemin
                 actions[_('Copier')] = '_copier/' + self.chemin
@@ -474,9 +492,9 @@ class Dossier:
                 actions[_('Envoyer fichier')] = '_envoyer/' + self.chemin
                 actions[_('Supprimer')] = \
                     '_supprimerdossier/' + self.chemin
-        except TypeError as e:
+        except TypeError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
         liens = {
             _('Projet'): self.projet,
             _('Parent'): self.projet + (
@@ -502,9 +520,11 @@ class Dossier:
         if not os.path.exists(dest) or ecraser:
             shutil.move(self.dossier, dest)
             self.depot.sauvegarder(
-                message=self.nom
-                        + ' -> ' + '/'.join(destination.split('/')[1:])
+                message=(
+                    self.nom
+                    + ' -> ' + '/'.join(destination.split('/')[1:])
                 )
+            )
             b.redirect(i18n_path('/' + destination))
 
     def copier(self, destination, ecraser=False):
@@ -514,10 +534,12 @@ class Dossier:
         if not os.path.exists(dest) or ecraser:
             shutil.copytree(self.dossier, dest)
             self.depot.sauvegarder(
-                message=_('copie')
-                        + ' ' + self.nom
-                        + ' -> ' + '/'.join(destination.split('/')[1:])
+                message=(
+                    _('copie')
+                    + ' ' + self.nom
+                    + ' -> ' + '/'.join(destination.split('/')[1:])
                 )
+            )
             b.redirect(i18n_path('/' + destination))
         else:
             return self.afficher(markdown(_(
@@ -530,6 +552,8 @@ class Dossier:
             )))
 
     def envoyer_fichier(self, fichier, ecraser=False):
+        """Envoi d'un fichier vers le dossier
+        """
         try:
             fichier.save(self.dossier, int(ecraser))
             self.depot.sauvegarder(
@@ -538,15 +562,17 @@ class Dossier:
                 ))
             )
             b.redirect(i18n_path('/' + self.chemin))
-        except OSError as e:
+        except OSError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             return self.afficher(_(
                 "Le fichier existe déjà. Si vous voulez l'écraser, merci de "
                 "cocher la case correspondante."
             ))
 
     def envoyer_fichier_infos(self):
+        """Informations pour l'envoi d'un fichier
+        """
         return self.afficher(b.template('envoi'))
 
     def lister(self):
@@ -567,9 +593,9 @@ class Dossier:
             else:
                 liste = []
         # Si cette exception est levée, c'est que l'on est à la racine.
-        except ValueError as e:
+        except ValueError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             liste = []
         # Liste des dossiers, puis des fichiers
         listedossiers = sorted(
@@ -608,11 +634,11 @@ class Dossier:
             for fichier in listefichiers
         ]
         try:
-            with open(os.path.join(self.dossier, 'README.md'), 'r') as r:
-                readme = markdown(r.read(-1))
-        except FileNotFoundError as e:
+            with open(os.path.join(self.dossier, 'README.md'), 'r') as readme:
+                readme = markdown(readme.read(-1))
+        except FileNotFoundError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             readme = None
         return self.afficher(b.template(
             'liste',
@@ -642,6 +668,7 @@ class Projet(Dossier):
         Dossier.__init__(self, projet, '')
         self.projet = projet
         self.depot = Depot(self.projet)
+        self.url = i18n_path('/' + projet)
 
     def afficher(self, contenu, suppression=False):
         """Propriétés communes des pages de gestion de dossiers
@@ -664,9 +691,9 @@ class Projet(Dossier):
                         '_supprimerprojet/' + self.chemin
                 else:
                     actions[_('Créer projet')] = '_creerprojet'
-        except TypeError as e:
+        except TypeError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
         liens = {_('Projet'): self.projet}
         return {
             'corps': contenu,
@@ -680,10 +707,10 @@ class Projet(Dossier):
         try:
             os.makedirs(self.dossier, exist_ok=False)
             self.depot.initialiser()
-            return self.lister()
-        except FileExistsError as e:
+            b.redirect(self.url)
+        except FileExistsError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             return self.afficher(_('Ce projet existe déjà !'))
 
     def renommer(self, destination):
@@ -696,7 +723,13 @@ class Projet(Dossier):
         else:
             return self.afficher(_('Il y a déjà un projet portant ce nom !'))
 
-    def copier(self, destination):
+    def cloner(self, depot):
+        """Clonage d'un projet distant
+        """
+        self.depot.cloner(depot)
+        b.redirect(self.url)
+
+    def copier(self, destination, ecraser=False):
         """Copie d'un projet
         """
         dest = os.path.join(cfg.DATA, destination)
@@ -740,9 +773,9 @@ class Projet(Dossier):
         try:
             shutil.rmtree(self.dossier, ignore_errors=False)
             return self.afficher(_('Projet supprimé !'), suppression=True)
-        except FileNotFoundError as e:
+        except FileNotFoundError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Cette exception est levée quand le projet n'existe pas.
             return self.afficher(_('''C'est drôle, ce que vous me demandez :
                 il n'y a pas de projet ici !'''), suppression=True)
@@ -753,7 +786,7 @@ class Projet(Dossier):
 
 # I. Bidouille et décorateurs destinés à éviter les redondances ########
 
-@app.hook('before_request')
+@APP.hook('before_request')
 def strip_path():
     """Effacement du / final s'il y en a un dans l'url
     """
@@ -768,6 +801,8 @@ def page(fonction):
     particulières, tels les css ou les fichiers statiques.
     """
     def afficher(*arguments, **parametres):
+        """Décorateur
+        """
         contenu = fonction(*arguments, **parametres)
         contenu['rq'] = rq
         return b.template('page', contenu)
@@ -777,7 +812,7 @@ def page(fonction):
 # II. pages du site ########
 
 #   1. Accueil
-@app.get('/')
+@APP.get('/')
 @page
 def accueil():
     """ Page d'accueil du site
@@ -786,9 +821,9 @@ def accueil():
         actions = {_('Créer projet'): '_creerprojet'} \
             if a.authentifier(rq.auth[0], rq.auth[1]) \
             else {}
-    except TypeError as e:
+    except TypeError as err:
         if cfg.DEVEL:
-            print(type(e), e)
+            print(type(err), err)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
     liens = {_('Projets'): '_projets'}
@@ -797,13 +832,13 @@ def accueil():
             cfg.PAGES,
             'md',
             'Accueil.{}.md'.format(rq.locale)
-        ), 'r') as f:
-            corps = markdown(f.read(-1))
-    except FileNotFoundError as e:
+        ), 'r') as acc:
+            corps = markdown(acc.read(-1))
+    except FileNotFoundError as err:
         if cfg.DEVEL:
-            print(type(e), e)
-        with open(os.path.join(cfg.PAGES, 'md', 'Accueil.fr.md'), 'r') as f:
-            corps = markdown(f.read(-1))
+            print(type(err), err)
+        with open(os.path.join(cfg.PAGES, 'md', 'Accueil.fr.md'), 'r') as acc:
+            corps = markdown(acc.read(-1))
     return {
         'corps': corps,
         'actions': actions,
@@ -811,18 +846,21 @@ def accueil():
     }
 
 
-@app.get('/_projets')
+@APP.get('/_projets')
 @page
 def lister_projets():
     """Liste des projets existants
     """
     try:
-        actions = {_('Créer projet'): '_creerprojet'} \
+        actions = {
+            _('Créer projet'): '_creerprojet',
+            _('Cloner projet'): '_clonerprojet',
+        } \
             if a.authentifier(rq.auth[0], rq.auth[1]) \
             else {}
-    except TypeError as e:
+    except TypeError as err:
         if cfg.DEVEL:
-            print(type(e), e)
+            print(type(err), err)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
     listefichiers = f.Dossier(cfg.DATA).lister(1)
@@ -841,11 +879,11 @@ def lister_projets():
 
 
 #   2. Authentification et administration
-@app.get('/authentification')
-@app.get('/authentification/<action>')
+@APP.get('/authentification')
+@APP.get('/authentification/<action>')
 @b.auth_basic(a.authentifier, _('Accès réservé'))
 @page
-def authentifier(action=''):
+def authentifier():
     """ Page destinée à forcer l'authentification.
     """
     return {
@@ -856,8 +894,8 @@ def authentifier(action=''):
     }
 
 
-@app.get('/admin')
-@app.get('/admin/<action>')
+@APP.get('/admin')
+@APP.get('/admin/<action>')
 @b.auth_basic(a.admin, _('Vous devez être administrateur'))
 @page
 def admin(action=''):
@@ -872,25 +910,29 @@ def admin(action=''):
                 cfg.PAGES,
                 'md',
                 'Admin.{}.md'.format(rq.locale)
-            ), 'r') as f:
-                retour['corps'] = markdown(f.read(-1))
-        except FileNotFoundError as e:
+            ), 'r') as adm:
+                retour['corps'] = markdown(adm.read(-1))
+        except FileNotFoundError as err:
             if cfg.DEVEL:
-                print(type(e), e)
-            with open(os.path.join(cfg.PAGES, 'md', 'Admin.fr.md'), 'r') as f:
-                retour['corps'] = markdown(f.read(-1))
+                print(type(err), err)
+            with open(os.path.join(
+                cfg.PAGES, 'md', 'Admin.fr.md'
+            ), 'r') as adm:
+                retour['corps'] = markdown(adm.read(-1))
     return retour
 
 
-@app.post('/admin/groupes')
+@APP.post('/admin/groupes')
 @b.auth_basic(a.admin, _('Vous devez être administrateur'))
 def groupes():
-    with open(os.path.join(cfg.ETC, 'groupes'), 'w') as f:
-        f.write(rq.forms.groupes)
+    """Enregistrement des groupes
+    """
+    with open(os.path.join(cfg.ETC, 'groupes'), 'w') as grp:
+        grp.write(rq.forms.groupes)
     b.redirect(i18n_path('/admin/utilisateurs'))
 
 
-@app.get('/admin/supprimerutilisateur/<nom>')
+@APP.get('/admin/supprimerutilisateur/<nom>')
 @b.auth_basic(a.admin, _('Vous devez être administrateur'))
 def utilisateur_suppression(nom):
     """Suppression d'un utilisateur
@@ -899,7 +941,7 @@ def utilisateur_suppression(nom):
     b.redirect(i18n_path('/admin/utilisateurs'))
 
 
-@app.post('/admin/utilisateurs')
+@APP.post('/admin/utilisateurs')
 @b.auth_basic(a.admin, _('Vous devez être administrateur'))
 def utilisateur_ajout():
     """ Ajout d'un nouvel utilisateur à la base
@@ -910,8 +952,8 @@ def utilisateur_ajout():
 
 
 #   3. Fichiers statiques
-@app.get('/static')
-@app.get('/static/<chemin:path>')
+@APP.get('/static')
+@APP.get('/static/<chemin:path>')
 def static(chemin='/'):
     """ Fichiers statiques
     """
@@ -923,7 +965,7 @@ def static(chemin='/'):
     )
 
 
-@app.get('/favicon.ico')
+@APP.get('/favicon.ico')
 def favicon():
     """Icône du site
     """
@@ -934,9 +976,9 @@ def favicon():
 #      Attention, l'ordre des méthodes est important.
 
 # Création d'un document
-@app.get('/_creer/<nom>')
-@app.get('/_creer/<nom>/<element:path>')
-@app.get('/_creer/<nom>/<element:path>.<ext>')
+@APP.get('/_creer/<nom>')
+@APP.get('/_creer/<nom>/<element:path>')
+@APP.get('/_creer/<nom>/<element:path>.<ext>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_creer_infos(nom, element=None, ext=None):
@@ -948,8 +990,8 @@ def document_creer_infos(nom, element=None, ext=None):
         return {'corps': b.template('creation', {'quoi': _('fichier')})}
 
 
-@app.post('/_creer/<nom>')
-@app.post('/_creer/<nom>/<element:path>')
+@APP.post('/_creer/<nom>')
+@APP.post('/_creer/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_creer(nom, element=''):
@@ -963,11 +1005,11 @@ def document_creer(nom, element=''):
         b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
-@app.get('/_creerdossier/<nom>')
-@app.get('/_creerdossier/<nom>/<element:path>')
+@APP.get('/_creerdossier/<nom>')
+@APP.get('/_creerdossier/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def dossier_creer_infos(nom, element=None, *args):
+def dossier_creer_infos(nom, element=None):
     """ Page de création d'un dossier
     """
     if element:
@@ -976,8 +1018,8 @@ def dossier_creer_infos(nom, element=None, *args):
         return {'corps': b.template('creation', {'quoi': _('dossier')})}
 
 
-@app.post('/_creerdossier/<nom>')
-@app.post('/_creerdossier/<nom>/<element:path>')
+@APP.post('/_creerdossier/<nom>')
+@APP.post('/_creerdossier/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def dossier_creer(nom, element=''):
@@ -989,11 +1031,32 @@ def dossier_creer(nom, element=''):
         b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
-@app.get('/_creerprojet')
-@app.get('/_creerprojet/<nom>')
+@APP.get('/_clonerprojet')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def projet_creer_infos(nom=None, *args):
+def projet_cloner_infos():
+    """ Formulaire pour cloner un projet distant
+    """
+    return {'corps': b.template('clonage', {'quoi': _('projet')})}
+
+
+@APP.post('/_clonerprojet')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_cloner():
+    """ Clonage effectif du projet
+    """
+    if rq.forms.action == 'cloner':
+        return Projet(rq.forms.nom).cloner(rq.forms.origine)
+    else:
+        b.redirect(i18n_path('/_projets'))
+
+
+@APP.get('/_creerprojet')
+@APP.get('/_creerprojet/<nom>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_creer_infos(nom=None):
     """ Page de création d'un projet
     """
     if nom:
@@ -1002,7 +1065,7 @@ def projet_creer_infos(nom=None, *args):
         return {'corps': b.template('creation', {'quoi': _('projet')})}
 
 
-@app.post('/_creerprojet')
+@APP.post('/_creerprojet')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def projet_creer():
@@ -1015,8 +1078,8 @@ def projet_creer():
 
 
 # Déplacement d'un projet, dossier ou document
-@app.get('/_deplacer/<nom>')
-@app.get('/_deplacer/<nom>/<element:path>')
+@APP.get('/_deplacer/<nom>')
+@APP.get('/_deplacer/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def deplacer_infos(nom, element=None):
@@ -1038,8 +1101,8 @@ def deplacer_infos(nom, element=None):
     )}
 
 
-@app.post('/_deplacer/<nom>')
-@app.post('/_deplacer/<nom>/<element:path>')
+@APP.post('/_deplacer/<nom>')
+@APP.post('/_deplacer/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def deplacer(nom, element=None):
@@ -1061,8 +1124,8 @@ def deplacer(nom, element=None):
 
 
 # Déplacement d'un projet, dossier ou document
-@app.get('/_copier/<nom>')
-@app.get('/_copier/<nom>/<element:path>')
+@APP.get('/_copier/<nom>')
+@APP.get('/_copier/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def copier_infos(nom, element=None):
@@ -1078,9 +1141,9 @@ def copier_infos(nom, element=None):
     )}
 
 
-@app.post('/_copier/<nom>')
-@app.post('/_copier/<nom>/<element:path>')
-@app.post('/_copier/<nom>/<element:path>.<ext>')
+@APP.post('/_copier/<nom>')
+@APP.post('/_copier/<nom>/<element:path>')
+@APP.post('/_copier/<nom>/<element:path>.<ext>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def copier(nom, element=None, ext=None):
@@ -1093,9 +1156,9 @@ def copier(nom, element=None, ext=None):
                     rq.forms.destination,
                     ecraser=bool(rq.forms.ecraser)
                 )
-            except (NotADirectoryError, FileNotFoundError) as e:
+            except (NotADirectoryError, FileNotFoundError) as err:
                 if cfg.DEVEL:
-                    print(type(e), e)
+                    print(type(err), err)
                 print(nom, element, ext)
                 return Document(nom, element, ext).copier(
                     rq.forms.destination,
@@ -1111,7 +1174,7 @@ def copier(nom, element=None, ext=None):
 
 
 # Suppression d'un document
-@app.get('/_supprimer/<nom>/<element:path>')
+@APP.get('/_supprimer/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_supprimer_confirmation(nom, element=False):
@@ -1126,7 +1189,7 @@ def document_supprimer_confirmation(nom, element=False):
         )}
 
 
-@app.post('/_supprimer/<nom>/<element:path>')
+@APP.post('/_supprimer/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_supprimer(nom, element=False):
@@ -1142,7 +1205,7 @@ def document_supprimer(nom, element=False):
             b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
-@app.get('/_supprimerdossier/<nom>/<element:path>')
+@APP.get('/_supprimerdossier/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def dossier_supprimer_confirmation(nom, element=False):
@@ -1153,12 +1216,17 @@ def dossier_supprimer_confirmation(nom, element=False):
     else:
         return {'corps': b.template(
             'suppression',
-            {'quoi': 'le dossier {}/{} et tout son contenu ?'
-                .format(nom, element)}
+            {
+                'quoi':
+                    'le dossier {}/{} et tout son contenu ?'.format(
+                        nom,
+                        element
+                    )
+            }
         )}
 
 
-@app.post('/_supprimerdossier/<nom>/<element:path>')
+@APP.post('/_supprimerdossier/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def dossier_supprimer(nom, element=False):
@@ -1173,7 +1241,7 @@ def dossier_supprimer(nom, element=False):
             b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
-@app.get('/_supprimerprojet/<nom>')
+@APP.get('/_supprimerprojet/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def projet_supprimer_confirmation(nom):
@@ -1189,7 +1257,7 @@ def projet_supprimer_confirmation(nom):
     )}
 
 
-@app.post('/_supprimerprojet/<nom>')
+@APP.post('/_supprimerprojet/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def projet_supprimer(nom):
@@ -1202,8 +1270,8 @@ def projet_supprimer(nom):
 
 
 # Envoi d'un fichier
-@app.get('/_envoyer/<nom>')
-@app.get('/_envoyer/<nom>/<element:path>')
+@APP.get('/_envoyer/<nom>')
+@APP.get('/_envoyer/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_envoyer_infos(nom, element=''):
@@ -1212,8 +1280,8 @@ def document_envoyer_infos(nom, element=''):
     return Dossier(nom, element).envoyer_fichier_infos()
 
 
-@app.post('/_envoyer/<nom>')
-@app.post('/_envoyer/<nom>/<element:path>')
+@APP.post('/_envoyer/<nom>')
+@APP.post('/_envoyer/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_envoyer(nom, element=''):
@@ -1237,34 +1305,38 @@ def document_envoyer(nom, element=''):
 
 
 # Emplacement inexistant
-@app.get('/_inexistant/<nom>')
-@app.get('/_inexistant/<nom>/<element:path>')
-@app.get('/_inexistant/<nom>/<element:path>.<ext>')
+@APP.get('/_inexistant/<nom>')
+@APP.get('/_inexistant/<nom>/<element:path>')
+@APP.get('/_inexistant/<nom>/<element:path>.<ext>')
 @page
-def inexistant(nom, element=None, ext=None):
+def inexistant(nom, element=None, ext=None): # pylint: disable=W0613
+    """Page renvoyée pour proposer la création d'un emplacement inexistant
+    """
     return {
         'corps': b.template('inexistant', {'element': element})
     }
 
 
-@app.post('/_inexistant/<nom>')
-@app.post('/_inexistant/<nom>/<element:path>')
-@app.post('/_inexistant/<nom>/<element:path>.<ext>')
+@APP.post('/_inexistant/<nom>')
+@APP.post('/_inexistant/<nom>/<element:path>')
+@APP.post('/_inexistant/<nom>/<element:path>.<ext>')
 def inexistant_creer(nom, element=None, ext=None):
+    """ Création effective de l'élément en question
+    """
     try:
         return {
             'dossier':  dossier_creer_infos,
             'document': document_creer_infos,
             'projet':   projet_creer_infos
         }[rq.forms.action](nom, element, ext)
-    except KeyError as e:
+    except KeyError as err:
         if cfg.DEVEL:
-            print(type(e), e)
+            print(type(err), err)
         b.redirect(i18n_path('/'))
 
 
 # Historique d'un document
-@app.get('/_historique/<nom>/<element:path>')
+@APP.get('/_historique/<nom>/<element:path>')
 @page
 def document_historique(nom, element):
     """Page affichant les modifications successives affectant un document
@@ -1277,7 +1349,7 @@ def document_historique(nom, element):
         return Document(nom, element, ext[1:]).historique
 
 
-@app.post('/_retablir/<nom>/<element:path>')
+@APP.post('/_retablir/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_retablir_commit(nom, element):
@@ -1288,7 +1360,7 @@ def document_retablir_commit(nom, element):
 
 
 # Historique d'un projet
-@app.get('/_historique/<nom>')
+@APP.get('/_historique/<nom>')
 @page
 def projet_historique(nom):
     """Page affichant les modifications successives affectant un projet
@@ -1300,7 +1372,7 @@ def projet_historique(nom):
         return Projet(nom).historique
 
 
-@app.post('/_retablir/<nom>')
+@APP.post('/_retablir/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def projet_retablir_commit(nom):
@@ -1310,8 +1382,8 @@ def projet_retablir_commit(nom):
 
 
 # Édition d'un document
-@app.get('/_editer/<nom>/<element:path>')
-@app.get('/_editer/<nom>/<element:path>.<ext>')
+@APP.get('/_editer/<nom>/<element:path>')
+@APP.get('/_editer/<nom>/<element:path>.<ext>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_editer(nom, element='', ext=''):
@@ -1321,14 +1393,14 @@ def document_editer(nom, element='', ext=''):
 
 
 # Export d'un document
-@app.get('/_exporter/<nom>/<element:path>.<ext>')
+@APP.get('/_exporter/<nom>/<element:path>.<ext>')
 @page
 def document_exporter_infos(nom, element='', ext=''):
     """ Page où l'utilisateur définit les propriétés du document à exporter"""
     return Document(nom, element, ext).exporter_infos(rq.query.fmt)
 
 
-@app.post('/_exporter/<nom>/<element:path>.<ext>')
+@APP.post('/_exporter/<nom>/<element:path>.<ext>')
 @page
 def document_exporter(nom, element='', ext=''):
     """ Page où l'utilisateur définit les propriétés du document à exporter"""
@@ -1339,7 +1411,7 @@ def document_exporter(nom, element='', ext=''):
 
 
 # Affichage de la source d'un document
-@app.get('/_src/<nom>/<element:path>.<ext>')
+@APP.get('/_src/<nom>/<element:path>.<ext>')
 @page
 def document_src(nom, element='', ext=''):
     """ Source d'un document
@@ -1348,9 +1420,9 @@ def document_src(nom, element='', ext=''):
 
 
 # Listing des dossiers et aperçu des documents
-@app.get('/<nom>')
-@app.get('/<nom>/<element:path>')
-@app.get('/<nom>/<element:path>.<ext>')
+@APP.get('/<nom>')
+@APP.get('/<nom>/<element:path>')
+@APP.get('/<nom>/<element:path>.<ext>')
 @page
 def document_afficher(nom, element=None, ext=None):
     """ Affichage des fichiers et dossiers d'un projet
@@ -1364,22 +1436,22 @@ def document_afficher(nom, element=None, ext=None):
             return Projet(nom).lister()
         else:
             return Dossier(nom, element).lister()
-    except TypeError as e:
+    except TypeError as err:
         if cfg.DEVEL:
-            print(type(e), e)
+            print(type(err), err)
         # Cette exception est levée s'il ne s'agit pas d'un dossier.
         try:
             return Document(nom, element, ext).contenu
-        except FileNotFoundError as e:
+        except FileNotFoundError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Cette exception est levée s'il n'y a pas de document, ce qui
             # arrive notamment lorsque l'on renonce à créer un nouveau
             # document.
             b.redirect(i18n_path('/' + nom))
-        except TypeError as e:
+        except TypeError as err:
             if cfg.DEVEL:
-                print(type(e), e)
+                print(type(err), err)
             # Cette exception est levée si l'on tente d'accéder à un
             # emplacement inexistant.
             b.redirect(i18n_path(
@@ -1389,12 +1461,11 @@ def document_afficher(nom, element=None, ext=None):
                 + ('.' + ext if ext else "")
             ))
             raise
-            b.abort(404)
 
 
 # Enregistrement des documents après édition
-@app.post('/<nom>/<element:path>')
-@app.post('/<nom>/<element:path>.<ext>')
+@APP.post('/<nom>/<element:path>')
+@APP.post('/<nom>/<element:path>.<ext>')
 @page
 def document_enregistrer(nom, element='', ext=''):
     """Enregistrement d'un document
@@ -1418,8 +1489,8 @@ def document_enregistrer(nom, element='', ext=''):
 
 # III. Feuilles de style ########
 
-@app.get('/css')
-@app.get('/css/<ext>')
+@APP.get('/css')
+@APP.get('/css/<ext>')
 @b.view('style')
 def css(ext=''):
     """ Feuilles de style."""
@@ -1428,24 +1499,25 @@ def css(ext=''):
 
 # IV. pages d'erreur ########
 
-@app.error(code=401)
+@APP.error(code=401)
 @page
-def erreur_accesreserve(erreur):
+def erreur_accesreserve(erreur): # pylint: disable=W0613
     """Accès réservé
 
     Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page
     réservée.
     """
-    return {'corps':
-        _('Accès réservé !')
-        + h.BR() + h.BR()
-        + h.A('Retour à la page précédente', href=rq['HTTP_REFERER'])
+    return {
+        'corps':
+            _('Accès réservé !')
+            + h.BR() + h.BR()
+            + h.A('Retour à la page précédente', href=rq['HTTP_REFERER'])
     }
 
 
-@app.error(code=404)
+@APP.error(code=404)
 @page
-def erreur_pageintrouvable(erreur):
+def erreur_pageintrouvable(erreur): # pylint: disable=W0613
     """Page introuvable
 
     Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page
@@ -1456,8 +1528,8 @@ def erreur_pageintrouvable(erreur):
 
 # Traduction ##################################################################
 
-webapp = Traduction(
-    app,
+WEBAPP = Traduction(
+    APP,
     langs=cfg.LANGUES,
     default_locale=cfg.LANGUE,
     locale_dir=cfg.I18N,
@@ -1471,7 +1543,7 @@ if cfg.DEVEL:
     # On active le débogage pour avoir des messages d'erreur plus explicites.
     b.debug(True)
     b.run(
-        app=webapp,
+        app=WEBAPP,
         host=cfg.HOTE,
         port=cfg.PORT,
         server='cherrypy',
@@ -1480,10 +1552,10 @@ if cfg.DEVEL:
     )
 # En production ####
 else:
-    from cherrypy.wsgiserver import CherryPyWSGIServer
-    server = CherryPyWSGIServer(
+    from deps.cherrypy.wsgiserver.wsgiserver3 import CherryPyWSGIServer
+    SERVER = CherryPyWSGIServer(
         (cfg.HOTE, cfg.PORT),
-        webapp,
+        WEBAPP,
         server_name='Musite',
         numthreads=30)
-    server.start()
+    SERVER.start()

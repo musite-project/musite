@@ -6,19 +6,21 @@ Ces partitions nécessitent LilyPond.
 Voir plus d'informations à l'adresse :
 http://www.lilypond.org
 """
-import ext.txt as txt
+from . import txt as txt
 from etc import config as cfg
-from outils import motaleatoire, url, _
-from mistune import markdown
+from deps.outils import url, _
+from deps.mistune import markdown
 import os
 import shutil
 import subprocess as sp
-import HTMLTags as h
-import jrnl as l
+import deps.HTMLTags as h
+from deps import jrnl as l
 EXT = __name__.split('.')[-1]
 
 
 class Document(txt.Document):
+    """Document lilypond
+    """
     def __init__(self, chemin, ext=EXT):
         txt.Document.__init__(self, chemin, ext)
 
@@ -44,10 +46,11 @@ restrictives, qui rendent impossibles certaines opérations.
 Voici la sortie de la commande :
 
                 """
-            )) + traiter_erreur_compilation(self.dossiertmp)
-            )
+            )) + traiter_erreur_compilation(self.dossiertmp))
 
     def pdf(self, chemin=False, indice=''):
+        """Format pdf
+        """
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichier('pdf')
         cheminpdf = self._chemin('pdf')
@@ -61,14 +64,16 @@ Voici la sortie de la commande :
                 '/{}/{}/'.format(chemin, indice).replace('//', '/')
             )
         if (
-            not os.path.isfile(self._fichier('pdf'))
-            or os.path.getmtime(self._fichier('pdf'))
+                not os.path.isfile(self._fichier('pdf'))
+                or os.path.getmtime(self._fichier('pdf'))
                 < os.path.getmtime(self.fichier)
         ):
             self.preparer_pdf()
         return url(fichierpdf)
 
-    def preparer_pdf(self, destination=False, environnement={}):
+    def preparer_pdf(self, destination=False, environnement=None):
+        """Mise en place du pdf
+        """
         orig = self._fichiertmp('pdf')
         dest = destination if destination else self._fichier('pdf')
         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -79,7 +84,9 @@ Voici la sortie de la commande :
         shutil.rmtree(self.rd, ignore_errors=True)
 
 
-def compiler_pdf(fichier, environnement={}):
+def compiler_pdf(fichier, environnement=None):
+    """Compilation en pdf
+    """
     try:
         os.chdir(os.path.dirname(fichier))
         commande = [
@@ -87,7 +94,10 @@ def compiler_pdf(fichier, environnement={}):
             '-dsafe',
             fichier
         ]
-        environnement = dict(os.environ, **environnement)
+        environnement = dict(
+            os.environ,
+            **environnement if environnement else {}
+        )
         compilation = sp.Popen(
             commande,
             env=environnement,
@@ -111,6 +121,8 @@ def compiler_pdf(fichier, environnement={}):
 
 
 def traiter_erreur_compilation(dossier):
+    """Réaction en cas d'erreur de compilation
+    """
     return txt.Document(dossier.replace(os.path.sep, '/') + '/log').afficher()
 
 
@@ -118,4 +130,6 @@ FichierIllisible = txt.FichierIllisible
 
 
 class ErreurCompilation(Exception):
+    """Exception levée en cas d'erreur de compilation
+    """
     pass
