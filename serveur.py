@@ -106,8 +106,7 @@ class Depot:
             )
             return h.CODE(modification)
         except CalledProcessError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             return _("Il n'y a rien avant la création !")
 
     def historique(self, fichier=None):
@@ -122,8 +121,7 @@ class Depot:
             else:
                 tableau = self.depot.journalcomplet
         except CalledProcessError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             return _("Il n'y a pas encore de modifications à signaler.")
         for element in tableau[1:]:
             element[0] = h.A(element[0], href='?commit=' + element[0])
@@ -193,8 +191,7 @@ class Document:
                 actions[_('Éditer')] = '_editer/' + self.chemin
                 actions[_('Supprimer')] = '_supprimer/' + self.chemin
         except TypeError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
         liens = {
             _('Projet'): self.projet,
             _('Dossier'): '/'.join(self.chemin.split('/')[:-1])
@@ -202,19 +199,17 @@ class Document:
         try:
             exports = {
                 fmt: self.chemin + '?fmt=' + fmt
-                for fmt in EXT[self.ext].Document(self.chemin).fmt
+                for fmt in EXT[self.ext].Document(self.chemin).proprietes
             }
         except (AttributeError, KeyError) as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Cette exception est levée quand le module concerné ne définit pas
             # de format d'export.
             exports = {}
         try:
             midi = EXT[self.ext].Document(self.chemin).midi()
         except (AttributeError, KeyError) as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Cette exception est levée quand le module concerné ne définit pas
             # de fichier midi.
             midi = None
@@ -241,24 +236,20 @@ class Document:
                 EXT[self.ext].Document(self.chemin).afficher()
             )
         except (KeyError, AttributeError) as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage,
             # on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
             try:
                 return self.afficher(TXT.Document(self.chemin).afficher())
             except TXT.FichierIllisible as err:
-                if cfg.DEVEL:
-                    print(type(err), err)
+                f.traiter_erreur(err)
                 return self.afficher(_("Extension inconnue : {}.").format(err))
             except FileNotFoundError as err:
-                if cfg.DEVEL:
-                    print(type(err), err)
+                f.traiter_erreur(err)
                 b.abort(404)
         except EXT[self.ext].FichierIllisible as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             return self.afficher(_("Ce fichier est illisible."))
 
     @property
@@ -270,8 +261,7 @@ class Document:
                 EXT[self.ext].Document(self.chemin).afficher_source()
             )
         except (KeyError, AttributeError) as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage
             # de la source, on essaie de le traiter comme un document texte.
             # Sinon, on abandonne.
@@ -280,8 +270,7 @@ class Document:
                     TXT.Document(self.chemin).afficher_source()
                 )
             except TXT.FichierIllisible as err:
-                if cfg.DEVEL:
-                    print(type(err), err)
+                f.traiter_erreur(err)
                 return self.afficher(
                     _("Extension inconnue : {}.").format(err)
                     + h.BR()
@@ -295,12 +284,10 @@ class Document:
                     )
                 )
             except NameError as err:
-                if cfg.DEVEL:
-                    print(type(err), err)
+                f.traiter_erreur(err)
                 b.abort(404)
         except EXT[self.ext].FichierIllisible as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             return self.afficher(_("Ce fichier est illisible."))
 
     def creer(self):
@@ -314,8 +301,7 @@ class Document:
         try:
             EXT[self.ext].Document(self.chemin).supprimer()
         except KeyError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             TXT.Document(self.chemin).supprimer()
         self.depot.sauvegarder(
             message=_('Suppression du document {}').format(self.chemin)
@@ -330,8 +316,7 @@ class Document:
                 EXT[self.ext].Document(self.chemin).editer(creation)
             )
         except KeyError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Si le type de document est inconnu, on essaie de le traiter
             # comme un document texte. Sinon, on abandonne.
             try:
@@ -339,19 +324,16 @@ class Document:
                     TXT.Document(self.chemin).editer(creation)
                 )
             except TXT.FichierIllisible as err:
-                if cfg.DEVEL:
-                    print(type(err), err)
+                f.traiter_erreur(err)
                 return self.afficher(
                     _("Ce type de document n'est pas éditable.")
                 )
         except AttributeError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Si le type de document ne prévoit pas d'édition, on abandonne.
             return self.afficher(_("Ce type de document n'est pas éditable."))
         except EXT[self.ext].FichierIllisible as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             return self.afficher(
                 '''Si je ne puis même pas lire ce fichier,
                 comment voulez-vous que je l'édite ?'''
@@ -363,8 +345,7 @@ class Document:
         try:
             EXT[self.ext].Document(self.chemin).enregistrer(contenu)
         except (AttributeError, KeyError) as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             TXT.Document(self.chemin).enregistrer(self.chemin)
         f.Depot(
             os.path.join(
@@ -413,8 +394,7 @@ class Document:
                 )
             )
         except EXT[self.ext].ErreurCompilation as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             return self.afficher(
                 markdown(_(
                     """\
@@ -493,8 +473,7 @@ class Dossier:
                 actions[_('Supprimer')] = \
                     '_supprimerdossier/' + self.chemin
         except TypeError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
         liens = {
             _('Projet'): self.projet,
             _('Parent'): self.projet + (
@@ -563,8 +542,7 @@ class Dossier:
             )
             b.redirect(i18n_path('/' + self.chemin))
         except OSError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             return self.afficher(_(
                 "Le fichier existe déjà. Si vous voulez l'écraser, merci de "
                 "cocher la case correspondante."
@@ -594,8 +572,7 @@ class Dossier:
                 liste = []
         # Si cette exception est levée, c'est que l'on est à la racine.
         except ValueError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             liste = []
         # Liste des dossiers, puis des fichiers
         listedossiers = sorted(
@@ -637,8 +614,7 @@ class Dossier:
             with open(os.path.join(self.dossier, 'README.md'), 'r') as readme:
                 readme = markdown(readme.read(-1))
         except FileNotFoundError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             readme = None
         return self.afficher(b.template(
             'liste',
@@ -692,8 +668,7 @@ class Projet(Dossier):
                 else:
                     actions[_('Créer projet')] = '_creerprojet'
         except TypeError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
         liens = {_('Projet'): self.projet}
         return {
             'corps': contenu,
@@ -709,8 +684,7 @@ class Projet(Dossier):
             self.depot.initialiser()
             b.redirect(self.url)
         except FileExistsError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             return self.afficher(_('Ce projet existe déjà !'))
 
     def renommer(self, destination):
@@ -774,8 +748,7 @@ class Projet(Dossier):
             shutil.rmtree(self.dossier, ignore_errors=False)
             return self.afficher(_('Projet supprimé !'), suppression=True)
         except FileNotFoundError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Cette exception est levée quand le projet n'existe pas.
             return self.afficher(_('''C'est drôle, ce que vous me demandez :
                 il n'y a pas de projet ici !'''), suppression=True)
@@ -822,8 +795,7 @@ def accueil():
             if a.authentifier(rq.auth[0], rq.auth[1]) \
             else {}
     except TypeError as err:
-        if cfg.DEVEL:
-            print(type(err), err)
+        f.traiter_erreur(err)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
     liens = {_('Projets'): '_projets'}
@@ -835,8 +807,7 @@ def accueil():
         ), 'r') as acc:
             corps = markdown(acc.read(-1))
     except FileNotFoundError as err:
-        if cfg.DEVEL:
-            print(type(err), err)
+        f.traiter_erreur(err)
         with open(os.path.join(cfg.PAGES, 'md', 'Accueil.fr.md'), 'r') as acc:
             corps = markdown(acc.read(-1))
     return {
@@ -859,8 +830,7 @@ def lister_projets():
             if a.authentifier(rq.auth[0], rq.auth[1]) \
             else {}
     except TypeError as err:
-        if cfg.DEVEL:
-            print(type(err), err)
+        f.traiter_erreur(err)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
     listefichiers = f.Dossier(cfg.DATA).lister(1)
@@ -913,8 +883,7 @@ def admin(action=''):
             ), 'r') as adm:
                 retour['corps'] = markdown(adm.read(-1))
         except FileNotFoundError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             with open(os.path.join(
                 cfg.PAGES, 'md', 'Admin.fr.md'
             ), 'r') as adm:
@@ -1157,8 +1126,7 @@ def copier(nom, element=None, ext=None):
                     ecraser=bool(rq.forms.ecraser)
                 )
             except (NotADirectoryError, FileNotFoundError) as err:
-                if cfg.DEVEL:
-                    print(type(err), err)
+                f.traiter_erreur(err)
                 print(nom, element, ext)
                 return Document(nom, element, ext).copier(
                     rq.forms.destination,
@@ -1330,8 +1298,7 @@ def inexistant_creer(nom, element=None, ext=None):
             'projet':   projet_creer_infos
         }[rq.forms.action](nom, element, ext)
     except KeyError as err:
-        if cfg.DEVEL:
-            print(type(err), err)
+        f.traiter_erreur(err)
         b.redirect(i18n_path('/'))
 
 
@@ -1437,21 +1404,18 @@ def document_afficher(nom, element=None, ext=None):
         else:
             return Dossier(nom, element).lister()
     except TypeError as err:
-        if cfg.DEVEL:
-            print(type(err), err)
+        f.traiter_erreur(err)
         # Cette exception est levée s'il ne s'agit pas d'un dossier.
         try:
             return Document(nom, element, ext).contenu
         except FileNotFoundError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Cette exception est levée s'il n'y a pas de document, ce qui
             # arrive notamment lorsque l'on renonce à créer un nouveau
             # document.
             b.redirect(i18n_path('/' + nom))
         except TypeError as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            f.traiter_erreur(err)
             # Cette exception est levée si l'on tente d'accéder à un
             # emplacement inexistant.
             b.redirect(i18n_path(

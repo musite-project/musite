@@ -1,8 +1,8 @@
 # coding: utf-8
 """Gestion des documents txt
 
-Ce module sert aussi de module de base pour d'autres types de documents : soyez
-vigilant si vous y apportez des modifications.
+Ce module sert aussi de module de base pour d'autres types de documents :
+soyez vigilant si vous y apportez des modifications.
 Il n'y a aucune dépendance externe particulière.
 
 Si vous voulez définir un module pour gérer une nouvelle extension, il doit
@@ -10,23 +10,59 @@ comporter au moins les méthodes documentées ici. Le cas échéant, vous pouvez
 user des mécanismes d'héritage de Python en vous basant sur ce module.
 """
 import os.path
+import subprocess as sp
 from deps import HTMLTags as h
 from deps import bottle as b
-from deps.outils import motaleatoire
+from deps.outils import motaleatoire, _
+from deps import jrnl as l
 from etc import config as cfg
 b.TEMPLATE_PATH += cfg.MODELES
 EXT = __name__.split('.')[-1]
 
 
 class Document:
-    """Classe gérant les documents
+    """Classe gérant les documents texte
     """
-    def __init__(self, chemin):
+    def __init__(
+            self,
+            chemin,
+            formats=None,
+            listeproprietes=None,
+            proprietes=None
+    ):
         self.chemin = chemin
         self.nom, self.ext = os.path.splitext(chemin.split('/')[-1])
         self.ext = self.ext[1:]
         # Chemin absolu des fichiers temporaires
         self.rnd = os.path.join(cfg.TMP, motaleatoire(6))
+        self.listeproprietes = listeproprietes if listeproprietes else {}
+        self.proprietes = proprietes if proprietes else {}
+        if formats:
+            for fmt in formats:
+                self.proprietes[fmt] = {
+                    prop: val[1] for prop, val in listeproprietes[fmt].items()
+                }
+        if proprietes:
+            for fmt in proprietes:
+                for prop, val in proprietes[fmt].items():
+                    if prop in listeproprietes[fmt]:
+                        typ = type(listeproprietes[fmt][prop][1])
+                        if typ in (str, int, float):
+                            self.proprietes[fmt][prop] = typ(val)
+                        elif typ is bool:
+                            self.proprietes[fmt][prop] = typ(int(val))
+                        elif typ in (tuple, list):
+                            if type(val) in (tuple, list):
+                                self.proprietes[fmt][prop] = val
+                            else:
+                                self.proprietes[fmt][prop] = tuple(
+                                    type(pr)(i)
+                                    for i, pr
+                                    in zip(
+                                        val.split(','),
+                                        listeproprietes[fmt][prop][1]
+                                    )
+                                )
 
     def _chemin(self, ext=None):
         """Url vers un fichier portant ce nom avec une autre extension
@@ -62,10 +98,14 @@ class Document:
 
     @property
     def dossier(self):
+        """Dossier contenant le document
+        """
         return os.path.dirname(self._fichier())
 
     @property
     def dossiertmp(self):
+        """Dossier temporaire
+        """
         return os.path.dirname(self._fichiertmp())
 
     def afficher(self):
@@ -85,7 +125,7 @@ class Document:
             with open(self._fichier()) as doc:
                 return doc.read(-1)
         except UnicodeDecodeError:
-            raise FichierIllisible(fichier)
+            raise FichierIllisible(self._fichier())
 
     def editer(self, creation=False):
         """Page d'édition du document
@@ -123,10 +163,46 @@ class Document:
         os.remove(self._fichier())
 
 
+def compiler(commande, environnement):
+    """Appel de commande externe
+
+    Cette méthode est surtout appelée dans les modules dépendant de celui-ci.
+    """
+    if cfg.DEVEL:
+        print(environnement)
+    compilation = sp.Popen(
+        commande,
+        env=environnement,
+        stdout=sp.PIPE,
+        stderr=sp.PIPE
+    )
+    sortie, erreurs = compilation.communicate()
+    try:
+        l.log(
+            _('Sortie :')
+            + '\n========\n'
+            + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
+            + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
+            + _('Erreurs :')
+            + '\n=========\n'
+            + '\n{}\n'.format(erreurs.decode('utf8'))
+        )
+    except UnicodeDecodeError:
+        raise FichierIllisible
+    if compilation.returncode:
+        raise ErreurCompilation
+
+
 class FichierIllisible(Exception):
     """Exception renvoyée quand le fichier est illisible
 
     Ici, cette exception est utile si le fichier est un binaire et non un
     document texte.
+    """
+    pass
+
+
+class ErreurCompilation(Exception):
+    """Exception levée en cas d'erreur de compilation
     """
     pass

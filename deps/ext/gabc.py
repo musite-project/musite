@@ -9,7 +9,7 @@ http://gregorio-project.github.io/
 """
 from . import txt, tex
 from etc import config as cfg
-from deps.outils import templateperso, url, _
+from deps.outils import templateperso, url, traiter_erreur, _
 from deps.gabctk import Gabc, Lily, Midi, Partition
 from deps.mistune import markdown
 import os
@@ -27,9 +27,7 @@ TEMPLATETEX = templateperso()
 class Document(txt.Document):
     """Document gabc
     """
-    def __init__(self, chemin, proprietes=False):
-        txt.Document.__init__(self, chemin)
-
+    def __init__(self, chemin, proprietes=None):
         # Formats d'export possibles, avec la méthode renvoyant le document
         # compilé dans chaque format.
         self.fmt = {
@@ -39,56 +37,37 @@ class Document(txt.Document):
             }
 
         # Propriétés du document
-        # self.listeproprietes contient la liste des propriétés, avec leur
+        # listeproprietes contient la liste des propriétés, avec leur
         # description et leur valeur par défaut.
-        # self.proprietes contient les propriétés définies par l'utilisateur,
-        # ou à défaut les valeurs par défaut.
-        self.listeproprietes = {}
-        self.proprietes = {}
-        self.listeproprietes['midi']\
-            = self.listeproprietes['ly']\
-            = {
+        listeproprietes = {
+            'midi': {
                 'tempo':                (_("Tempo"), 165),
-                'transposition':        (_("Transposition"), 0)
+                'transposition':        (_("Transposition"), 0),
+            },
+            'ly': {
+                'tempo':                (_("Tempo"), 165),
+                'transposition':        (_("Transposition"), 0),
+            },
+            'pdf': {
+                'couleur':              (_("Couleur (R,V,B)"), (154, 0, 0)),
+                'couleur_initiale':     (_("Initiale en couleur"), False),
+                'couleur_lignes':       (_("Lignes en couleur"), True),
+                'couleur_symboles':     (_("Symboles en couleur"), True),
+                'epaisseur_lignes':     (_("Épaisseur des lignes"), 20),
+                'espace_lignes_texte':  (_("Espace sous la portée"), '7 mm'),
+                'papier':               (_("Taille de la page"), 'a5'),
+                'taille_initiale':      (_("Taille de l'initiale"), 43),
+                'taille_notes':         (_("Taille des notes"), 17),
+                'taille_police':        (_("Taille de la police"), 12),
             }
-        self.listeproprietes['pdf'] = {
-            'couleur':              (_("Couleur (R,V,B)"), (154, 0, 0)),
-            'couleur_initiale':     (_("Initiale en couleur"), False),
-            'couleur_lignes':       (_("Lignes en couleur"), True),
-            'couleur_symboles':     (_("Symboles en couleur"), True),
-            'epaisseur_lignes':     (_("Épaisseur des lignes"), 20),
-            'espace_lignes_texte':  (_("Espacement sous la portée"), '7 mm'),
-            'papier':               (_("Taille de la page"), 'a5'),
-            'taille_initiale':      (_("Taille de l'initiale"), 43),
-            'taille_notes':         (_("Taille des notes"), 17),
-            'taille_police':        (_("Taille de la police"), 12),
         }
-        for fmt in self.fmt:
-            self.proprietes[fmt] = {
-                prop: val[1]
-                for prop, val in self.listeproprietes[fmt].items()
-            }
-        if proprietes:
-            for fmt in proprietes:
-                for prop, val in proprietes[fmt].items():
-                    if prop in self.listeproprietes[fmt]:
-                        typ = type(self.listeproprietes[fmt][prop][1])
-                        if typ in (str, int, float):
-                            self.proprietes[fmt][prop] = typ(val)
-                        elif typ is bool:
-                            self.proprietes[fmt][prop] = typ(int(val))
-                        elif typ in (tuple, list):
-                            if type(val) in (tuple, list):
-                                self.proprietes[fmt][prop] = val
-                            else:
-                                self.proprietes[fmt][prop] = tuple(
-                                    type(pr)(i)
-                                    for i, pr
-                                    in zip(
-                                        val.split(','),
-                                        self.listeproprietes[fmt][prop][1]
-                                    )
-                                )
+        txt.Document.__init__(
+            self,
+            chemin,
+            formats=self.fmt,
+            listeproprietes=listeproprietes,
+            proprietes=proprietes
+        )
 
     def afficher(self):
         try:
@@ -98,7 +77,7 @@ class Document(txt.Document):
                 width="100%",
                 height="100%"
             )
-        except tex.ErreurCompilation:
+        except ErreurCompilation:
             return (markdown(_(
                 """\
 Il y a eu une erreur pendant le traitement du document.
@@ -156,12 +135,11 @@ Voici la sortie de la commande :
             try:
                 self.preparer_gabc(fmt, fichier)
             except IndexError as err:
-                if cfg.DEVEL:
-                    print(type(err), err)
+                traiter_erreur(err)
                 raise ErreurCompilation
         return url(fichier)
 
-    def ly(self, chemin=False, indice=''): # pylint: disable=C0103
+    def ly(self, chemin=False, indice=''):  # pylint: disable=C0103
         """Format lilypond
         """
         return self.gabc('ly', chemin, indice)
@@ -172,8 +150,7 @@ Voici la sortie de la commande :
         try:
             return self.gabc('midi', chemin, indice)
         except ErreurCompilation as err:
-            if cfg.DEVEL:
-                print(type(err), err)
+            traiter_erreur(err)
 
     def preparer_pdf(self, destination=False, environnement=None):
         """Mise en place du pdf
@@ -224,4 +201,4 @@ def compiler_pdf(fichier, environnement=None):
 
 FichierIllisible = txt.FichierIllisible
 
-ErreurCompilation = tex.ErreurCompilation
+ErreurCompilation = txt.ErreurCompilation

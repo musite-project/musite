@@ -8,6 +8,7 @@ static/pdf/
 static/midi/
 tmp/
 test.py
+rapport_pylint
 
 # Fichiers temporaires
 *~

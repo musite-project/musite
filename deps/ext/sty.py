@@ -9,5 +9,5 @@ from .tex import Document as DocTeX
 class Document(DocTeX):
     """Document sty
     """
-    def __init__(self, chemin, ext=None):
-        DocTeX.__init__(self, chemin, ext=None)
+    def __init__(self, chemin):
+        DocTeX.__init__(self, chemin)

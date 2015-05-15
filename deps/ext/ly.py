@@ -12,9 +12,7 @@ from deps.outils import url, _
 from deps.mistune import markdown
 import os
 import shutil
-import subprocess as sp
 import deps.HTMLTags as h
-from deps import jrnl as l
 EXT = __name__.split('.')[-1]
 
 
@@ -98,26 +96,12 @@ def compiler_pdf(fichier, environnement=None):
             os.environ,
             **environnement if environnement else {}
         )
-        compilation = sp.Popen(
-            commande,
-            env=environnement,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE
-        )
-        sortie, erreurs = compilation.communicate()
-        l.log(
-            _('Sortie :')
-            + '\n========\n'
-            + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
-            + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-            + _('Erreurs :')
-            + '\n=========\n'
-            + '\n{}\n'.format(erreurs.decode('utf8'))
-        )
-        if compilation.returncode:
-            raise ErreurCompilation
+        compiler(commande, environnement)
     finally:
         os.chdir(cfg.PWD)
+
+
+compiler = txt.compiler  # pylint: disable=C0103
 
 
 def traiter_erreur_compilation(dossier):
@@ -129,7 +113,4 @@ def traiter_erreur_compilation(dossier):
 FichierIllisible = txt.FichierIllisible
 
 
-class ErreurCompilation(Exception):
-    """Exception levée en cas d'erreur de compilation
-    """
-    pass
+ErreurCompilation = txt.ErreurCompilation

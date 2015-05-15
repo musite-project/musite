@@ -9,12 +9,10 @@ http://fr.wikipedia.org/wiki/Markdown
 """
 import os
 import shutil
-import subprocess as sp
 from deps.mistune import markdown
 from . import txt
 from etc import config as cfg
 from deps.outils import url, _
-from deps import jrnl as l
 EXT = __name__.split('.')[-1]
 
 
@@ -22,8 +20,6 @@ class Document(txt.Document):
     """Document markdown
     """
     def __init__(self, chemin, proprietes=None):
-        txt.Document.__init__(self, chemin)
-
         # Formats d'export possibles, avec la méthode renvoyant le document
         # compilé dans chaque format.
         self.fmt = {
@@ -31,50 +27,27 @@ class Document(txt.Document):
             'reveal.js': self.revealjs,
             'beamer': self.beamer,
             }
-
         # Propriétés du document
-        # self.listeproprietes contient la liste des propriétés, avec leur
+        # listeproprietes contient la liste des propriétés, avec leur
         # description et leur valeur par défaut.
-        # self.proprietes contient les propriétés définies par l'utilisateur,
-        # ou à défaut les valeurs par défaut.
-        self.listeproprietes = {}
-        self.proprietes = {}
-        for fmt in self.fmt:
-            self.listeproprietes[fmt] = {}
-        self.listeproprietes['pdf'] = {
-            'papier':               (_("Taille de la page"), 'a4'),
-            'taillepolice':         (_("Taille de la police"), '12'),
-        }
-        self.listeproprietes['reveal.js'] = {
-            'theme':                (_("Thème"), 'black')
-        }
-
-        for fmt in self.fmt:
-            self.proprietes[fmt] = {
-                prop: val[1]
-                for prop, val in self.listeproprietes[fmt].items()
+        listeproprietes = {
+            'pdf': {
+                'papier':               (_("Taille de la page"), 'a4'),
+                'taillepolice':         (_("Taille de la police"), '12'),
+            },
+            'reveal.js': {
+                'theme':                (_("Thème"), 'black')
+            },
+            'beamer': {
             }
-        if proprietes:
-            for fmt in proprietes:
-                for prop, val in proprietes[fmt].items():
-                    if prop in self.listeproprietes[fmt]:
-                        typ = type(self.listeproprietes[fmt][prop][1])
-                        if typ in (str, int, float):
-                            self.proprietes[fmt][prop] = typ(val)
-                        elif typ is bool:
-                            self.proprietes[fmt][prop] = typ(int(val))
-                        elif typ in (tuple, list):
-                            if type(val) in (tuple, list):
-                                self.proprietes[fmt][prop] = val
-                            else:
-                                self.proprietes[fmt][prop] = tuple(
-                                    type(pr)(i)
-                                    for i, pr
-                                    in zip(
-                                        val.split(','),
-                                        self.listeproprietes[fmt][prop][1]
-                                    )
-                                )
+        }
+        txt.Document.__init__(
+            self,
+            chemin,
+            formats=self.fmt,
+            listeproprietes=listeproprietes,
+            proprietes=proprietes
+        )
 
     def afficher(self):
         return markdown(self.contenu)
@@ -175,7 +148,12 @@ class Document(txt.Document):
                         'reveal.js'
                     ),
                 ]
-        pandoc(self._fichiertmp(), destination=orig, fmt=fmt, arguments=arguments)
+        pandoc(
+            self._fichiertmp(),
+            destination=orig,
+            fmt=fmt,
+            arguments=arguments
+        )
         os.renames(orig, dest)
         if not cfg.DEVEL:
             shutil.rmtree(self.rnd, ignore_errors=True)
@@ -200,40 +178,14 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
         if arguments:
             commande = commande + arguments
         commande.append(fichier)
-        if cfg.DEVEL:
-            print(commande)
-        environnement = os.environ
-        if cfg.DEVEL:
-            print(environnement)
-        compilation = sp.Popen(
-            commande,
-            env=environnement,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE
-        )
-        sortie, erreurs = compilation.communicate()
-        try:
-            l.log(
-                _('Sortie :')
-                + '\n========\n'
-                + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
-                + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-                + _('Erreurs :')
-                + '\n=========\n'
-                + '\n{}\n'.format(erreurs.decode('utf8'))
-            )
-        except UnicodeDecodeError:
-            raise FichierIllisible
-        if compilation.returncode:
-            print(erreurs)
-            raise ErreurCompilation
+        compiler(commande, {})
     finally:
         os.chdir(cfg.PWD)
 
+compiler = txt.compiler  # pylint: disable=C0103
+
+
 FichierIllisible = txt.FichierIllisible
 
-class ErreurCompilation(Exception):
-    """Exception levée en cas d'erreur de compilation
-    """
-    pass
 
+ErreurCompilation = txt.ErreurCompilation

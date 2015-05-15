@@ -40,8 +40,7 @@ class Depot():
         try:
             resultat = subprocess.check_output(ligne)
         except subprocess.CalledProcessError as err:
-            if cfg.DEVEL:
-                print(err.output)
+            traiter_erreur(err)
             raise
         return resultat.decode('utf-8')
 
@@ -53,6 +52,7 @@ class Depot():
             resultat = subprocess.check_output(cmd)
         except subprocess.CalledProcessError as err:
             if cfg.DEVEL:
+                traiter_erreur(err)
                 print(err.output)
             raise
         return resultat.decode('utf-8')
@@ -245,107 +245,6 @@ class Fichier():
         fichier.close()
         return contenu
 
-    #~ def ecrirebinaire(self, contenu):
-        #~ self.creerdossier()
-        #~ fichier = open(self.chemin, 'wb')
-        #~ fichier.write(contenu)
-        #~ fichier.close()
-
-    #~ def copier(self, fin):
-        #~ try:
-            #~ shutil.copytree(self.dossier, fin.dossier)
-        #~ except Exception as err:
-            #~ l.log('Erreur l. 758 :', type(err))
-            #~ pass
-        #~ shutil.copy(self.chemin, fin.chemin)
-        #~ depot.sauvegardecomplete(_("Clonage"))
-
-    #~ def deplacer(self, fin):
-        #~ fin.creerdossier()
-        #~ os.rename(self.chemin, fin.chemin)
-        #~ self.effacerdossier()
-        #~ depot.sauvegardecomplete(_("Déplacement"))
-
-    #~ def creerdossier(self):
-        #~ try:
-            #~ os.makedirs(self.dossier)
-        #~ except FileExistsError as err:
-            #~ pass
-
-    #~ def effacerdossier(self):
-        #~ try:
-            #~ os.removedirs(self.dossier)
-        #~ except Exception as err:
-            #~ l.log('Erreur l. 779 :', type(err))
-            #~ pass
-
-    #~ def effacer(self):
-        #~ poubelle = os.path.join(travail, '.poubelle')
-        #~ dossierpoubelle = os.path.join(poubelle, self.dossier)
-        #~ fichierpoubelle = os.path.join(poubelle, self.chemin)
-        #~ if self.dossier != '':
-            #~ try:
-                #~ os.mkdir(dossierpoubelle)
-            #~ except Exception as err:
-                #~ l.log('Erreur l. 788 :', type(err))
-                #~ try:
-                    #~ os.remove(dossierpoubelle[0:-1])
-                #~ except Exception as err:
-                    #~ l.log('Erreur l. 791 :', type(err))
-                    #~ pass
-                #~ try:
-                    #~ os.makedirs(dossierpoubelle)
-                #~ except Exception as err:
-                    #~ l.log('Erreur l. 795 :', type(err))
-                    #~ pass
-        #~ try:
-            #~ os.rename(self.chemin, fichierpoubelle)
-        #~ except Exception as err:
-            #~ l.log('Erreur l. 799 :', type(err))
-            #~ try:
-                #~ fichiers = os.listdir(fichierpoubelle)
-                #~ for fichier in fichiers:
-                    #~ Fichier(fichierpoubelle, fichier).supprimer()
-            #~ except Exception as err:
-                #~ l.log('Erreur l. 804 :', type(err))
-                #~ pass
-            #~ try:
-                #~ os.removedirs(fichierpoubelle)
-            #~ except Exception as err:
-                #~ l.log('Erreur l. 808 :', type(err))
-                #~ pass
-            #~ dossiers = os.path.split(self.chemin)
-            #~ for i in range(len(dossiers)):
-                #~ chemin = os.path.join(dossiers[:-i])
-                #~ try:
-                    #~ os.remove(os.path.join(poubelle, chemin))
-                #~ except Exception as err:
-                    #~ l.log('Erreur l. 815 :', type(err))
-                    #~ pass
-            #~ self.effacer()
-        #~ self.effacerdossier()
-        #~ depot.sauvegardecomplete(_("Effacement"))
-
-    #~ def supprimer(self):
-        #~ os.remove(self.chemin)
-
-    #~ def supprimerdossier(self):
-        #~ try:
-            #~ for fichier in os.listdir(self.dossier):
-                #~ os.remove(self.dossier + '/' + fichier)
-        #~ except Exception as err:
-            #~ l.log('Erreur l. 828 :', type(err))
-            #~ pass
-        #~ try:
-            #~ os.removedirs(self.dossier)
-        #~ except Exception as err:
-            #~ l.log('Erreur l. 832 :', type(err))
-            #~ pass
-
-    #~ def mouliner(self, commande):
-        #~ os.chdir(self.dossier)
-        #~ subprocess.call([commande, self.chemin])
-
 
 def sansaccents(entree):
     """Retourne le texte en ôtant les accents
@@ -369,6 +268,11 @@ def templateperso(syntaxe='<% %> % <<< >>>'):
         def __init__(self, syntax=syntaxe, *args, **settings):
             SimpleTemplate.__init__(self, syntax=syntax, *args, **settings)
     return functools.partial(template, template_adapter=Adaptateur)
+
+
+def traiter_erreur(err):
+    if cfg.DEVEL:
+        print(type(err), err)
 
 
 def url(fichier):

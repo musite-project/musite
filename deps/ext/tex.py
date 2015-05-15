@@ -14,11 +14,9 @@ from etc import config as cfg
 from deps.outils import url, _
 import os
 import shutil
-import subprocess as sp
 import re
 from deps import HTMLTags as h
 from deps.mistune import markdown
-from deps import jrnl as l
 EXT = __name__.split('.')[-1]
 
 
@@ -118,55 +116,16 @@ def compiler_pdf(fichier, environnement=None):
             "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
             "gregorio,lilypond"
         )
-        if cfg.DEVEL:
-            print(environnement)
-        compilation = sp.Popen(
-            commande,
-            env=environnement,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE
-        )
-        sortie, erreurs = compilation.communicate()
-        try:
-            l.log(
-                _('Sortie :')
-                + '\n========\n'
-                + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
-                + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-                + _('Erreurs :')
-                + '\n=========\n'
-                + '\n{}\n'.format(erreurs.decode('utf8'))
-            )
-        except UnicodeDecodeError:
-            raise FichierIllisible
-        if compilation.returncode:
-            raise ErreurCompilation
+        compiler(commande, environnement)
         if os.path.exists(os.path.splitext(fichier)[0] + '.toc'):
             if cfg.DEVEL:
                 print('Table des matières : 2e compilation')
-            compilation = sp.Popen(
-                commande,
-                env=environnement,
-                stdout=sp.PIPE,
-                stderr=sp.PIPE
-            )
-            sortie, erreurs = compilation.communicate()
-            try:
-                l.log(
-                    _('Sortie :')
-                    + '\n========\n'
-                    + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
-                    + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-                    + _('Erreurs :')
-                    + '\n=========\n'
-                    + '\n{}\n'.format(erreurs.decode('utf8'))
-                )
-            except UnicodeDecodeError:
-                raise FichierIllisible
-            if compilation.returncode:
-                raise ErreurCompilation
+            compiler(commande, environnement)
     finally:
         os.chdir(cfg.PWD)
+
+
+compiler = txt.compiler  # pylint: disable=C0103
 
 
 def traiter_erreur_compilation(dossier):
@@ -177,8 +136,4 @@ def traiter_erreur_compilation(dossier):
 
 FichierIllisible = txt.FichierIllisible
 
-
-class ErreurCompilation(Exception):
-    """Exception levée en cas d'erreur de compilation
-    """
-    pass
+ErreurCompilation = txt.ErreurCompilation
