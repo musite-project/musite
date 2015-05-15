@@ -8,11 +8,8 @@ http://www.lilypond.org
 """
 from . import txt
 from etc import config as cfg
-from deps.outils import url, _
-from deps.mistune import markdown
 import os
 import shutil
-import deps.HTMLTags as h
 EXT = __name__.split('.')[-1]
 
 
@@ -23,51 +20,13 @@ class Document(txt.Document):
         txt.Document.__init__(self, chemin)
 
     def afficher(self):
-        try:
-            return h.OBJECT(
-                data="{}".format(self.pdf()),
-                Type="application/pdf",
-                width="100%",
-                height="100%"
-            )
-        except ErreurCompilation:
-            return (markdown(_(
-                """\
-Il y a eu une erreur pendant le traitement du document.
-Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
-certain du contraire, merci de signaler le problème.
-
+        return self.afficher_pdf(
+            message="""
 Il est aussi possible que vous ayez saisi du code *Scheme* dans votre
 document : par souci de sécurité, `Lilypond` est lancé avec des options plus
 restrictives, qui rendent impossibles certaines opérations.
-
-Voici la sortie de la commande :
-
-                """
-            )) + traiter_erreur_compilation(self.dossiertmp))
-
-    def pdf(self, chemin=False, indice=''):
-        """Format pdf
-        """
-        chemin = chemin if chemin else 'pdf'
-        fichierpdf = self._fichier('pdf')
-        cheminpdf = self._chemin('pdf')
-        fichierpdf = fichierpdf.replace(
-            '/pdf/',
-            '/{}/{}/'.format(chemin, indice).replace('//', '/')
+"""
         )
-        cheminpdf = cheminpdf.replace(
-            '/pdf/',
-            '/{}/{}/'.format(chemin, indice).replace('//', '/')
-        )
-        if (
-                not os.path.isfile(self._fichier('pdf'))
-                or os.path.getmtime(self._fichier('pdf'))
-                < os.path.getmtime(self._fichier())
-        ):
-            self.preparer_pdf()
-        print(fichierpdf)
-        return url(fichierpdf)
 
     def preparer_pdf(self, destination=False, environnement=None):
         """Mise en place du pdf
@@ -96,7 +55,7 @@ def compiler_pdf(fichier, environnement=None):
             os.environ,
             **environnement if environnement else {}
         )
-        compiler(commande, environnement)
+        compiler(commande, fichier, environnement)
     finally:
         os.chdir(cfg.PWD)
 

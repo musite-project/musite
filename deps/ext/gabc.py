@@ -11,10 +11,8 @@ from . import txt, tex
 from etc import config as cfg
 from deps.outils import templateperso, url, traiter_erreur, _
 from deps.gabctk import Gabc, Lily, Midi, Partition
-from deps.mistune import markdown
 import os
 import shutil
-import deps.HTMLTags as h
 EXT = __name__.split('.')[-1]
 
 
@@ -70,52 +68,12 @@ class Document(txt.Document):
         )
 
     def afficher(self):
-        try:
-            return h.OBJECT(
-                data="{}".format(self.pdf()),
-                Type="application/pdf",
-                width="100%",
-                height="100%"
-            )
-        except ErreurCompilation:
-            return (markdown(_(
-                """\
-Il y a eu une erreur pendant le traitement du document.
-Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
-certain du contraire, merci de signaler le problème.
-
-Voici la sortie de la commande :
-
-                """
-            )) + tex.traiter_erreur_compilation(self.dossiertmp))
+        return self.afficher_pdf()
 
     def exporter(self, fmt):
         """Export vers d'autres formats
         """
         return self.fmt[fmt]
-
-    def pdf(self, chemin=False, indice=''):
-        """Format pdf
-        """
-        chemin = chemin if chemin else 'pdf'
-        fichierpdf = self._fichier('pdf')
-        cheminpdf = self._chemin('pdf')
-        if chemin:
-            fichierpdf = fichierpdf.replace(
-                '/pdf/',
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
-            cheminpdf = cheminpdf.replace(
-                '/pdf/',
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
-        if (
-                not os.path.isfile(fichierpdf)
-                or os.path.getmtime(fichierpdf)
-                < os.path.getmtime(self._fichier())
-        ):
-            self.preparer_pdf(fichierpdf)
-        return url(fichierpdf)
 
     def gabc(self, fmt, chemin=False, indice=''):
         """Format gabc

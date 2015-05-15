@@ -12,7 +12,7 @@ import shutil
 from deps.mistune import markdown
 from . import txt
 from etc import config as cfg
-from deps.outils import url, _
+from deps.outils import url, traiter_erreur, _
 EXT = __name__.split('.')[-1]
 
 
@@ -57,7 +57,7 @@ class Document(txt.Document):
         """
         return self.fmt[fmt]
 
-    def pdf(self, chemin=False, indice='', fmt=None):
+    def pdf(self, chemin=False, indice='', fmt=None):  # pylint: disable=W0221
         """Format pdf
         """
         chemin = chemin if chemin else 'pdf'
@@ -178,7 +178,11 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
         if arguments:
             commande = commande + arguments
         commande.append(fichier)
-        compiler(commande, {})
+        try:
+            compiler(commande, fichier, os.environ)
+        except ErreurCompilation as err:
+            traiter_erreur(err)
+            raise
     finally:
         os.chdir(cfg.PWD)
 

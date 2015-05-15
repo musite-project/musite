@@ -13,7 +13,8 @@ import os.path
 import subprocess as sp
 from deps import HTMLTags as h
 from deps import bottle as b
-from deps.outils import motaleatoire, _
+from deps.outils import motaleatoire, traiter_erreur, url, _
+from deps.mistune import markdown
 from deps import jrnl as l
 from etc import config as cfg
 b.TEMPLATE_PATH += cfg.MODELES
@@ -117,6 +118,31 @@ class Document:
 
     afficher_source = afficher
 
+    def afficher_pdf(self, message=''):
+        """Affichage du document pdf en html (base 64)
+        """
+        try:
+            return h.OBJECT(
+                data="{}".format(self.pdf()),
+                Type="application/pdf",
+                width="100%",
+                height="100%"
+            )
+        except ErreurCompilation as err:
+            traiter_erreur(err)
+            return (markdown(_(
+                """\
+Il y a eu une erreur pendant le traitement du document.
+Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
+certain du contraire, merci de signaler le problème.
+
+{}
+
+Voici la sortie de la commande :
+
+                """
+            ).format(message)) + traiter_erreur_compilation(self.dossiertmp))
+
     @property
     def contenu(self):
         """Contenu du document
@@ -162,35 +188,67 @@ class Document:
         """
         os.remove(self._fichier())
 
+    def pdf(self, chemin=False, indice=''):
+        """Format pdf
+        """
+        chemin = chemin if chemin else 'pdf'
+        fichierpdf = self._fichier('pdf')
+        cheminpdf = self._chemin('pdf')
+        fichierpdf = fichierpdf.replace(
+            '/pdf/',
+            '/{}/{}/'.format(chemin, indice).replace('//', '/')
+        )
+        cheminpdf = cheminpdf.replace(
+            '/pdf/',
+            '/{}/{}/'.format(chemin, indice).replace('//', '/')
+        )
+        if (
+                not os.path.isfile(self._fichier('pdf'))
+                or os.path.getmtime(self._fichier('pdf'))
+                < os.path.getmtime(self._fichier())
+        ):
+            self.preparer_pdf()
+        return url(fichierpdf)
 
-def compiler(commande, environnement):
+
+def compiler(commande, fichier, environnement):
     """Appel de commande externe
 
     Cette méthode est surtout appelée dans les modules dépendant de celui-ci.
     """
-    if cfg.DEVEL:
-        print(environnement)
-    compilation = sp.Popen(
-        commande,
-        env=environnement,
-        stdout=sp.PIPE,
-        stderr=sp.PIPE
-    )
-    sortie, erreurs = compilation.communicate()
     try:
-        l.log(
-            _('Sortie :')
-            + '\n========\n'
-            + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
-            + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
-            + _('Erreurs :')
-            + '\n=========\n'
-            + '\n{}\n'.format(erreurs.decode('utf8'))
+        os.chdir(os.path.dirname(fichier))
+        if cfg.DEVEL:
+            print(environnement)
+        compilation = sp.Popen(
+            commande,
+            env=environnement,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE
         )
-    except UnicodeDecodeError:
-        raise FichierIllisible
-    if compilation.returncode:
-        raise ErreurCompilation
+        sortie, erreurs = compilation.communicate()
+        try:
+            l.log(
+                _('Sortie :')
+                + '\n========\n'
+                + '\n{}\n\n\n\n'.format(sortie.decode('utf8'))
+                + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
+                + _('Erreurs :')
+                + '\n=========\n'
+                + '\n{}\n'.format(erreurs.decode('utf8'))
+            )
+        except UnicodeDecodeError:
+            raise FichierIllisible
+        if compilation.returncode:
+            raise ErreurCompilation
+    finally:
+        os.chdir(cfg.PWD)
+
+
+def traiter_erreur_compilation(dossier):
+    """Réaction en cas d'erreur de compilation
+    """
+    return Document(dossier.replace(os.path.sep, '/') + '/log').afficher()
 
 
 class FichierIllisible(Exception):
