@@ -10,18 +10,19 @@ http://fr.wikipedia.org/wiki/Markdown
 import os
 import shutil
 import subprocess as sp
-from mistune import markdown
-import ext.txt as txt
+from deps.mistune import markdown
+from . import txt
 from etc import config as cfg
-from outils import url, _
-from deps.i18n import i18n_path
-import jrnl as l
+from deps.outils import url, _
+from deps import jrnl as l
 EXT = __name__.split('.')[-1]
 
 
 class Document(txt.Document):
-    def __init__(self, chemin, ext=EXT, proprietes=None):
-        txt.Document.__init__(self, chemin, ext)
+    """Document markdown
+    """
+    def __init__(self, chemin, proprietes=None):
+        txt.Document.__init__(self, chemin)
 
         # Formats d'export possibles, avec la méthode renvoyant le document
         # compilé dans chaque format.
@@ -57,12 +58,12 @@ class Document(txt.Document):
             for fmt in proprietes:
                 for prop, val in proprietes[fmt].items():
                     if prop in self.listeproprietes[fmt]:
-                        t = type(self.listeproprietes[fmt][prop][1])
-                        if t in (str, int, float):
-                            self.proprietes[fmt][prop] = t(val)
-                        elif t is bool:
-                            self.proprietes[fmt][prop] = t(int(val))
-                        elif t in (tuple, list):
+                        typ = type(self.listeproprietes[fmt][prop][1])
+                        if typ in (str, int, float):
+                            self.proprietes[fmt][prop] = typ(val)
+                        elif typ is bool:
+                            self.proprietes[fmt][prop] = typ(int(val))
+                        elif typ in (tuple, list):
                             if type(val) in (tuple, list):
                                 self.proprietes[fmt][prop] = val
                             else:
@@ -79,9 +80,13 @@ class Document(txt.Document):
         return markdown(self.contenu)
 
     def exporter(self, fmt):
+        """Export dans les différents formats
+        """
         return self.fmt[fmt]
 
     def pdf(self, chemin=False, indice='', fmt=None):
+        """Format pdf
+        """
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichier('pdf')
         cheminpdf = self._chemin('pdf')
@@ -95,17 +100,25 @@ class Document(txt.Document):
                 '/{}/{}/'.format(chemin, indice).replace('//', '/')
             )
         if (
-            not os.path.isfile(fichierpdf)
-            or os.path.getmtime(fichierpdf)
-                < os.path.getmtime(self.fichier)
+                not os.path.isfile(fichierpdf)
+                or os.path.getmtime(fichierpdf)
+                < os.path.getmtime(self._fichier())
         ):
             self.preparer('pdf', fichierpdf, fmt)
         return url(fichierpdf)
 
     def beamer(self, chemin=False, indice=''):
+        """Format beamer
+
+        Format pdf pour les présentations.
+        """
         return self.pdf(chemin=chemin, indice=indice, fmt='beamer')
 
     def revealjs(self, chemin=False, indice=''):
+        """Format reveal.js
+
+        Format html5 pour les présentations.
+        """
         chemin = chemin if chemin else 'rj'
         fichierhtml = self._fichier('html')
         cheminhtml = self._chemin('html')
@@ -119,17 +132,22 @@ class Document(txt.Document):
                 '/{}/{}/'.format(chemin, indice).replace('//', '/')
             )
         if (
-            not os.path.isfile(fichierhtml)
-            or os.path.getmtime(fichierhtml)
-                < os.path.getmtime(self.fichier)
+                not os.path.isfile(fichierhtml)
+                or os.path.getmtime(fichierhtml)
+                < os.path.getmtime(self._fichier())
         ):
             self.preparer('html', fichierhtml, fmt='revealjs')
         return url(fichierhtml)
 
     def preparer(self, ext='pdf', destination=False, fmt=None):
+        """Préparation des divers formats
+
+        C'est ici que l'on appelle la commande pandoc en vue des divers
+        exports possibles
+        """
         orig = self._fichiertmp(ext)
         dest = destination if destination else self._fichier(ext)
-        shutil.rmtree(self.rd, ignore_errors=True)
+        shutil.rmtree(self.rnd, ignore_errors=True)
         shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
         arguments = []
         if ext == 'pdf':
@@ -157,13 +175,15 @@ class Document(txt.Document):
                         'reveal.js'
                     ),
                 ]
-        pandoc(self.fichiertmp, destination=orig, fmt=fmt, arguments=arguments)
+        pandoc(self._fichiertmp(), destination=orig, fmt=fmt, arguments=arguments)
         os.renames(orig, dest)
         if not cfg.DEVEL:
-            shutil.rmtree(self.rd, ignore_errors=True)
+            shutil.rmtree(self.rnd, ignore_errors=True)
 
 
-def pandoc(fichier, destination, fmt=None, arguments=[]):
+def pandoc(fichier, destination, fmt=None, arguments=None):
+    """Méthode appelant la commande pandoc
+    """
     try:
         os.chdir(os.path.dirname(fichier))
         commande = [
@@ -213,5 +233,7 @@ def pandoc(fichier, destination, fmt=None, arguments=[]):
 FichierIllisible = txt.FichierIllisible
 
 class ErreurCompilation(Exception):
+    """Exception levée en cas d'erreur de compilation
+    """
     pass
 

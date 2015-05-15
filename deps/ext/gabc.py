@@ -27,8 +27,8 @@ TEMPLATETEX = templateperso()
 class Document(txt.Document):
     """Document gabc
     """
-    def __init__(self, chemin, ext=EXT, proprietes=False):
-        txt.Document.__init__(self, chemin, ext)
+    def __init__(self, chemin, proprietes=False):
+        txt.Document.__init__(self, chemin)
 
         # Formats d'export possibles, avec la méthode renvoyant le document
         # compilé dans chaque format.
@@ -133,7 +133,7 @@ Voici la sortie de la commande :
         if (
                 not os.path.isfile(fichierpdf)
                 or os.path.getmtime(fichierpdf)
-                < os.path.getmtime(self.fichier)
+                < os.path.getmtime(self._fichier())
         ):
             self.preparer_pdf(fichierpdf)
         return url(fichierpdf)
@@ -151,7 +151,7 @@ Voici la sortie de la commande :
         if (
                 not os.path.isfile(fichier)
                 or os.path.getmtime(fichier)
-                < os.path.getmtime(self.fichier)
+                < os.path.getmtime(self._fichier())
         ):
             self.preparer_gabc(fmt, fichier)
         return url(fichier)
@@ -173,9 +173,9 @@ Voici la sortie de la commande :
         textmp = os.path.join(self.dossiertmp, fichiertmp + '.tex')
         orig = os.path.join(self.dossiertmp, fichiertmp + '.pdf')
         dest = destination if destination else self._fichier('pdf')
-        shutil.rmtree(self.rd, ignore_errors=True)
+        shutil.rmtree(self.rnd, ignore_errors=True)
         os.makedirs(self.dossiertmp, exist_ok=True)
-        shutil.copy2(self.fichier, self.fichiertmp)
+        shutil.copy2(self._fichier(), self._fichiertmp())
         with open(textmp, 'w') as tmp:
             tmp.write(TEMPLATETEX(
                 'partgreg',
@@ -187,14 +187,14 @@ Voici la sortie de la commande :
         compiler_pdf(textmp, environnement)
         os.renames(orig, dest)
         if not cfg.DEVEL:
-            shutil.rmtree(self.rd, ignore_errors=True)
+            shutil.rmtree(self.rnd, ignore_errors=True)
 
     def preparer_gabc(self, fmt, destination=False):
         """Mise en place du gabc
         """
         dest = destination if destination else self._fichier(fmt)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        with open(self.fichier, 'r') as fch:
+        with open(self._fichier(), 'r') as fch:
             gabc = Gabc(fch.read(-1))
             partition = Partition(
                 gabc=gabc.partition,

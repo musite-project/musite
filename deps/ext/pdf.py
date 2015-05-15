@@ -2,13 +2,14 @@
 """Gestion des fichiers pdf
 """
 import os
-import HTMLTags as h
+from deps import HTMLTags as h
 from base64 import b64encode
 from etc import config as cfg
-from outils import _
 
 
 class Document:
+    """Document pdf
+    """
     def __init__(self, chemin, ext='pdf'):
         self.ext = ext
         self.chemin = chemin
@@ -24,6 +25,8 @@ class Document:
         self.dossier = os.path.dirname(self.fichier)
 
     def afficher(self):
+        """Contenu du pdf embarqué dans un code html
+        """
         return h.OBJECT(
             data="data:application/pdf;base64,{}".format(self.contenu),
             Type="application/pdf",
@@ -33,9 +36,10 @@ class Document:
 
     @property
     def contenu(self):
-        fichier = os.path.join(self.fichier)
-        with open(self.fichier, "rb") as f:
-            return b64encode(f.read()).decode('ascii')
+        """Contenu du pdf en base 64
+        """
+        with open(self.fichier, "rb") as doc:
+            return b64encode(doc.read()).decode('ascii')
 
     def supprimer(self):
         """Suppression du document

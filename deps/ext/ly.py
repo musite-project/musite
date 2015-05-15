@@ -6,7 +6,7 @@ Ces partitions nécessitent LilyPond.
 Voir plus d'informations à l'adresse :
 http://www.lilypond.org
 """
-from . import txt as txt
+from . import txt
 from etc import config as cfg
 from deps.outils import url, _
 from deps.mistune import markdown
@@ -21,8 +21,8 @@ EXT = __name__.split('.')[-1]
 class Document(txt.Document):
     """Document lilypond
     """
-    def __init__(self, chemin, ext=EXT):
-        txt.Document.__init__(self, chemin, ext)
+    def __init__(self, chemin):
+        txt.Document.__init__(self, chemin)
 
     def afficher(self):
         try:
@@ -54,21 +54,21 @@ Voici la sortie de la commande :
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichier('pdf')
         cheminpdf = self._chemin('pdf')
-        if chemin:
-            fichierpdf = fichierpdf.replace(
-                '/pdf/',
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
-            cheminpdf = cheminpdf.replace(
-                '/pdf/',
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
+        fichierpdf = fichierpdf.replace(
+            '/pdf/',
+            '/{}/{}/'.format(chemin, indice).replace('//', '/')
+        )
+        cheminpdf = cheminpdf.replace(
+            '/pdf/',
+            '/{}/{}/'.format(chemin, indice).replace('//', '/')
+        )
         if (
                 not os.path.isfile(self._fichier('pdf'))
                 or os.path.getmtime(self._fichier('pdf'))
-                < os.path.getmtime(self.fichier)
+                < os.path.getmtime(self._fichier())
         ):
             self.preparer_pdf()
+        print(fichierpdf)
         return url(fichierpdf)
 
     def preparer_pdf(self, destination=False, environnement=None):
@@ -77,11 +77,11 @@ Voici la sortie de la commande :
         orig = self._fichiertmp('pdf')
         dest = destination if destination else self._fichier('pdf')
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        shutil.rmtree(self.rd, ignore_errors=True)
+        shutil.rmtree(self.rnd, ignore_errors=True)
         shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
-        compiler_pdf(self.fichiertmp, environnement)
+        compiler_pdf(self._fichiertmp(), environnement)
         os.renames(orig, dest)
-        shutil.rmtree(self.rd, ignore_errors=True)
+        shutil.rmtree(self.rnd, ignore_errors=True)
 
 
 def compiler_pdf(fichier, environnement=None):

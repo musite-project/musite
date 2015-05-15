@@ -1,4 +1,5 @@
 %from etc import config as cfg
+%from deps.outils import i18n_path, _
 %if ext in ['gabc']:
 <script language="javascript" type="text/javascript" src="/static/js/edit_area/edit_area_full.js"></script>
 <script language="javascript" type="text/javascript">

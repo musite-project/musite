@@ -21,46 +21,52 @@ EXT = __name__.split('.')[-1]
 class Document:
     """Classe gérant les documents
     """
-    def __init__(self, chemin, ext=EXT):
-        self.ext = ext
+    def __init__(self, chemin):
         self.chemin = chemin
-        self.nom = os.path.splitext(chemin.split('/')[-1])[0]
-        # Chemin relatif du fichier
-        self.fichierrelatif = chemin.replace('/', os.path.sep)
-        self.dossierrelatif = os.path.dirname(self.fichierrelatif)
-        # Chemin absolu du fichier
-        self.fichier = os.path.join(
-            cfg.DATA,
-            self.fichierrelatif
-        )
-        self.dossier = os.path.dirname(self.fichier)
+        self.nom, self.ext = os.path.splitext(chemin.split('/')[-1])
+        self.ext = self.ext[1:]
         # Chemin absolu des fichiers temporaires
         self.rnd = os.path.join(cfg.TMP, motaleatoire(6))
-        self.fichiertmp = os.path.join(self.rnd, self.fichierrelatif)
-        self.dossiertmp = os.path.join(self.rnd, self.dossierrelatif)
 
-    def _chemin(self, ext):
+    def _chemin(self, ext=None):
         """Url vers un fichier portant ce nom avec une autre extension
         """
-        return os.path.splitext(self.chemin)[0] + '.' + ext
+        return os.path.splitext(self.chemin)[0] \
+            + ('.' + ext if ext else '.' + self.ext if self.ext else '')
 
-    def _fichierrelatif(self, ext):
+    def _fichierrelatif(self, ext=None):
         """Chemin vers un fichier portant ce nom avec une autre extension
         """
-        return self._chemin(ext).replace('/', os.path.sep)
+        return self._chemin(ext if ext else self.ext).replace('/', os.path.sep)
 
-    def _fichier(self, ext):
+    def _fichier(self, ext=None):
         """Chemin absolu
         """
-        return os.path.join(
-            cfg.PWD, cfg.STATIC, ext,
-            self._fichierrelatif(ext)
-        )
+        if ext:
+            return os.path.join(
+                cfg.PWD, cfg.STATIC, ext,
+                self._fichierrelatif(ext)
+            )
+        else:
+            return os.path.join(cfg.DATA, self._fichierrelatif())
 
-    def _fichiertmp(self, ext):
+    def _fichiertmp(self, ext=None):
         """Fichier temporaire
         """
-        return os.path.join(self.rnd, self._fichierrelatif(ext))
+        return os.path.join(
+            self.rnd,
+            self._fichierrelatif(
+                ext if ext else self.ext
+            )
+        )
+
+    @property
+    def dossier(self):
+        return os.path.dirname(self._fichier())
+
+    @property
+    def dossiertmp(self):
+        return os.path.dirname(self._fichiertmp())
 
     def afficher(self):
         """Affichage du contenu du document
@@ -76,10 +82,10 @@ class Document:
         """Contenu du document
         """
         try:
-            with open(self.fichier) as doc:
+            with open(self._fichier()) as doc:
                 return doc.read(-1)
         except UnicodeDecodeError:
-            raise FichierIllisible(self.fichier)
+            raise FichierIllisible(fichier)
 
     def editer(self, creation=False):
         """Page d'édition du document
@@ -108,13 +114,13 @@ class Document:
     def enregistrer(self, contenu):
         """Enregistrement du document
         """
-        with open(self.fichier, 'w') as doc:
+        with open(self._fichier(), 'w') as doc:
             doc.write(contenu)
 
     def supprimer(self):
         """Suppression du document
         """
-        os.remove(self.fichier)
+        os.remove(self._fichier())
 
 
 class FichierIllisible(Exception):

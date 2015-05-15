@@ -18,10 +18,13 @@ __license__ = 'MIT'
 
 import os
 import sys
-LIB = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'deps')
-sys.path.insert(0, LIB)
 import shutil
 import re
+LIB = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'deps')
+sys.path.insert(0, LIB)
+import bottle as b
+from bottle import request as rq
+from deps.i18n import I18NPlugin as Traduction
 from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
@@ -29,10 +32,7 @@ from deps import outils as f
 from deps.outils import i18n_path, _
 from deps import auth as a
 from deps import utilisateurs as u
-from deps import bottle as b
-from deps.bottle import request as rq
 from deps import HTMLTags as h
-from deps.i18n import I18NPlugin as Traduction
 from deps.mistune import markdown
 from etc import config as cfg
 

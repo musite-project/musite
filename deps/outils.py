@@ -7,54 +7,74 @@ en plusieurs points du programme.
 import os
 import re
 import subprocess
-from datetime import datetime
 from glob import glob as ls
 import random as rd
 from string import ascii_lowercase
 import unicodedata as ud
-import jrnl as l
 import functools
-from bottle import SimpleTemplate, template
+from .bottle import SimpleTemplate, template
 from etc import config as cfg
-from deps.i18n import lazy_gettext as _, i18n_path
+from .i18n import lazy_gettext as _, i18n_path
+
+# Ce qui suit vise à éviter la tentation de supprimer l'import de i18n_path :
+# en effet, les autres modules l'importent depuis celui-ci, afin de centraliser
+# tout cela et de permettre le cas échéant de redéfinir cette méthode.
+assert i18n_path
 
 
 class Depot():
+    """Gestion du dépôt
+
+    C'est ici qu'ont lieu les clonages, commits et autres reverts de cet outil
+    magique qu'est git.
+    """
     def __init__(self, dossier):
         self.dossier = dossier
 
     def commande(self, arguments):
+        """Commande sur un dépôt existant
+        """
         os.chdir(self.dossier)
         ligne = ['git']
         ligne.extend(arguments)
         try:
             resultat = subprocess.check_output(ligne)
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError as err:
             if cfg.DEVEL:
-                print(e.output)
+                print(err.output)
             raise
         return resultat.decode('utf-8')
 
     def cloner(self, depot):
+        """Cloner un dépôt distant
+        """
         cmd = ['git', 'clone', depot, self.dossier]
         try:
             resultat = subprocess.check_output(cmd)
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError as err:
             if cfg.DEVEL:
-                print(e.output)
+                print(err.output)
             raise
         return resultat.decode('utf-8')
 
     def initialiser(self):
+        """Initialisation du dépôt
+        """
         self.commande(['init'])
 
-    def journal(self, arguments=[]):
+    def journal(self, arguments=None):
+        """Journal des modifications
+
+        Méthode générale.
+        """
         ligne = ['log']
-        ligne.extend(arguments)
+        ligne.extend(arguments if arguments else [])
         return self.commande(ligne)
 
     @property
     def journalcomplet(self):
+        """Journal de l'ensemble des modifications
+        """
         entete = [['Id', 'auteur', 'date', 'message']]
         historique = [
             re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
@@ -66,6 +86,8 @@ class Depot():
         return entete + historique
 
     def journalfichier(self, fichier):
+        """Journal d'un fichier isolé
+        """
         entete = [['Id', 'auteur', 'date', 'message']]
         historique = [
             re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
@@ -76,18 +98,13 @@ class Depot():
             element[0] = element[0][:7]
             element.pop(3)
         return entete + historique
-        historique = [
-            version.split(' ')
-            for version in self.journal(
-                [
-                    '--follow',
-                    fichier
-                ]
-            )[1:-1].split('"\n"')
-        ]
-        return historique
 
     def comparer(self, version, versionb=None, fichier=None):
+        """Comparer deux versions
+
+        Si la deuxième version n'est pas donnée, la version précédant
+        la première est automatiquement choisie.
+        """
         if versionb:
             parametres = [
                 'diff',
@@ -108,6 +125,8 @@ class Depot():
         return details
 
     def retablir(self, version, fichier=None, auteur=None):
+        """Ramener le dépôt à une version donnée
+        """
         if fichier:
             self.commande([
                 'checkout',
@@ -129,29 +148,32 @@ class Depot():
         )
 
     def sauvegarde(self, chemin, message, auteur=None):
-        def sauver(self, chemin, message):
-            arguments = [
-                'commit',
-                '-m',
-                message
-            ]
-            if auteur:
-                arguments.append('--author="{0} <{0}>'.format(auteur))
+        """Actions de sauvegarde
+
+        Méthode générique, appelée pour toutes les sauvegardes.
+        """
+        arguments = [
+            'commit',
+            '-m',
+            message
+        ]
+        if auteur:
+            arguments.append('--author="{0} <{0}>'.format(auteur))
+        try:
             self.commande(['add', chemin])
             self.commande(arguments)
-
-        try:
-            sauver(self, chemin, message)
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 128:
+        except subprocess.CalledProcessError as err:
+            if err.returncode == 128:
                 try:
                     self.initialiser()
                 except subprocess.CalledProcessError:
                     pass
             else:
-                print(e.__dict__)
+                print(err.__dict__)
 
     def sauvegardefichier(self, fichier, auteur=None):
+        """Sauvegarde d'un fichier isolé
+        """
         self.sauvegarde(
             fichier.chemin.replace(self.dossier + os.sep, ''),
             fichier.nom,
@@ -159,16 +181,25 @@ class Depot():
         )
 
     def sauvegardecomplete(self, message=_("Sauvegarde complète"), auteur=None):
-            self.sauvegarde('-A', message, auteur)
+        """Sauvegarde de l'ensemble du dépôt
+        """
+        self.sauvegarde('-A', message, auteur)
 
 
 class Dossier():
+    """Gestion des dossiers
+    """
     def __init__(self, dossier):
         self.dossier = dossier
         if not os.path.isdir(dossier):
             raise TypeError(dossier + _(" n'est pas un dossier"))
 
     def lister(self, profondeur=1):
+        """Liste du contenu d'un dossier
+
+        Sous la forme d'un dictionnaire, chaque sous-dossier étant une clé
+        de ce dictionnaire.
+        """
         liste = {
             self.dossier: [
                 os.path.split(fichier)[-1]
@@ -188,12 +219,16 @@ class Dossier():
 
 
 class Fichier():
+    """Gestion des fichiers
+    """
     def __init__(self, chemin):
         self.chemin = chemin
         self.dossier = os.path.dirname(chemin)
         self.nom = os.path.basename(chemin)
 
     def lire(self):
+        """Retourne le contenu d'un fichier texte
+        """
         fichier = open(self.chemin, 'r')
         try:
             contenu = fichier.read(-1)
@@ -203,136 +238,140 @@ class Fichier():
         return contenu
 
     def ouvrir(self):
+        """Utile ?
+        """
         fichier = open(self.chemin, 'rb')
         contenu = fichier.read(-1)
         fichier.close()
         return contenu
 
-    def ecrire(self, contenu):
-        self.creerdossier()
-        fichier = open(self.chemin, 'w')
-        fichier.write(contenu)
-        fichier.close()
-        if self.nom not in (recherche, gitlog):
-            depot.sauvegardefichier(self)
+    #~ def ecrirebinaire(self, contenu):
+        #~ self.creerdossier()
+        #~ fichier = open(self.chemin, 'wb')
+        #~ fichier.write(contenu)
+        #~ fichier.close()
 
-    def ecrirebinaire(self, contenu):
-        self.creerdossier()
-        fichier = open(self.chemin, 'wb')
-        fichier.write(contenu)
-        fichier.close()
+    #~ def copier(self, fin):
+        #~ try:
+            #~ shutil.copytree(self.dossier, fin.dossier)
+        #~ except Exception as err:
+            #~ l.log('Erreur l. 758 :', type(err))
+            #~ pass
+        #~ shutil.copy(self.chemin, fin.chemin)
+        #~ depot.sauvegardecomplete(_("Clonage"))
 
-    def copier(self, fin):
-        try:
-            shutil.copytree(self.dossier, fin.dossier)
-        except Exception as e:
-            l.log('Erreur l. 758 :', type(e))
-            pass
-        shutil.copy(self.chemin, fin.chemin)
-        depot.sauvegardecomplete(_("Clonage"))
+    #~ def deplacer(self, fin):
+        #~ fin.creerdossier()
+        #~ os.rename(self.chemin, fin.chemin)
+        #~ self.effacerdossier()
+        #~ depot.sauvegardecomplete(_("Déplacement"))
 
-    def deplacer(self, fin):
-        fin.creerdossier()
-        os.rename(self.chemin, fin.chemin)
-        self.effacerdossier()
-        depot.sauvegardecomplete(_("Déplacement"))
+    #~ def creerdossier(self):
+        #~ try:
+            #~ os.makedirs(self.dossier)
+        #~ except FileExistsError as err:
+            #~ pass
 
-    def creerdossier(self):
-        try:
-            os.makedirs(self.dossier)
-        except FileExistsError as e:
-            pass
+    #~ def effacerdossier(self):
+        #~ try:
+            #~ os.removedirs(self.dossier)
+        #~ except Exception as err:
+            #~ l.log('Erreur l. 779 :', type(err))
+            #~ pass
 
-    def effacerdossier(self):
-        try:
-            os.removedirs(self.dossier)
-        except Exception as e:
-            l.log('Erreur l. 779 :', type(e))
-            pass
+    #~ def effacer(self):
+        #~ poubelle = os.path.join(travail, '.poubelle')
+        #~ dossierpoubelle = os.path.join(poubelle, self.dossier)
+        #~ fichierpoubelle = os.path.join(poubelle, self.chemin)
+        #~ if self.dossier != '':
+            #~ try:
+                #~ os.mkdir(dossierpoubelle)
+            #~ except Exception as err:
+                #~ l.log('Erreur l. 788 :', type(err))
+                #~ try:
+                    #~ os.remove(dossierpoubelle[0:-1])
+                #~ except Exception as err:
+                    #~ l.log('Erreur l. 791 :', type(err))
+                    #~ pass
+                #~ try:
+                    #~ os.makedirs(dossierpoubelle)
+                #~ except Exception as err:
+                    #~ l.log('Erreur l. 795 :', type(err))
+                    #~ pass
+        #~ try:
+            #~ os.rename(self.chemin, fichierpoubelle)
+        #~ except Exception as err:
+            #~ l.log('Erreur l. 799 :', type(err))
+            #~ try:
+                #~ fichiers = os.listdir(fichierpoubelle)
+                #~ for fichier in fichiers:
+                    #~ Fichier(fichierpoubelle, fichier).supprimer()
+            #~ except Exception as err:
+                #~ l.log('Erreur l. 804 :', type(err))
+                #~ pass
+            #~ try:
+                #~ os.removedirs(fichierpoubelle)
+            #~ except Exception as err:
+                #~ l.log('Erreur l. 808 :', type(err))
+                #~ pass
+            #~ dossiers = os.path.split(self.chemin)
+            #~ for i in range(len(dossiers)):
+                #~ chemin = os.path.join(dossiers[:-i])
+                #~ try:
+                    #~ os.remove(os.path.join(poubelle, chemin))
+                #~ except Exception as err:
+                    #~ l.log('Erreur l. 815 :', type(err))
+                    #~ pass
+            #~ self.effacer()
+        #~ self.effacerdossier()
+        #~ depot.sauvegardecomplete(_("Effacement"))
 
-    def effacer(self):
-        poubelle = os.path.join(travail, '.poubelle')
-        dossierpoubelle = os.path.join(poubelle, self.dossier)
-        fichierpoubelle = os.path.join(poubelle, self.chemin)
-        if self.dossier != '':
-            try:
-                os.mkdir(dossierpoubelle)
-            except Exception as e:
-                l.log('Erreur l. 788 :', type(e))
-                try:
-                    os.remove(dossierpoubelle[0:-1])
-                except Exception as e:
-                    l.log('Erreur l. 791 :', type(e))
-                    pass
-                try:
-                    os.makedirs(dossierpoubelle)
-                except Exception as e:
-                    l.log('Erreur l. 795 :', type(e))
-                    pass
-        try:
-            os.rename(self.chemin, fichierpoubelle)
-        except Exception as e:
-            l.log('Erreur l. 799 :', type(e))
-            try:
-                fichiers = os.listdir(fichierpoubelle)
-                for fichier in fichiers:
-                    Fichier(fichierpoubelle, fichier).supprimer()
-            except Exception as e:
-                l.log('Erreur l. 804 :', type(e))
-                pass
-            try:
-                os.removedirs(fichierpoubelle)
-            except Exception as e:
-                l.log('Erreur l. 808 :', type(e))
-                pass
-            dossiers = os.path.split(self.chemin)
-            for i in range(len(dossiers)):
-                chemin = os.path.join(dossiers[:-i])
-                try:
-                    os.remove(os.path.join(poubelle, chemin))
-                except Exception as e:
-                    l.log('Erreur l. 815 :', type(e))
-                    pass
-            self.effacer()
-        self.effacerdossier()
-        depot.sauvegardecomplete(_("Effacement"))
+    #~ def supprimer(self):
+        #~ os.remove(self.chemin)
 
-    def supprimer(self):
-        os.remove(self.chemin)
+    #~ def supprimerdossier(self):
+        #~ try:
+            #~ for fichier in os.listdir(self.dossier):
+                #~ os.remove(self.dossier + '/' + fichier)
+        #~ except Exception as err:
+            #~ l.log('Erreur l. 828 :', type(err))
+            #~ pass
+        #~ try:
+            #~ os.removedirs(self.dossier)
+        #~ except Exception as err:
+            #~ l.log('Erreur l. 832 :', type(err))
+            #~ pass
 
-    def supprimerdossier(self):
-        try:
-            for fichier in os.listdir(self.dossier):
-                os.remove(self.dossier + '/' + fichier)
-        except Exception as e:
-            l.log('Erreur l. 828 :', type(e))
-            pass
-        try:
-            os.removedirs(self.dossier)
-        except Exception as e:
-            l.log('Erreur l. 832 :', type(e))
-            pass
-
-    def mouliner(self, commande):
-        os.chdir(self.dossier)
-        subprocess.call([commande, self.chemin])
+    #~ def mouliner(self, commande):
+        #~ os.chdir(self.dossier)
+        #~ subprocess.call([commande, self.chemin])
 
 
 def sansaccents(entree):
+    """Retourne le texte en ôtant les accents
+    """
     nkfd_form = ud.normalize('NFKD', entree)
     return "".join([c for c in nkfd_form if not ud.combining(c)])
 
 
 def motaleatoire(longueur=6, source=ascii_lowercase):
+    """Mot aléatoire, pour les fichiers temporaires notamment
+    """
     return ''.join(rd.choice(source) for i in range(longueur))
 
 
 def templateperso(syntaxe='<% %> % <<< >>>'):
+    """Modification des délimiteurs dans les gabarits bottle
+    """
     class Adaptateur(SimpleTemplate):
+        """Classe décorateur
+        """
         def __init__(self, syntax=syntaxe, *args, **settings):
             SimpleTemplate.__init__(self, syntax=syntax, *args, **settings)
     return functools.partial(template, template_adapter=Adaptateur)
 
 
 def url(fichier):
+    """Url correspondant à un fichier
+    """
     return fichier.replace(cfg.PWD, '').replace(os.sep, '/')
