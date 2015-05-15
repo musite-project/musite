@@ -153,7 +153,12 @@ Voici la sortie de la commande :
                 or os.path.getmtime(fichier)
                 < os.path.getmtime(self._fichier())
         ):
-            self.preparer_gabc(fmt, fichier)
+            try:
+                self.preparer_gabc(fmt, fichier)
+            except IndexError as err:
+                if cfg.DEVEL:
+                    print(type(err), err)
+                raise ErreurCompilation
         return url(fichier)
 
     def ly(self, chemin=False, indice=''): # pylint: disable=C0103
@@ -164,7 +169,11 @@ Voici la sortie de la commande :
     def midi(self, chemin=False, indice=''):
         """Format midi
         """
-        return self.gabc('midi', chemin, indice)
+        try:
+            return self.gabc('midi', chemin, indice)
+        except ErreurCompilation as err:
+            if cfg.DEVEL:
+                print(type(err), err)
 
     def preparer_pdf(self, destination=False, environnement=None):
         """Mise en place du pdf
