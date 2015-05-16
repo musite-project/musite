@@ -13,6 +13,7 @@ from deps.mistune import markdown
 from . import txt
 from etc import config as cfg
 from deps.outils import url, traiter_erreur, _
+# pylint: disable=R0801
 EXT = __name__.split('.')[-1]
 
 
@@ -20,32 +21,23 @@ class Document(txt.Document):
     """Document markdown
     """
     def __init__(self, chemin, proprietes=None):
-        # Formats d'export possibles, avec la méthode renvoyant le document
-        # compilé dans chaque format.
-        self.fmt = {
-            'pdf':  self.pdf,
-            'reveal.js': self.revealjs,
-            'beamer': self.beamer,
-            }
-        # Propriétés du document
-        # listeproprietes contient la liste des propriétés, avec leur
-        # description et leur valeur par défaut.
-        listeproprietes = {
-            'pdf': {
-                'papier':               (_("Taille de la page"), 'a4'),
-                'taillepolice':         (_("Taille de la police"), '12'),
-            },
-            'reveal.js': {
-                'theme':                (_("Thème"), 'black')
-            },
-            'beamer': {
-            }
-        }
         txt.Document.__init__(
-            self,
-            chemin,
-            formats=self.fmt,
-            listeproprietes=listeproprietes,
+            self, chemin,
+            formats={
+                'pdf':          self.pdf,
+                'reveal.js':    self.revealjs,
+                'beamer':       self.beamer,
+            },
+            listeproprietes={
+                'pdf': {
+                    'papier':           (_("Taille de la page"), 'a4'),
+                    'taillepolice':     (_("Taille de la police"), '12'),
+                },
+                'reveal.js': {
+                    'theme':            (_("Thème"), 'black')
+                },
+                'beamer': {},
+            },
             proprietes=proprietes
         )
 
@@ -125,7 +117,8 @@ class Document(txt.Document):
         arguments = []
         if ext == 'pdf':
             arguments = [
-                '--variable=fontsize:' + self.proprietes['pdf']['taillepolice'],
+                '--variable=fontsize:'
+                + self.proprietes['pdf']['taillepolice'],
                 '--variable=papersize:'
                 + self.proprietes['pdf']['papier']
                 + 'paper',
@@ -162,29 +155,26 @@ class Document(txt.Document):
 def pandoc(fichier, destination, fmt=None, arguments=None):
     """Méthode appelant la commande pandoc
     """
+    os.chdir(os.path.dirname(fichier))
+    commande = [
+        'pandoc',
+        '-S',
+        '-s',
+        '--data-dir', cfg.PANDOC,
+        '--self-contained',
+        '--variable=lang:' + {'fr': 'french', 'en': 'english'}[cfg.LANGUE],
+        '-o', destination
+    ]
+    if fmt:
+        commande = commande + ['-t', fmt]
+    if arguments:
+        commande = commande + arguments
+    commande.append(fichier)
     try:
-        os.chdir(os.path.dirname(fichier))
-        commande = [
-            'pandoc',
-            '-S',
-            '-s',
-            '--data-dir', cfg.PANDOC,
-            '--self-contained',
-            '--variable=lang:' + {'fr':'french', 'en':'english'}[cfg.LANGUE],
-            '-o', destination
-        ]
-        if fmt:
-            commande = commande + ['-t', fmt]
-        if arguments:
-            commande = commande + arguments
-        commande.append(fichier)
-        try:
-            compiler(commande, fichier, os.environ)
-        except ErreurCompilation as err:
-            traiter_erreur(err)
-            raise
-    finally:
-        os.chdir(cfg.PWD)
+        compiler(commande, fichier, os.environ)
+    except ErreurCompilation as err:
+        traiter_erreur(err)
+        raise
 
 compiler = txt.compiler  # pylint: disable=C0103
 

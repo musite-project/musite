@@ -13,7 +13,7 @@ from deps.outils import templateperso, url, traiter_erreur, _
 from deps.gabctk import Gabc, Lily, Midi, Partition
 import os
 import shutil
-EXT = __name__.split('.')[-1]
+EXT = __name__.split('.')[-1]  # pylint: disable=R0801
 
 
 # Ce qui suit est nécessaire pour modifier les délimiteurs dans les gabarits.
@@ -26,44 +26,36 @@ class Document(txt.Document):
     """Document gabc
     """
     def __init__(self, chemin, proprietes=None):
-        # Formats d'export possibles, avec la méthode renvoyant le document
-        # compilé dans chaque format.
-        self.fmt = {
-            'ly':   self.ly,
-            'midi': self.midi,
-            'pdf':  self.pdf,
-            }
-
-        # Propriétés du document
-        # listeproprietes contient la liste des propriétés, avec leur
-        # description et leur valeur par défaut.
-        listeproprietes = {
-            'midi': {
-                'tempo':                (_("Tempo"), 165),
-                'transposition':        (_("Transposition"), 0),
-            },
-            'ly': {
-                'tempo':                (_("Tempo"), 165),
-                'transposition':        (_("Transposition"), 0),
-            },
-            'pdf': {
-                'couleur':              (_("Couleur (R,V,B)"), (154, 0, 0)),
-                'couleur_initiale':     (_("Initiale en couleur"), False),
-                'couleur_lignes':       (_("Lignes en couleur"), True),
-                'couleur_symboles':     (_("Symboles en couleur"), True),
-                'epaisseur_lignes':     (_("Épaisseur des lignes"), 20),
-                'espace_lignes_texte':  (_("Espace sous la portée"), '7 mm'),
-                'papier':               (_("Taille de la page"), 'a5'),
-                'taille_initiale':      (_("Taille de l'initiale"), 43),
-                'taille_notes':         (_("Taille des notes"), 17),
-                'taille_police':        (_("Taille de la police"), 12),
-            }
-        }
         txt.Document.__init__(
-            self,
-            chemin,
-            formats=self.fmt,
-            listeproprietes=listeproprietes,
+            self, chemin,
+            formats={
+                'ly':   self.ly,
+                'midi': self.midi,
+                'pdf':  self.pdf,
+            },
+            listeproprietes={
+                'midi': {
+                    'tempo':                (_("Tempo"), 165),
+                    'transposition':        (_("Transposition"), 0),
+                },
+                'ly': {
+                    'tempo':                (_("Tempo"), 165),
+                    'transposition':        (_("Transposition"), 0),
+                },
+                'pdf': {
+                    'couleur':             (_("Couleur (R,V,B)"), (154, 0, 0)),
+                    'couleur_initiale':     (_("Initiale en couleur"), False),
+                    'couleur_lignes':       (_("Lignes en couleur"), True),
+                    'couleur_symboles':     (_("Symboles en couleur"), True),
+                    'epaisseur_lignes':     (_("Épaisseur des lignes"), 20),
+                    'espace_lignes_texte':
+                        (_("Espace sous la portée"), '7 mm'),
+                    'papier':               (_("Taille de la page"), 'a5'),
+                    'taille_initiale':      (_("Taille de l'initiale"), 43),
+                    'taille_notes':         (_("Taille des notes"), 17),
+                    'taille_police':        (_("Taille de la police"), 12),
+                }
+            },
             proprietes=proprietes
         )
 

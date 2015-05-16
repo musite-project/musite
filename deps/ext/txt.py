@@ -18,6 +18,7 @@ from deps.mistune import markdown
 from deps import jrnl as l
 from etc import config as cfg
 b.TEMPLATE_PATH += cfg.MODELES
+# pylint: disable=R0801
 EXT = __name__.split('.')[-1]
 
 
@@ -36,15 +37,18 @@ class Document:
         self.ext = self.ext[1:]
         # Chemin absolu des fichiers temporaires
         self.rnd = os.path.join(cfg.TMP, motaleatoire(6))
-        self.listeproprietes = listeproprietes if listeproprietes else {}
-        self.proprietes = proprietes if proprietes else {}
+        if listeproprietes:
+            self.listeproprietes = listeproprietes
+            self.proprietes = {}
         if formats:
+            self.fmt = formats
             for fmt in formats:
                 self.proprietes[fmt] = {
                     prop: val[1] for prop, val in listeproprietes[fmt].items()
                 }
         if proprietes:
             for fmt in proprietes:
+                print(dict(proprietes[fmt]))
                 for prop, val in proprietes[fmt].items():
                     if prop in listeproprietes[fmt]:
                         typ = type(listeproprietes[fmt][prop][1])
@@ -203,12 +207,12 @@ Voici la sortie de la commande :
             '/{}/{}/'.format(chemin, indice).replace('//', '/')
         )
         if (
-                not os.path.isfile(self._fichier('pdf'))
-                or os.path.getmtime(self._fichier('pdf'))
+                not os.path.isfile(fichierpdf)
+                or os.path.getmtime(fichierpdf)
                 < os.path.getmtime(self._fichier())
         ):
             self.preparer_pdf()
-        return url(fichierpdf)
+        return url(self._fichier('pdf'))
 
 
 def compiler(commande, fichier, environnement):

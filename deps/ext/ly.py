@@ -7,10 +7,9 @@ Voir plus d'informations à l'adresse :
 http://www.lilypond.org
 """
 from . import txt
-from etc import config as cfg
 import os
 import shutil
-EXT = __name__.split('.')[-1]
+EXT = __name__.split('.')[-1]  # pylint: disable=R0801
 
 
 class Document(txt.Document):
@@ -44,20 +43,16 @@ restrictives, qui rendent impossibles certaines opérations.
 def compiler_pdf(fichier, environnement=None):
     """Compilation en pdf
     """
-    try:
-        os.chdir(os.path.dirname(fichier))
-        commande = [
-            'lilypond',
-            '-dsafe',
-            fichier
-        ]
-        environnement = dict(
-            os.environ,
-            **environnement if environnement else {}
-        )
-        compiler(commande, fichier, environnement)
-    finally:
-        os.chdir(cfg.PWD)
+    commande = [
+        'lilypond',
+        '-dsafe',
+        fichier
+    ]
+    environnement = dict(
+        os.environ,
+        **environnement if environnement else {}
+    )
+    compiler(commande, fichier, environnement)
 
 
 compiler = txt.compiler  # pylint: disable=C0103
