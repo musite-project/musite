@@ -6,8 +6,9 @@
 Musite est une sorte de wiki, pensé pour gérer des documents contenant des
 partitions de musique, mais adaptable à toutes sortes d'autres usages.
 
-Ce fichier gère la partie interface du site, renvoyant les pages
-correspondant aux urls saisies dans le navigateur.
+Ce fichier gère la partie interface du site, renvoyant les pages correspondant
+aux urls saisies dans le navigateur.Si j'ai bien compris ce qu'est une vue
+dans le modèle MVC, ce doit être à peu près ça.
 """
 
 __appname__ = 'serveur'

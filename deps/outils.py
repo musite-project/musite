@@ -1,6 +1,8 @@
 # coding: utf-8
 """Gestion des fichiers, dossiers et dépôts
 
+Si j'ai bien compris ce qu'est un modèle dans le modèle MVC, ce doit être
+à peu près ça.
 Vous trouverez aussi à la fin des méthodes un peu "inclassables", mais utiles
 en plusieurs points du programme.
 """
@@ -271,6 +273,8 @@ def templateperso(syntaxe='<% %> % <<< >>>'):
 
 
 def traiter_erreur(err):
+    """Méthode appelée lorsqu'une exception est levée
+    """
     if cfg.DEVEL:
         print(type(err), err)
 
