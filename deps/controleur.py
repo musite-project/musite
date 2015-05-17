@@ -43,15 +43,20 @@ class Depot:
         self.projet = projet
         self.depot = f.Depot(os.path.join(cfg.DATA, projet))
 
+    def annuler(self, commit):
+        """Annulation des modifications d'un seul commit
+
+        Cette méthode est là au cas où elle pourrait servir dans la suite, mais
+        son usage est très délicat : cette opération peut en effet engendrer
+        des conflits, dont la gestion depuis un script est complexe. À utiliser
+        avec modération !
+        """
+        self.depot.annuler(commit)
+
     def cloner(self, depot):
         """Clonage d'un dépôt existant.
         """
         self.depot.cloner(depot)
-
-    def initialiser(self):
-        """Initialisation d'un nouveau dépôt.
-        """
-        self.depot.initialiser()
 
     def comparer(self, commit, commitb=None, fichier=''):
         """Comparaison entre deux versions.
@@ -107,15 +112,20 @@ class Depot:
             element[1] = re.sub(r'\<.*\>', '', element[1])
         return b.template('tableau', tableau=tableau)
 
-    def annuler(self, commit):
-        """Annulation des modifications d'un seul commit
-
-        Cette méthode est là au cas où elle pourrait servir dans la suite, mais
-        son usage est très délicat : cette opération peut en effet engendrer
-        des conflits, dont la gestion depuis un script est complexe. À utiliser
-        avec modération !
+    def initialiser(self):
+        """Initialisation d'un nouveau dépôt.
         """
-        self.depot.annuler(commit)
+        self.depot.initialiser()
+
+    @property
+    def origine(self):
+        return self.depot.origine
+
+    def pull(self, depot):
+        self.depot.pull(depot)
+
+    def push(self, depot, utilisateur, mdp):
+        self.depot.push(depot, utilisateur, mdp)
 
     def retablir(self, commit, fichier=None, auteur=None):
         """Retour en arrière à une version donnée
@@ -640,6 +650,10 @@ class Projet(Dossier):
                     actions[_('Créer dossier')] = \
                         '_creerdossier/' + self.chemin
                     actions[_('Copier')] = '_copier/' + self.chemin
+                    actions[_('Distant-envoi')] = \
+                        '_envoyerprojet/' + self.chemin
+                    actions[_('Distant-réception')] = \
+                        '_recevoirprojet/' + self.chemin
                     actions[_('Envoyer fichier')] = '_envoyer/' + self.chemin
                     actions[_('Renommer')] = '_deplacer/' + self.chemin
                     actions[_('Supprimer')] = \
@@ -655,27 +669,6 @@ class Projet(Dossier):
             'liens': liens,
         }
 
-    def creer(self):
-        """Création d'un nouveau projet
-        """
-        try:
-            os.makedirs(self.dossier, exist_ok=False)
-            self.depot.initialiser()
-            b.redirect(self.url)
-        except FileExistsError as err:
-            f.traiter_erreur(err)
-            return self.afficher(_('Ce projet existe déjà !'))
-
-    def renommer(self, destination):
-        """Renommage d'un projet
-        """
-        dest = os.path.join(cfg.DATA, destination)
-        if not os.path.exists(dest):
-            shutil.move(self.dossier, dest)
-            b.redirect(i18n_path('/' + destination))
-        else:
-            return self.afficher(_('Il y a déjà un projet portant ce nom !'))
-
     def cloner(self, depot):
         """Clonage d'un projet distant
         """
@@ -688,6 +681,35 @@ class Projet(Dossier):
         dest = os.path.join(cfg.DATA, destination)
         if not os.path.exists(dest):
             shutil.copytree(self.dossier, dest)
+            b.redirect(i18n_path('/' + destination))
+        else:
+            return self.afficher(_('Il y a déjà un projet portant ce nom !'))
+
+    def creer(self):
+        """Création d'un nouveau projet
+        """
+        try:
+            os.makedirs(self.dossier, exist_ok=False)
+            self.depot.initialiser()
+            b.redirect(self.url)
+        except FileExistsError as err:
+            f.traiter_erreur(err)
+            return self.afficher(_('Ce projet existe déjà !'))
+
+    def envoyer(self, depot, utilisateur, mdp):
+        self.depot.push(depot, utilisateur, mdp)
+        b.redirect(self.url)
+
+    def recevoir(self, depot):
+        self.depot.pull(depot)
+        b.redirect(self.url)
+
+    def renommer(self, destination):
+        """Renommage d'un projet
+        """
+        dest = os.path.join(cfg.DATA, destination)
+        if not os.path.exists(dest):
+            shutil.move(self.dossier, dest)
             b.redirect(i18n_path('/' + destination))
         else:
             return self.afficher(_('Il y a déjà un projet portant ce nom !'))

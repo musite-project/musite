@@ -292,7 +292,10 @@ def dossier_creer(nom, element=''):
 def projet_cloner_infos():
     """ Formulaire pour cloner un projet distant
     """
-    return {'corps': b.template('clonage', {'quoi': _('projet')})}
+    return {'corps': b.template('depot', {
+        'action': ('cloner', _('Cloner')),
+        'quoi': _('projet')
+    })}
 
 
 @APP.post('/_clonerprojet')
@@ -305,6 +308,42 @@ def projet_cloner():
         return Projet(rq.forms.nom).cloner(rq.forms.origine)
     else:
         b.redirect(i18n_path('/_projets'))
+
+
+@APP.get('/_<action>projet/<nom>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_action_infos(action, nom):
+    """ Formulaire pour l'envoi/réception vers un dépôt distant
+    """
+    try:
+        return {'corps': b.template('depot', {
+            'action': (
+                action,
+                {'recevoir': _('Recevoir'), 'envoyer': _('Envoyer')}[action]
+            ),
+            'origine': Projet(nom).depot.origine,
+            'quoi': _('projet')
+        })}
+    except KeyError as err:
+        f.traiter_erreur(err)
+        b.abort(404)
+
+
+@APP.post('/_<action>projet/<nom>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_action(action, nom):
+    """ Envoi/réception vers un dépôt distant
+    """
+    if rq.forms.action == 'recevoir':
+        return Projet(nom).recevoir(rq.forms.origine)
+    elif rq.forms.action == 'envoyer':
+        return Projet(nom).envoyer(
+            rq.forms.origine, rq.forms.utilisateur, rq.forms.mdp
+        )
+    else:
+        b.redirect(Projet(nom).url)
 
 
 @APP.get('/_creerprojet')

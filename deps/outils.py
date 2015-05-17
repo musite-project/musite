@@ -33,6 +33,19 @@ class Depot():
     def __init__(self, dossier):
         self.dossier = dossier
 
+    def cloner(self, depot):
+        """Cloner un dépôt distant
+        """
+        cmd = ['git', 'clone', depot, self.dossier]
+        try:
+            resultat = subprocess.check_output(cmd)
+        except subprocess.CalledProcessError as err:
+            if cfg.DEVEL:
+                traiter_erreur(err)
+                print(err.output)
+            raise
+        return resultat.decode('utf-8')
+
     def commande(self, arguments):
         """Commande sur un dépôt existant
         """
@@ -46,18 +59,29 @@ class Depot():
             raise
         return resultat.decode('utf-8')
 
-    def cloner(self, depot):
-        """Cloner un dépôt distant
+    def comparer(self, version, versionb=None, fichier=None):
+        """Comparer deux versions
+
+        Si la deuxième version n'est pas donnée, la version précédant
+        la première est automatiquement choisie.
         """
-        cmd = ['git', 'clone', depot, self.dossier]
-        try:
-            resultat = subprocess.check_output(cmd)
-        except subprocess.CalledProcessError as err:
-            if cfg.DEVEL:
-                traiter_erreur(err)
-                print(err.output)
-            raise
-        return resultat.decode('utf-8')
+        if versionb:
+            parametres = [
+                'diff',
+                '--word-diff-regex=.??',
+                version,
+                versionb
+            ]
+        else:
+            parametres = [
+                'diff',
+                '--word-diff-regex=.??',
+                version + '^',
+                version
+            ]
+        if fichier:
+            parametres.append(fichier)
+        return self.commande(parametres).replace('\r', '').split('\n')
 
     def initialiser(self):
         """Initialisation du dépôt
@@ -101,30 +125,29 @@ class Depot():
             element.pop(3)
         return entete + historique
 
-    def comparer(self, version, versionb=None, fichier=None):
-        """Comparer deux versions
+    @property
+    def origine(self):
+        with open(os.path.join(self.dossier,'.git','config')) as gitconfig:
+            url = False
+            for ligne in gitconfig:
+                if url:
+                    return ligne.split('url = ')[1][:-1]
+                if '[remote "origin"]' in ligne:
+                    url = True
 
-        Si la deuxième version n'est pas donnée, la version précédant
-        la première est automatiquement choisie.
+    def pull(self, depot=None):
+        """Récupérer les modifications depuis un dépôt distant
         """
-        if versionb:
-            parametres = [
-                'diff',
-                '--word-diff-regex=.??',
-                version,
-                versionb
-            ]
-        else:
-            parametres = [
-                'diff',
-                '--word-diff-regex=.??',
-                version + '^',
-                version
-            ]
-        if fichier:
-            parametres.append(fichier)
-        details = self.commande(parametres).replace('\r', '').split('\n')
-        return details
+        depot = depot if depot else self.origine
+        self.commande(['pull', depot])
+
+    def push(self, depot=None, utilisateur=None, mdp=''):
+        """Renvoyer les modifications locales vers un dépôt distant
+        """
+        depot = depot if depot else self.origine
+        if utilisateur:
+            depot = depot.replace('://', '://{}:{}@'.format(utilisateur, mdp))
+        self.commande(['push', depot])
 
     def retablir(self, version, fichier=None, auteur=None):
         """Ramener le dépôt à une version donnée
@@ -173,6 +196,11 @@ class Depot():
             else:
                 print(err.__dict__)
 
+    def sauvegardecomplete(self, message=_("Sauvegarde complète"), auteur=None):
+        """Sauvegarde de l'ensemble du dépôt
+        """
+        self.sauvegarde('-A', message, auteur)
+
     def sauvegardefichier(self, fichier, auteur=None):
         """Sauvegarde d'un fichier isolé
         """
@@ -181,11 +209,6 @@ class Depot():
             fichier.nom,
             auteur
         )
-
-    def sauvegardecomplete(self, message=_("Sauvegarde complète"), auteur=None):
-        """Sauvegarde de l'ensemble du dépôt
-        """
-        self.sauvegarde('-A', message, auteur)
 
 
 class Dossier():
