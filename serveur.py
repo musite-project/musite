@@ -39,9 +39,6 @@ b.TEMPLATE_PATH += cfg.MODELES
 APP = b.Bottle()
 
 
-# Import des modules qui vont traiter chaque extension ########################
-
-
 # Méthodes globales :  ########################################################
 
 

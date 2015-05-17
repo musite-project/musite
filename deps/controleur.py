@@ -20,6 +20,9 @@ from . import HTMLTags as h
 from .mistune import markdown
 from etc import config as cfg
 
+
+# Import des modules qui vont traiter chaque extension ########################
+
 EXT = {
     e[1]: import_module('ext.' + e[1])
     for e in iter_modules(
