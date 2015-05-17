@@ -3,11 +3,5 @@
 En pratique, se ramène à l'extension tex.
 """
 
-EXT = __name__.split('.')[-1]
-from .tex import Document as DocTeX
-
-class Document(DocTeX):
-    """Document sty
-    """
-    def __init__(self, chemin):
-        DocTeX.__init__(self, chemin)
+# pylint: disable=W0611
+from .tex import Document

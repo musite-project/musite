@@ -18,8 +18,6 @@ from deps.mistune import markdown
 from deps import jrnl as l
 from etc import config as cfg
 b.TEMPLATE_PATH += cfg.MODELES
-# pylint: disable=R0801
-EXT = __name__.split('.')[-1]
 
 
 class Document:
@@ -29,7 +27,6 @@ class Document:
             self,
             chemin,
             formats=None,
-            listeproprietes=None,
             proprietes=None
     ):
         self.chemin = chemin
@@ -37,18 +34,17 @@ class Document:
         self.ext = self.ext[1:]
         # Chemin absolu des fichiers temporaires
         self.rnd = os.path.join(cfg.TMP, motaleatoire(6))
-        if listeproprietes:
-            self.listeproprietes = listeproprietes
-            self.proprietes = {}
         if formats:
+            self.proprietes = {}
             self.fmt = formats
+            listeproprietes = self.listeproprietes
             for fmt in formats:
                 self.proprietes[fmt] = {
-                    prop: val[1] for prop, val in listeproprietes[fmt].items()
+                    prop: val[1]
+                    for prop, val in listeproprietes[fmt].items()
                 }
         if proprietes:
             for fmt in proprietes:
-                print(dict(proprietes[fmt]))
                 for prop, val in proprietes[fmt].items():
                     if prop in listeproprietes[fmt]:
                         typ = type(listeproprietes[fmt][prop][1])
@@ -69,16 +65,12 @@ class Document:
                                     )
                                 )
 
-    def _chemin(self, ext=None):
-        """Url vers un fichier portant ce nom avec une autre extension
-        """
-        return os.path.splitext(self.chemin)[0] \
-            + ('.' + ext if ext else '.' + self.ext if self.ext else '')
-
     def _fichierrelatif(self, ext=None):
         """Chemin vers un fichier portant ce nom avec une autre extension
         """
-        return self._chemin(ext if ext else self.ext).replace('/', os.path.sep)
+        return os.path.splitext(self.chemin)[0] \
+            + ('.' + ext if ext else '.' + self.ext if self.ext else '')\
+            .replace('/', os.path.sep)
 
     def _fichier(self, ext=None):
         """Chemin absolu
@@ -101,6 +93,15 @@ class Document:
             )
         )
 
+    def _fichiersortie(self, ext=None, chemin=None, indice=''):
+        """Fichier de destination pour un export
+        """
+        chemin = chemin if chemin else ext
+        return self._fichier(ext).replace(
+            '/' + ext + '/',
+            '/{}/{}/'.format(chemin, indice).replace('//', '/')
+        )
+
     @property
     def dossier(self):
         """Dossier contenant le document
@@ -112,6 +113,12 @@ class Document:
         """Dossier temporaire
         """
         return os.path.dirname(self._fichiertmp())
+
+    @property
+    def listeproprietes(self):
+        """Liste des propriétés utiles à chaque format d'export
+        """
+        return {fmt: self.fmt[fmt][1] for fmt in self.fmt}
 
     def afficher(self):
         """Affichage du contenu du document
@@ -192,27 +199,23 @@ Voici la sortie de la commande :
         """
         os.remove(self._fichier())
 
+    def exporter(self, fmt):
+        """Export dans les différents formats
+        """
+        return self.fmt[fmt][0]
+
     def pdf(self, chemin=False, indice=''):
         """Format pdf
         """
         chemin = chemin if chemin else 'pdf'
-        fichierpdf = self._fichier('pdf')
-        cheminpdf = self._chemin('pdf')
-        fichierpdf = fichierpdf.replace(
-            '/pdf/',
-            '/{}/{}/'.format(chemin, indice).replace('//', '/')
-        )
-        cheminpdf = cheminpdf.replace(
-            '/pdf/',
-            '/{}/{}/'.format(chemin, indice).replace('//', '/')
-        )
+        fichierpdf = self._fichiersortie('pdf', chemin=chemin, indice=indice)
         if (
                 not os.path.isfile(fichierpdf)
                 or os.path.getmtime(fichierpdf)
                 < os.path.getmtime(self._fichier())
         ):
-            self.preparer_pdf()
-        return url(self._fichier('pdf'))
+            self.preparer_pdf(destination=fichierpdf)
+        return url(fichierpdf)
 
 
 def compiler(commande, fichier, environnement):

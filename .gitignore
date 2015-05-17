@@ -6,6 +6,7 @@ etc/utilisateurs
 log
 static/pdf/
 static/midi/
+static/ly/
 tmp/
 test.py
 rapport_pylint

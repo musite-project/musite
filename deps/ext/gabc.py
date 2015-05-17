@@ -13,7 +13,6 @@ from deps.outils import templateperso, url, traiter_erreur, _
 from deps.gabctk import Gabc, Lily, Midi, Partition
 import os
 import shutil
-EXT = __name__.split('.')[-1]  # pylint: disable=R0801
 
 
 # Ce qui suit est nécessaire pour modifier les délimiteurs dans les gabarits.
@@ -29,20 +28,15 @@ class Document(txt.Document):
         txt.Document.__init__(
             self, chemin,
             formats={
-                'ly':   self.ly,
-                'midi': self.midi,
-                'pdf':  self.pdf,
-            },
-            listeproprietes={
-                'midi': {
+                'midi': (self.midi, {
                     'tempo':                (_("Tempo"), 165),
                     'transposition':        (_("Transposition"), 0),
-                },
-                'ly': {
+                }),
+                'ly': (self.ly, {
                     'tempo':                (_("Tempo"), 165),
                     'transposition':        (_("Transposition"), 0),
-                },
-                'pdf': {
+                }),
+                'pdf': (self.pdf, {
                     'couleur':             (_("Couleur (R,V,B)"), (154, 0, 0)),
                     'couleur_initiale':     (_("Initiale en couleur"), False),
                     'couleur_lignes':       (_("Lignes en couleur"), True),
@@ -54,7 +48,7 @@ class Document(txt.Document):
                     'taille_initiale':      (_("Taille de l'initiale"), 43),
                     'taille_notes':         (_("Taille des notes"), 17),
                     'taille_police':        (_("Taille de la police"), 12),
-                }
+                })
             },
             proprietes=proprietes
         )
@@ -62,21 +56,10 @@ class Document(txt.Document):
     def afficher(self):
         return self.afficher_pdf()
 
-    def exporter(self, fmt):
-        """Export vers d'autres formats
-        """
-        return self.fmt[fmt]
-
     def gabc(self, fmt, chemin=False, indice=''):
         """Format gabc
         """
-        chemin = chemin if chemin else fmt
-        fichier = self._fichier(fmt)
-        if chemin:
-            fichier = fichier.replace(
-                '/{}/'.format(fmt),
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
+        fichier = self._fichiersortie(fmt, chemin=chemin, indice=indice)
         if (
                 not os.path.isfile(fichier)
                 or os.path.getmtime(fichier)

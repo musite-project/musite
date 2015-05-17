@@ -14,7 +14,6 @@ from etc import config as cfg
 import os
 import shutil
 import re
-EXT = __name__.split('.')[-1]  # pylint: disable=R0801
 
 
 class Document(txt.Document):

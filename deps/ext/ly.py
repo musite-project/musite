@@ -9,7 +9,6 @@ http://www.lilypond.org
 from . import txt
 import os
 import shutil
-EXT = __name__.split('.')[-1]  # pylint: disable=R0801
 
 
 class Document(txt.Document):

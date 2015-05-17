@@ -1277,7 +1277,7 @@ def document_envoyer(nom, element=''):
 @APP.get('/_inexistant/<nom>/<element:path>')
 @APP.get('/_inexistant/<nom>/<element:path>.<ext>')
 @page
-def inexistant(nom, element=None, ext=None): # pylint: disable=W0613
+def inexistant(nom, element=None, ext=None):  # pylint: disable=W0613
     """Page renvoyée pour proposer la création d'un emplacement inexistant
     """
     return {
@@ -1465,7 +1465,7 @@ def css(ext=''):
 
 @APP.error(code=401)
 @page
-def erreur_accesreserve(erreur): # pylint: disable=W0613
+def erreur_accesreserve(erreur):  # pylint: disable=W0613
     """Accès réservé
 
     Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page
@@ -1481,7 +1481,7 @@ def erreur_accesreserve(erreur): # pylint: disable=W0613
 
 @APP.error(code=404)
 @page
-def erreur_pageintrouvable(erreur): # pylint: disable=W0613
+def erreur_pageintrouvable(erreur):  # pylint: disable=W0613
     """Page introuvable
 
     Cette erreur est renvoyée lorsque quelqu'un tente d'accéder à une page

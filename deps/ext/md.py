@@ -1,8 +1,8 @@
 # coding: utf-8
 """Gestion des fichiers MarkDown
 
-Le langage MarkDown est géré ici par le module mistune, intégré au programme :
-il n'y a donc pas de dépendance externe particulière.
+Le langage MarkDown est géré ici par le module mistune pour la traduction en
+html, par pandoc pour les exports ; d'où dépendance sur ce dernier.
 
 Voyez pour la syntaxe :
 http://fr.wikipedia.org/wiki/Markdown
@@ -13,8 +13,6 @@ from deps.mistune import markdown
 from . import txt
 from etc import config as cfg
 from deps.outils import url, traiter_erreur, _
-# pylint: disable=R0801
-EXT = __name__.split('.')[-1]
 
 
 class Document(txt.Document):
@@ -24,19 +22,14 @@ class Document(txt.Document):
         txt.Document.__init__(
             self, chemin,
             formats={
-                'pdf':          self.pdf,
-                'reveal.js':    self.revealjs,
-                'beamer':       self.beamer,
-            },
-            listeproprietes={
-                'pdf': {
+                'pdf': (self.pdf, {
                     'papier':           (_("Taille de la page"), 'a4'),
                     'taillepolice':     (_("Taille de la police"), '12'),
-                },
-                'reveal.js': {
+                }),
+                'reveal.js': (self.revealjs, {
                     'theme':            (_("Thème"), 'black')
-                },
-                'beamer': {},
+                }),
+                'beamer': (self.beamer, {}),
             },
             proprietes=proprietes
         )
@@ -44,26 +37,10 @@ class Document(txt.Document):
     def afficher(self):
         return markdown(self.contenu)
 
-    def exporter(self, fmt):
-        """Export dans les différents formats
-        """
-        return self.fmt[fmt]
-
-    def pdf(self, chemin=False, indice='', fmt=None):  # pylint: disable=W0221
+    def pdf(self, chemin='pdf', indice='', fmt=None):  # pylint: disable=W0221
         """Format pdf
         """
-        chemin = chemin if chemin else 'pdf'
-        fichierpdf = self._fichier('pdf')
-        cheminpdf = self._chemin('pdf')
-        if chemin:
-            fichierpdf = fichierpdf.replace(
-                '/pdf/',
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
-            cheminpdf = cheminpdf.replace(
-                '/pdf/',
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
+        fichierpdf = self._fichiersortie('pdf', chemin=chemin, indice=indice)
         if (
                 not os.path.isfile(fichierpdf)
                 or os.path.getmtime(fichierpdf)
@@ -85,17 +62,7 @@ class Document(txt.Document):
         Format html5 pour les présentations.
         """
         chemin = chemin if chemin else 'rj'
-        fichierhtml = self._fichier('html')
-        cheminhtml = self._chemin('html')
-        if chemin:
-            fichierhtml = fichierhtml.replace(
-                '/html/',
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
-            cheminhtml = cheminhtml.replace(
-                '/html/',
-                '/{}/{}/'.format(chemin, indice).replace('//', '/')
-            )
+        fichierhtml = self._fichiersortie('html', chemin=chemin, indice=indice)
         if (
                 not os.path.isfile(fichierhtml)
                 or os.path.getmtime(fichierhtml)
