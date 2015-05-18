@@ -1,10 +1,10 @@
 \documentclass[%
-,<<<proprietes['taille_police']>>>pt%    Taille de police.
+,<<<proprietes['texte_taille']>>>pt%    Taille de police.
 ]{scrartcl}
 
 \usepackage[%
-    paperwidth=<<<proprietes['papier'][0]>>>,
-    paperheight=<<<proprietes['papier'][1]>>>,
+    paperwidth=<<<proprietes['ba_papier'][0]>>>,
+    paperheight=<<<proprietes['ba_papier'][1]>>>,
     left=<<<proprietes['marge_gauche']>>>,
     right=<<<proprietes['marge_droite']>>>,
     top=<<<proprietes['marge_haut']>>>,
@@ -16,34 +16,36 @@
 
 \pagestyle{empty}
 
-\setgrefactor{<<<proprietes['taille_notes']>>>}
-\setstafflinethickness{<<<proprietes['epaisseur_lignes']>>>}
-\grechangedim{spacelinestext}{<<<proprietes['espace_lignes_texte']>>>}{0}
+\setgrefactor{<<<proprietes['notes_taille']>>>}
+\setstafflinethickness{<<<proprietes['notes_epaisseur_lignes']>>>}
+\grechangedim{spacelinestext}{<<<proprietes['notes_espace_lignes_texte']>>>}{0}
+\setaboveinitialseparation{<<<proprietes['annotations_espace']>>>}{0}
+
 
 \definecolor{gregoriocolor}{rgb}{%
     <<<','.join(str(p / 255) for p in proprietes['couleur'])>>>%
 }
 \def\rubrum{\color{gregoriocolor}}
-%if proprietes['couleur_initiale']:
+%if proprietes['initiale_couleur']:
 \let\rubrinit\rubrum
 %else:
 \def\rubrinit{}
 %end
-%if proprietes['couleur_lignes']:
+%if proprietes['notes_couleur_lignes']:
 \grecoloredlines{<<<'}{'.join(str(int(c)) for c in proprietes['couleur'])>>>}
 %end
-%if proprietes['couleur_symboles']:
+%if proprietes['texte_symboles_couleur']:
 \let\rubrsym\rubrum
 %else:
 \def\rubrsym{}
 %end
 
 
-\def\greinitialformat#1{\raisebox{<<<proprietes['elevation_initiale']>>>}{%
+\def\greinitialformat#1{\raisebox{<<<proprietes['initiale_elevation']>>>}{%
     \fontsize{%
-        <<<proprietes['taille_initiale']>>>%
+        <<<proprietes['initiale_taille']>>>%
     }{%
-        <<<proprietes['taille_initiale']>>>}\selectfont{}%
+        <<<proprietes['initiale_taille']>>>}\selectfont{}%
     \rubrinit #1%
 }}
 
@@ -67,11 +69,21 @@
 
 \begin{document}
 
-%if proprietes['titre'] != '':
-{\centering\LARGE <<<proprietes['titre']>>>\par
+%if proprietes['aa_titre'] != '':
+{\centering\LARGE <<<proprietes['aa_titre']>>>\par
 \bigskip}
 %end
 
+\setfirstannotation{%
+    \raisebox{<<<proprietes['annotations_elevation']>>>}[1.2\height][1ex]{%
+    \footnotesize <<<proprietes['ab_type']>>>%
+    }%
+}
+\setsecondannotation{%
+    \raisebox{<<<proprietes['annotations_elevation']>>>}[1.2\height][1ex]{%
+    \footnotesize <<<proprietes['ab_mode']>>>%
+    }%
+}
 \includescore{<<<partition>>>}
 
 \end{document}

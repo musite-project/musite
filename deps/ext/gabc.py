@@ -39,19 +39,15 @@ class Document(txt.Document):
                 'pdf': (self.pdf, {
                     'couleur':
                         (_("Couleur (R,V,B)"), (154, 0, 0)),
-                    'initiale': (_("Initiale"), {
-                        'taille_initiale':
-                            (_("Taille"), 43),
-                        'elevation_initiale':
-                            (_("Élévation"), '0 pt'),
-                        'couleur_initiale':
-                            (_("Couleur"), False),
-                    }),
                     'document': (_("Document"), {
-                        'papier':
-                            (_("Taille de la page"), ('148mm', '210mm')),
-                        'titre':
+                        'aa_titre':
                             (_("Titre"), ''),
+                        'ab_mode':
+                            (_("Mode"), ''),
+                        'ab_type':
+                            (_("Type"), ''),
+                        'ba_papier':
+                            (_("Taille de la page"), ('148mm', '210mm')),
                         'marges':
                             (_("Marges"), {
                                 'marge_gauche': (_("gauche"), '20mm'),
@@ -61,27 +57,65 @@ class Document(txt.Document):
                             }),
                     }),
                     'notes': (_("Notes"), {
-                        'taille_notes':
+                        'notes_taille':
                             (_("Taille des notes"), 17),
-                        'couleur_lignes':
+                        'notes_couleur_lignes':
                             (_("Lignes en couleur"), True),
-                        'epaisseur_lignes':
+                        'notes_epaisseur_lignes':
                             (_("Épaisseur des lignes"), 20),
-                        'espace_lignes_texte':
-                            (_("Espace sous la portée"), '7 mm'),
+                        'notes_espace_lignes_texte':
+                            (_("Espace sous la portée"), '7mm'),
                     }),
                     'texte': (_("Texte"), {
-                        'taille_police':
+                        'texte_taille':
                             (_("Taille de la police"), 12),
-                        'couleur_symboles':
+                        'texte_symboles_couleur':
                             (_("Symboles en couleur"), True),
+                        'initiale': (_("Initiale"), {
+                            'initiale_taille':
+                                (_("Taille"), 43),
+                            'initiale_elevation':
+                                (_("Élévation"), '0pt'),
+                            'initiale_couleur':
+                                (_("Couleur"), False),
+                        }),
+                        'annotations': (_("Annotations"), {
+                            'annotations_espace':
+                                (_("Espace"), '0.5mm'),
+                            'annotations_elevation':
+                                (_("Espace au-dessus de l'initiale"), '1mm'),
+                        }),
                     }),
                 })
             },
             proprietes=proprietes
         )
-        self.fmt['pdf'][1]['document'][1]['titre'] = \
-            (_("Titre"), self._gabc.entetes['name'])
+        self.fmt['pdf'][1]['document'][1]['aa_titre'] = \
+            (_("Titre"), self._gabc_entete('name'))
+        mode = self._gabc_entete('mode')
+        if len(mode) == 1:
+            mode += '.'
+        self.fmt['pdf'][1]['document'][1]['ab_mode'] = \
+            (_("Mode"), mode)
+        self.fmt['pdf'][1]['document'][1]['ab_type'] = \
+            (
+                _("Type"),
+                {
+                    '':             '',
+                    'alleluia':     '',
+                    'antiphona':    'Ant.',
+                    'communio':     'Comm.',
+                    'graduale':     'Grad.',
+                    'hymnus':       'Hymn.',
+                    'introitus':    'Intr.',
+                    'offertorium':  'Off.',
+                    'responsorium': 'Resp.',
+                    'sequentia':    'Seq.',
+                    'tractus':      'Tract.',
+                    'varia':        '',
+                    'versus':       '℣.',
+                }[self._gabc_entete('office-part')]
+            )
 
     @property
     def _gabc(self):
@@ -89,6 +123,13 @@ class Document(txt.Document):
         """
         with open(self._fichier(), 'r') as fch:
             return Gabc(fch.read(-1))
+
+    def _gabc_entete(self, entete):
+        try:
+            return self._gabc.entetes[entete]
+        except KeyError as err:
+            traiter_erreur(err)
+            return ''
 
     def afficher(self):
         return self.afficher_pdf()
