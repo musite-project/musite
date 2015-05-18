@@ -183,7 +183,7 @@ def groupes():
     """Enregistrement des groupes
     """
     with open(os.path.join(cfg.ETC, 'groupes'), 'w') as grp:
-        grp.write(rq.forms.groupes)
+        grp.write(rq.forms.decode().groupes)
     b.redirect(i18n_path('/admin/utilisateurs'))
 
 
@@ -201,8 +201,9 @@ def utilisateur_suppression(nom):
 def utilisateur_ajout():
     """ Ajout d'un nouvel utilisateur à la base
     """
-    if rq.forms.mdp == rq.forms.mdp_v:
-        u.Utilisateur(rq.forms.nom, rq.forms.mdp).ajouter()
+    forms = rq.forms.decode()
+    if forms.mdp == forms.mdp_v:
+        u.Utilisateur(forms.nom, forms.mdp).ajouter()
     b.redirect(i18n_path('/admin/utilisateurs'))
 
 
@@ -253,7 +254,7 @@ def document_creer(nom, element=''):
     """ Création effective du document
     """
     if rq.forms.action == 'creer':
-        doc = rq.forms.nom.split('.')
+        doc = rq.forms.decode().nom.split('.')
         element, ext = element + '/' + '.'.join((doc[:-1])), doc[-1]
         return Document(nom, element, ext).creer()
     else:
@@ -281,7 +282,7 @@ def dossier_creer(nom, element=''):
     """ Création effective du dossier
     """
     if rq.forms.action == 'creer':
-        return Dossier(nom, '/'.join((element, rq.forms.nom))).creer()
+        return Dossier(nom, '/'.join((element, rq.forms.decode().nom))).creer()
     else:
         b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
@@ -304,8 +305,9 @@ def projet_cloner_infos():
 def projet_cloner():
     """ Clonage effectif du projet
     """
-    if rq.forms.action == 'cloner':
-        return Projet(rq.forms.nom).cloner(rq.forms.origine)
+    forms = rq.forms.decode()
+    if forms.action == 'cloner':
+        return Projet(forms.nom).cloner(forms.origine)
     else:
         b.redirect(i18n_path('/_projets'))
 
@@ -336,11 +338,12 @@ def projet_action_infos(action, nom):
 def projet_action(action, nom):
     """ Envoi/réception vers un dépôt distant
     """
-    if rq.forms.action == 'recevoir':
-        return Projet(nom).recevoir(rq.forms.origine)
-    elif rq.forms.action == 'envoyer':
+    forms = rq.forms.decode()
+    if forms.action == 'recevoir':
+        return Projet(nom).recevoir(forms.origine)
+    elif forms.action == 'envoyer':
         return Projet(nom).envoyer(
-            rq.forms.origine, rq.forms.utilisateur, rq.forms.mdp
+            forms.origine, forms.utilisateur, forms.mdp
         )
     else:
         b.redirect(Projet(nom).url)
@@ -366,7 +369,7 @@ def projet_creer():
     """ Création effective du projet
     """
     if rq.forms.action == 'creer':
-        return Projet(rq.forms.nom).creer()
+        return Projet(rq.forms.decode().nom).creer()
     else:
         b.redirect(i18n_path('/'))
 
@@ -402,14 +405,15 @@ def deplacer_infos(nom, element=None):
 def deplacer(nom, element=None):
     """ Page de création d'un document
     """
-    if rq.forms.action == "deplacer":
+    forms = rq.forms.decode()
+    if forms.action == "deplacer":
         if element:
             return Dossier(nom, element).deplacer(
-                rq.forms.destination,
-                ecraser=bool(rq.forms.ecraser)
+                forms.destination,
+                ecraser=bool(forms.ecraser)
             )
         else:
-            return Projet(nom).renommer(rq.forms.destination)
+            return Projet(nom).renommer(forms.destination)
     else:
         b.redirect(i18n_path(
             '/' + nom
@@ -443,22 +447,22 @@ def copier_infos(nom, element=None):
 def copier(nom, element=None, ext=None):
     """ Page de création d'un document
     """
-    if rq.forms.action == "copier":
+    forms = rq.forms.decode()
+    if forms.action == "copier":
         if element:
             try:
                 return Dossier(nom, element).copier(
-                    rq.forms.destination,
-                    ecraser=bool(rq.forms.ecraser)
+                    forms.destination,
+                    ecraser=bool(forms.ecraser)
                 )
             except (NotADirectoryError, FileNotFoundError) as err:
                 f.traiter_erreur(err)
-                print(nom, element, ext)
                 return Document(nom, element, ext).copier(
-                    rq.forms.destination,
-                    ecraser=bool(rq.forms.ecraser)
+                    forms.destination,
+                    ecraser=bool(forms.ecraser)
                 )
         else:
-            return Projet(nom).copier(rq.forms.destination)
+            return Projet(nom).copier(forms.destination)
     else:
         b.redirect(i18n_path(
             '/' + nom
@@ -593,7 +597,9 @@ def document_envoyer(nom, element=''):
             'corps':
                 _('Pourriez-vous expliciter votre intention ?')
                 + '<br><br>'
-                + '<br>'.join(':'.join(item) for item in rq.forms.items())
+                + '<br>'.join(
+                    ':'.join(item) for item in rq.forms.decode().items()
+                )
         }
 
 
@@ -697,7 +703,11 @@ def document_exporter_infos(nom, element='', ext=''):
 def document_exporter(nom, element='', ext=''):
     """ Page où l'utilisateur définit les propriétés du document à exporter"""
     if rq.forms.action == 'exporter':
-        return Document(nom, element, ext).exporter(rq.query.fmt, rq.forms)
+        return Document(
+            nom, element, ext
+        ).exporter(
+            rq.query.fmt, rq.forms.decode()
+        )
     else:
         b.redirect(i18n_path('/{}/{}.{}'.format(nom, element, ext)))
 
@@ -760,7 +770,7 @@ def document_enregistrer(nom, element='', ext=''):
     """Enregistrement d'un document
     """
     if rq.forms.action == 'enregistrer':
-        Document(nom, element, ext).enregistrer(rq.forms.contenu)
+        Document(nom, element, ext).enregistrer(rq.forms.decode().contenu)
     elif rq.forms.action == 'annuler':
         b.redirect(i18n_path(
             '/' + nom
@@ -772,7 +782,9 @@ def document_enregistrer(nom, element='', ext=''):
             'corps':
                 _('Pourriez-vous expliciter votre intention ?')
                 + '<br><br>'
-                + '<br>'.join(':'.join(item) for item in rq.forms.items())
+                + '<br>'.join(
+                    ':'.join(item) for item in rq.forms.decode().items()
+                )
         }
 
 

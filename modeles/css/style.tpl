@@ -147,6 +147,19 @@ table {
 font-size: 100%;
 }
 
+table.export {
+border: 1px solid black;
+}
+
+table.export table.export {
+border-top: 1px solid black;
+border-bottom: 1px solid black;
+}
+
+tr.export {
+border: none;
+}
+
 code {
 text-align: left;
 font-size: 90%;

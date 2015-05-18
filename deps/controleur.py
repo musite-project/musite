@@ -349,7 +349,6 @@ class Document:
         dest = os.path.join(cfg.DATA, destination)
         if not os.path.exists(dest) or ecraser:
             os.makedirs(os.path.dirname(dest), exist_ok=True)
-            print(self.fichier, dest)
             shutil.copy2(self.fichier, dest)
             self.depot.sauvegarder(
                 message=(
@@ -401,7 +400,7 @@ merci de signaler le problème.
             'export',
             {
                 'proprietes':
-                    EXT[self.ext].Document(self.chemin).listeproprietes[fmt]
+                    EXT[self.ext].Document(self.chemin).proprietes_detail[fmt]
             }
         ))
 

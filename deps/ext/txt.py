@@ -35,35 +35,16 @@ class Document:
         # Chemin absolu des fichiers temporaires
         self.rnd = os.path.join(cfg.TMP, motaleatoire(6))
         if formats:
-            self.proprietes = {}
             self.fmt = formats
-            listeproprietes = self.listeproprietes
-            for fmt in formats:
-                self.proprietes[fmt] = {
-                    prop: val[1]
-                    for prop, val in listeproprietes[fmt].items()
-                }
-        if proprietes:
-            for fmt in proprietes:
-                for prop, val in proprietes[fmt].items():
-                    if prop in listeproprietes[fmt]:
-                        typ = type(listeproprietes[fmt][prop][1])
-                        if typ in (str, int, float):
-                            self.proprietes[fmt][prop] = typ(val)
-                        elif typ is bool:
-                            self.proprietes[fmt][prop] = typ(int(val))
-                        elif typ in (tuple, list):
-                            if type(val) in (tuple, list):
-                                self.proprietes[fmt][prop] = val
-                            else:
-                                self.proprietes[fmt][prop] = tuple(
-                                    type(pr)(i)
-                                    for i, pr
-                                    in zip(
-                                        val.split(','),
-                                        listeproprietes[fmt][prop][1]
-                                    )
-                                )
+            self.proprietes = {}
+            for fmt in self.fmt:
+                self.proprietes[fmt] = \
+                    self._traiter_options(fmt, self.proprietes_detail[fmt])
+            if proprietes:
+                for fmt in proprietes:
+                    self._traiter_proprietes(
+                        fmt, proprietes[fmt], self.proprietes_liste[fmt]
+                    )
 
     def _fichierrelatif(self, ext=None):
         """Chemin vers un fichier portant ce nom avec une autre extension
@@ -102,6 +83,48 @@ class Document:
             '/{}/{}/'.format(chemin, indice).replace('//', '/')
         )
 
+    def _traiter_options(self, fmt, options):
+        """Options
+
+        Renvoie un dictionnaire 'à une dimension' à partir des options définies
+        dans la liste des propriétés.
+        """
+        proprietes = {}
+        for prop, val in options.items():
+            if type(val[1]) is dict:
+                proprietes = dict(
+                    proprietes, **self._traiter_options(fmt, val[1])
+                )
+            else:
+                proprietes[prop] = val[1]
+        return proprietes
+
+    def _traiter_proprietes(self, fmt, proprietes, listeproprietes):
+        """Mise en place des propriétés
+
+        Convertit les chaînes de caractères reçues de l'interface dans les
+        types de données attendus par le document.
+        """
+        for prop, val in proprietes.items():
+            if prop in listeproprietes:
+                typ = type(listeproprietes[prop])
+                if typ in (str, int, float):
+                    self.proprietes[fmt][prop] = typ(val)
+                elif typ is bool:
+                    self.proprietes[fmt][prop] = typ(int(val))
+                elif typ in (tuple, list):
+                    if type(val) in (tuple, list):
+                        self.proprietes[fmt][prop] = val
+                    else:
+                        self.proprietes[fmt][prop] = tuple(
+                            type(pr)(i)
+                            for i, pr
+                            in zip(
+                                val.split(','),
+                                listeproprietes[prop]
+                            )
+                        )
+
     @property
     def dossier(self):
         """Dossier contenant le document
@@ -115,10 +138,19 @@ class Document:
         return os.path.dirname(self._fichiertmp())
 
     @property
-    def listeproprietes(self):
-        """Liste des propriétés utiles à chaque format d'export
+    def proprietes_detail(self):
+        """Liste hiérarchisée des propriétés utiles à chaque format d'export
         """
         return {fmt: self.fmt[fmt][1] for fmt in self.fmt}
+
+    @property
+    def proprietes_liste(self):
+        """Liste non hiérarchisée des propriétés
+        """
+        listeproprietes = {}
+        for fmt, props in self.fmt.items():
+            listeproprietes[fmt] = self._traiter_options(fmt, props[1])
+        return listeproprietes
 
     def afficher(self):
         """Affichage du contenu du document

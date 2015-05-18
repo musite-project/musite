@@ -15,7 +15,6 @@
             label="{{val[0]}} :"
             placeholder="{{val[0]}}"
             value="{{val[1]}}"
-            required
         >
     %elif type(val[1]) is str:
         <input
@@ -24,7 +23,6 @@
             label="{{val[0]}} :"
             placeholder="{{val[0]}}"
             value="{{val[1]}}"
-            required
         >
     %elif type(val[1]) in (list, tuple):
         <input
@@ -33,23 +31,28 @@
             label="{{val[0]}} :"
             placeholder="{{val[0]}}"
             value="{{','.join(str(v) for v in val[1])}}"
-            required
         >
+    %elif type(val[1]) is dict:
+        %creer_tableau(val[1])
     %end
+%end
+
+%def creer_tableau(props):
+    <table class="export">
+    %for prop, val in sorted(props.items()):
+        <tr class="export">
+            <td>{{val[0]}}&nbsp</td>
+            <td>
+            %creer_input(prop, val)
+            </td>
+        </tr>
+    %end
+    </table>
 %end
 
 <div id="zonesaisie">
     <form method="post">
-        <table>
-        %for prop, val in sorted(proprietes.items()):
-            <tr>
-                <td>{{val[0]}}</td>
-                <td>
-                %creer_input(prop, val)
-                </td>
-            </tr>
-        %end
-        </table>
+        %creer_tableau(proprietes)
         <button type="submit" name="action" value="exporter">{{_("Exporter")}}</button>
         &nbsp
         <button type="submit" name="action" value="annuler">{{_("Retour")}}</button>

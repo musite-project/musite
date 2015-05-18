@@ -1,9 +1,15 @@
 \documentclass[%
-<<<proprietes['papier']>>>paper%         Taille de page.
 ,<<<proprietes['taille_police']>>>pt%    Taille de police.
-,DIV=15%                                 Plus grand => des marges plus petites.
 ]{scrartcl}
 
+\usepackage[%
+    paperwidth=<<<proprietes['papier'][0]>>>,
+    paperheight=<<<proprietes['papier'][1]>>>,
+    left=<<<proprietes['marge_gauche']>>>,
+    right=<<<proprietes['marge_droite']>>>,
+    top=<<<proprietes['marge_haut']>>>,
+    bottom=<<<proprietes['marge_bas']>>>,
+]{geometry}
 \usepackage[autocompile]{gregoriotex}
 \usepackage{libertine}
 \usepackage{xcolor}
@@ -33,7 +39,7 @@
 %end
 
 
-\def\greinitialformat#1{{%
+\def\greinitialformat#1{\raisebox{<<<proprietes['elevation_initiale']>>>}{%
     \fontsize{%
         <<<proprietes['taille_initiale']>>>%
     }{%
@@ -60,5 +66,12 @@
 
 
 \begin{document}
+
+%if proprietes['titre'] != '':
+{\centering\LARGE <<<proprietes['titre']>>>\par
+\bigskip}
+%end
+
 \includescore{<<<partition>>>}
+
 \end{document}

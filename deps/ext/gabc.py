@@ -37,21 +37,58 @@ class Document(txt.Document):
                     'transposition':        (_("Transposition"), 0),
                 }),
                 'pdf': (self.pdf, {
-                    'couleur':             (_("Couleur (R,V,B)"), (154, 0, 0)),
-                    'couleur_initiale':     (_("Initiale en couleur"), False),
-                    'couleur_lignes':       (_("Lignes en couleur"), True),
-                    'couleur_symboles':     (_("Symboles en couleur"), True),
-                    'epaisseur_lignes':     (_("Épaisseur des lignes"), 20),
-                    'espace_lignes_texte':
-                        (_("Espace sous la portée"), '7 mm'),
-                    'papier':               (_("Taille de la page"), 'a5'),
-                    'taille_initiale':      (_("Taille de l'initiale"), 43),
-                    'taille_notes':         (_("Taille des notes"), 17),
-                    'taille_police':        (_("Taille de la police"), 12),
+                    'couleur':
+                        (_("Couleur (R,V,B)"), (154, 0, 0)),
+                    'initiale': (_("Initiale"), {
+                        'taille_initiale':
+                            (_("Taille"), 43),
+                        'elevation_initiale':
+                            (_("Élévation"), '0 pt'),
+                        'couleur_initiale':
+                            (_("Couleur"), False),
+                    }),
+                    'document': (_("Document"), {
+                        'papier':
+                            (_("Taille de la page"), ('148mm', '210mm')),
+                        'titre':
+                            (_("Titre"), ''),
+                        'marges':
+                            (_("Marges"), {
+                                'marge_gauche': (_("gauche"), '20mm'),
+                                'marge_droite': (_("droite"), '20mm'),
+                                'marge_haut':   (_("haut"), '20mm'),
+                                'marge_bas':    (_("bas"), '20mm'),
+                            }),
+                    }),
+                    'notes': (_("Notes"), {
+                        'taille_notes':
+                            (_("Taille des notes"), 17),
+                        'couleur_lignes':
+                            (_("Lignes en couleur"), True),
+                        'epaisseur_lignes':
+                            (_("Épaisseur des lignes"), 20),
+                        'espace_lignes_texte':
+                            (_("Espace sous la portée"), '7 mm'),
+                    }),
+                    'texte': (_("Texte"), {
+                        'taille_police':
+                            (_("Taille de la police"), 12),
+                        'couleur_symboles':
+                            (_("Symboles en couleur"), True),
+                    }),
                 })
             },
             proprietes=proprietes
         )
+        self.fmt['pdf'][1]['document'][1]['titre'] = \
+            (_("Titre"), self._gabc.entetes['name'])
+
+    @property
+    def _gabc(self):
+        """Contenu gabc du document
+        """
+        with open(self._fichier(), 'r') as fch:
+            return Gabc(fch.read(-1))
 
     def afficher(self):
         return self.afficher_pdf()
@@ -113,17 +150,15 @@ class Document(txt.Document):
         """
         dest = destination if destination else self._fichier(fmt)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        with open(self._fichier(), 'r') as fch:
-            gabc = Gabc(fch.read(-1))
-            partition = Partition(
-                gabc=gabc.partition,
-                transposition=self.proprietes[fmt]['transposition']
-            )
-            fichier = {
-                'midi': Midi,
-                'ly':   Lily
-            }[fmt](partition, self.proprietes[fmt]['tempo'])
-            fichier.ecrire(dest)
+        partition = Partition(
+            gabc=self._gabc.partition,
+            transposition=self.proprietes[fmt]['transposition']
+        )
+        fichier = {
+            'midi': Midi,
+            'ly':   Lily
+        }[fmt](partition, self.proprietes[fmt]['tempo'])
+        fichier.ecrire(dest)
 
 
 def compiler_pdf(fichier, environnement=None):
