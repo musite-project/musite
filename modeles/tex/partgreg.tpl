@@ -5,13 +5,21 @@
 \usepackage[%
     paperwidth=<<<proprietes['ba_papier'][0]>>>,
     paperheight=<<<proprietes['ba_papier'][1]>>>,
-    left=<<<proprietes['marge_gauche']>>>,
-    right=<<<proprietes['marge_droite']>>>,
-    top=<<<proprietes['marge_haut']>>>,
-    bottom=<<<proprietes['marge_bas']>>>,
+    left=<<<proprietes['marge'][2]>>>,
+    right=<<<proprietes['marge'][3]>>>,
+    top=<<<proprietes['marge'][0]>>>,
+    bottom=<<<proprietes['marge'][1]>>>,
 ]{geometry}
 \usepackage[autocompile]{gregoriotex}
 \usepackage{libertine}
+\usepackage[%
+    activate={true,nocompatibility}%
+    ,final%
+    ,tracking=true%
+    ,factor=1100%
+    ,stretch=50%
+    ,shrink=30%
+    ]{microtype}
 \usepackage{xcolor}
 
 \pagestyle{empty}
@@ -20,6 +28,8 @@
 \setstafflinethickness{<<<proprietes['notes_epaisseur_lignes']>>>}
 \grechangedim{spacelinestext}{<<<proprietes['notes_espace_lignes_texte']>>>}{0}
 \setaboveinitialseparation{<<<proprietes['annotations_espace']>>>}{0}
+\grechangedim{beforeinitialshift}{<<<proprietes['initiale_espace'][0]>>>}{0}
+\grechangedim{afterinitialshift}{<<<proprietes['initiale_espace'][1]>>>}{0}
 
 
 \definecolor{gregoriocolor}{rgb}{%
@@ -38,6 +48,11 @@
 \let\rubrsym\rubrum
 %else:
 \def\rubrsym{}
+%end
+%if proprietes['annotations_couleur']:
+\let\rubrannot\rubrum
+%else:
+\def\rubrannot{}
 %end
 
 
@@ -76,12 +91,12 @@
 
 \setfirstannotation{%
     \raisebox{<<<proprietes['annotations_elevation']>>>}[1.2\height][1ex]{%
-    \footnotesize <<<proprietes['ab_type']>>>%
+    \rubrannot \hspace*{.2ex}\footnotesize <<<proprietes['ab_type']>>>%
     }%
 }
 \setsecondannotation{%
     \raisebox{<<<proprietes['annotations_elevation']>>>}[1.2\height][1ex]{%
-    \footnotesize <<<proprietes['ab_mode']>>>%
+    \rubrannot \hspace*{.2ex}\footnotesize <<<proprietes['ab_mode']>>>%
     }%
 }
 \includescore{<<<partition>>>}

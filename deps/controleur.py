@@ -396,11 +396,14 @@ merci de signaler le problème.
     def exporter_infos(self, fmt):
         """Informations pour l'export
         """
+        doc = EXT[self.ext].Document(self.chemin)
         return self.afficher(b.template(
             'export',
             {
+                'listeproprietes':
+                    doc.proprietes_detail[fmt],
                 'proprietes':
-                    EXT[self.ext].Document(self.chemin).proprietes_detail[fmt]
+                    doc.proprietes_liste[fmt]
             }
         ))
 

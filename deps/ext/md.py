@@ -21,6 +21,11 @@ class Document(txt.Document):
     def __init__(self, chemin, proprietes=None):
         txt.Document.__init__(
             self, chemin,
+            # Liste des formats, avec :
+            # - la méthode permettant de les créér ;
+            # - les propriétés nécessaires à cette création ;
+            # - l'intitulé correspondant à ces propriétés ;
+            # - la valeur par défaut de ces propriétés.
             formats={
                 'pdf': (self.pdf, {
                     'papier':           (_("Taille de la page"), 'a4'),

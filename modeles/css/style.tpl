@@ -154,6 +154,7 @@ border: 1px solid black;
 table.export table.export {
 border-top: 1px solid black;
 border-bottom: 1px solid black;
+width:100%;
 }
 
 tr.export {

@@ -1,4 +1,4 @@
-%def creer_input(prop, val):
+%def creer_input(prop, val, proprietes):
     %if type(val[1]) is bool:
         <input name="{{prop}}" value="0" type="hidden">
         <input
@@ -6,7 +6,7 @@
             name="{{prop}}"
             label="{{val[0]}} :"
             value="1"
-            {{"checked" if val[1] else ""}}
+            {{"checked" if proprietes[prop] else ""}}
         >
     %elif type(val[1]) in (int, float):
         <input
@@ -14,7 +14,7 @@
             name="{{prop}}"
             label="{{val[0]}} :"
             placeholder="{{val[0]}}"
-            value="{{val[1]}}"
+            value="{{proprietes[prop]}}"
         >
     %elif type(val[1]) is str:
         <input
@@ -22,7 +22,7 @@
             name="{{prop}}"
             label="{{val[0]}} :"
             placeholder="{{val[0]}}"
-            value="{{val[1]}}"
+            value="{{proprietes[prop]}}"
         >
     %elif type(val[1]) in (list, tuple):
         <input
@@ -30,20 +30,20 @@
             name="{{prop}}"
             label="{{val[0]}} :"
             placeholder="{{val[0]}}"
-            value="{{','.join(str(v) for v in val[1])}}"
+            value="{{','.join(str(v) for v in proprietes[prop])}}"
         >
     %elif type(val[1]) is dict:
-        %creer_tableau(val[1])
+        %creer_tableau(val[1], proprietes)
     %end
 %end
 
-%def creer_tableau(props):
+%def creer_tableau(listeprops, proprietes):
     <table class="export">
-    %for prop, val in sorted(props.items()):
+    %for prop, val in sorted(listeprops.items()):
         <tr class="export">
             <td>{{val[0]}}&nbsp</td>
             <td>
-            %creer_input(prop, val)
+            %creer_input(prop, val, proprietes)
             </td>
         </tr>
     %end
@@ -52,7 +52,7 @@
 
 <div id="zonesaisie">
     <form method="post">
-        %creer_tableau(proprietes)
+        %creer_tableau(listeproprietes, proprietes)
         <button type="submit" name="action" value="exporter">{{_("Exporter")}}</button>
         &nbsp
         <button type="submit" name="action" value="annuler">{{_("Retour")}}</button>

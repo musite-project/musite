@@ -27,6 +27,11 @@ class Document(txt.Document):
     def __init__(self, chemin, proprietes=None):
         txt.Document.__init__(
             self, chemin,
+            # Liste des formats, avec :
+            # - la méthode permettant de les créér ;
+            # - les propriétés nécessaires à cette création ;
+            # - l'intitulé correspondant à ces propriétés ;
+            # - la valeur par défaut de ces propriétés.
             formats={
                 'midi': (self.midi, {
                     'tempo':                (_("Tempo"), 165),
@@ -47,14 +52,15 @@ class Document(txt.Document):
                         'ab_type':
                             (_("Type"), ''),
                         'ba_papier':
-                            (_("Taille de la page"), ('148mm', '210mm')),
-                        'marges':
-                            (_("Marges"), {
-                                'marge_gauche': (_("gauche"), '20mm'),
-                                'marge_droite': (_("droite"), '20mm'),
-                                'marge_haut':   (_("haut"), '20mm'),
-                                'marge_bas':    (_("bas"), '20mm'),
-                            }),
+                            (
+                                _("Taille de la page (largeur, hauteur)"),
+                                ('148mm', '210mm')
+                            ),
+                        'marge':
+                            (
+                                _("Marges (haut, bas, gauche, droite"),
+                                ('20mm', '20mm', '20mm', '20mm')
+                            ),
                     }),
                     'notes': (_("Notes"), {
                         'notes_taille':
@@ -72,35 +78,42 @@ class Document(txt.Document):
                         'texte_symboles_couleur':
                             (_("Symboles en couleur"), True),
                         'initiale': (_("Initiale"), {
-                            'initiale_taille':
-                                (_("Taille"), 43),
-                            'initiale_elevation':
-                                (_("Élévation"), '0pt'),
                             'initiale_couleur':
                                 (_("Couleur"), False),
+                            'initiale_elevation':
+                                (_("Élévation"), '0pt'),
+                            'initiale_taille':
+                                (_("Taille"), 42),
+                            'initiale_espace':
+                                (
+                                    _("Espace (avant, après)"),
+                                    ('2.5mm', '2.5mm')
+                                )
                         }),
                         'annotations': (_("Annotations"), {
+                            'annotations_couleur':
+                                (_("Couleur"), True),
                             'annotations_espace':
                                 (_("Espace"), '0.5mm'),
                             'annotations_elevation':
-                                (_("Espace au-dessus de l'initiale"), '1mm'),
+                                (_("Espace au-dessus de l'initiale"), '1.5mm'),
                         }),
                     }),
                 })
             },
             proprietes=proprietes
         )
-        self.fmt['pdf'][1]['document'][1]['aa_titre'] = \
-            (_("Titre"), self._gabc_entete('name'))
         mode = self._gabc_entete('mode')
         if len(mode) == 1:
             mode += '.'
-        self.fmt['pdf'][1]['document'][1]['ab_mode'] = \
-            (_("Mode"), mode)
-        self.fmt['pdf'][1]['document'][1]['ab_type'] = \
-            (
-                _("Type"),
-                {
+        if not proprietes:
+            # Ces propriétés par défaut nécessitant de lire le gabc
+            # correspondant, ce qui suppose que l'instance de classe soit
+            # déjà initialisée, elles ne peuvent pas être définies ci-dessus.
+            proprietes = {
+                'aa_titre':     self._gabc_entete('name'),
+                'ab_mode':      mode,
+                'ab_type': {
                     '':             '',
                     'alleluia':     '',
                     'antiphona':    'Ant.',
@@ -115,6 +128,9 @@ class Document(txt.Document):
                     'varia':        '',
                     'versus':       '℣.',
                 }[self._gabc_entete('office-part')]
+            }
+            self.proprietes['pdf'] = self._traiter_options(
+                'pdf', self.proprietes_detail['pdf'], proprietes
             )
 
     @property
@@ -125,6 +141,11 @@ class Document(txt.Document):
             return Gabc(fch.read(-1))
 
     def _gabc_entete(self, entete):
+        """Entête d'un document gabc
+
+        Renvoie l'entête correspondante, ou bien une chaîne vide si cette
+        entête n'est pas définie.
+        """
         try:
             return self._gabc.entetes[entete]
         except KeyError as err:

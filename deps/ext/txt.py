@@ -39,7 +39,9 @@ class Document:
             self.proprietes = {}
             for fmt in self.fmt:
                 self.proprietes[fmt] = \
-                    self._traiter_options(fmt, self.proprietes_detail[fmt])
+                    self._traiter_options(
+                        fmt, self.proprietes_detail[fmt], self.proprietes
+                    )
             if proprietes:
                 for fmt in proprietes:
                     self._traiter_proprietes(
@@ -83,7 +85,7 @@ class Document:
             '/{}/{}/'.format(chemin, indice).replace('//', '/')
         )
 
-    def _traiter_options(self, fmt, options):
+    def _traiter_options(self, fmt, options, props):
         """Options
 
         Renvoie un dictionnaire 'à une dimension' à partir des options définies
@@ -93,10 +95,16 @@ class Document:
         for prop, val in options.items():
             if type(val[1]) is dict:
                 proprietes = dict(
-                    proprietes, **self._traiter_options(fmt, val[1])
+                    proprietes,
+                    **self._traiter_options(fmt, val[1], props)
                 )
             else:
-                proprietes[prop] = val[1]
+                if prop in self.proprietes:
+                    proprietes[prop] = self.proprietes[prop]
+                elif prop in props:
+                    proprietes[prop] = props[prop]
+                else:
+                    proprietes[prop] = val[1]
         return proprietes
 
     def _traiter_proprietes(self, fmt, proprietes, listeproprietes):
@@ -149,7 +157,9 @@ class Document:
         """
         listeproprietes = {}
         for fmt, props in self.fmt.items():
-            listeproprietes[fmt] = self._traiter_options(fmt, props[1])
+            listeproprietes[fmt] = self._traiter_options(
+                fmt, props[1], self.proprietes[fmt]
+            )
         return listeproprietes
 
     def afficher(self):
