@@ -27,10 +27,10 @@
             btnmidi.value = '▶';
         }
     }
+    </script>
     %end
     %except NameError: pass
     %end
-    </script>
     </head>
     %try:
     %if midi:

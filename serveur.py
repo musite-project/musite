@@ -690,6 +690,17 @@ def document_editer(nom, element='', ext=''):
     return Document(nom, element, ext).editer()
 
 
+# Édition d'un document gabc : alternative pour débutants
+@APP.get('/_gabc_editer/<nom>/<element:path>')
+@APP.get('/_gabc_editer/<nom>/<element:path>.<ext>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def document_gabc_editer(nom, element='', ext=''):
+    """ Page d'édition d'un document
+    """
+    return {'corps': b.template('jgabc')}
+
+
 # Export d'un document
 @APP.get('/_exporter/<nom>/<element:path>.<ext>')
 @page
@@ -812,7 +823,6 @@ def erreur_accesreserve(erreur):  # pylint: disable=W0613
         'corps':
             _('Accès réservé !')
             + h.BR() + h.BR()
-            + h.A('Retour à la page précédente', href=rq['HTTP_REFERER'])
     }
 
 

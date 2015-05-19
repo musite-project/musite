@@ -97,14 +97,6 @@ left:0px;
 right:51%;
 }
 
-#groupes {
-position:absolute;
-top:0px;
-bottom:0px;
-right:0px;
-left:51%;
-}
-
 A:link { text-decoration: none; color: #303030 }
 A:visited { text-decoration: none; color: #303030 }
 A:active { text-decoration: none; color: black }
@@ -196,6 +188,15 @@ color: red;
     position: absolute;
     top:auto;
     bottom:10px;
+}
+
+.btn-groups {
+  width: 30%;
+  position: absolute;
+  left: 0px;
+  right: auto;
+  top: auto;
+  bottom: auto;
 }
 
 {{ext}}
