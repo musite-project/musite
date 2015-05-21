@@ -1,4 +1,5 @@
-﻿<link rel=chrome-webstore-item" href="https://chrome.google.com/webstore/detail/mkhgaijffgijgkolifpoaijimncdakkd" />
+﻿<html>
+<link rel=chrome-webstore-item" href="https://chrome.google.com/webstore/detail/mkhgaijffgijgkolifpoaijimncdakkd" />
 <link rel="stylesheet" type="text/css" href="/static/jgabc/css/bootstrap.css" media="all" />
 <link rel="stylesheet" type="text/css" href="/static/jgabc/style.css" />
 <link rel="stylesheet" type="text/css" href="/static/jgabc/css/smoothness/jquery-ui-1.10.3.custom.min.css" />
@@ -11,18 +12,18 @@
 <script src="/static/jgabc/transcriber.html.js"></script>
 <script src="/static/jgabc/js/bootstrap.min.js"></script>
 <script src="/static/jgabc/js/main.js"></script>
-<!--/head-->
-<!--body class='sans' style='overflow:hidden'-->
 <style>
 .btn-groups {
-  width: 35%;
+  width: 380px;
+  height: 100%;
+  overflow-y: auto;
   float: left;
   margin-left: 5px;
   padding-left: 0px;
 }
 .print-hide {
-  width:65%;
-  margin-left: 420px;
+  width:auto;
+  margin-left: 385px;
 }
 textarea{
   padding:0px;
@@ -38,8 +39,8 @@ td{
   padding:0px;
 }
 #chant-parent2{
-  width:65%;
-  margin-left:420px;
+  width:auto;
+  margin-left:385px;
   height:100%;
 }
 #chant-parent{
@@ -450,15 +451,16 @@ textarea{
 <div style="margin:auto;width:10.3in;max-width:100%"><div style="margin-left:4px;margin-right:-4px">
 <table width="100%" style="margin-left:-2px;margin-top:-2px">
 <tr><td width="50%">
-  <label for="hymntext" title="This text box is for the text of the chant.  If the English checkbox is not checked it will be assumed to be Latin.">Text</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="cbElisionHasNote"/><label for="cbElisionHasNote" title="You can signify an elision in the text by putting a vowel in parentheses.  If this box is checked, the elision will still have a punctum associated with it; if this is unchecked, that syllable will have no punctum.">Use puncta for elisions</label>
-<select style="float:right;margin:0;height:24px;max-width:30%;margin-right:20px" id="selLanguage" title="If you select English, the text will be run through the lyric hyphenator at juiciobrennan.com; it will only contact this site once every 5 seconds so you may have to wait a bit at times for the word syllabification to correct itself.  Unknown words are assumed to be a single syllable, and custom syllable breaks may be entered using = as in 'syl=la=ble'">
-  <option value="la">Latin</option>
-  <option value="en">English</option>
-  <option value="pl">Polish</option>
-</select>
+  <label for="hymntext" title="This text box is for the text of the chant.  If the English checkbox is not checked it will be assumed to be Latin.">Text</label>&nbsp;&nbsp;
+  <select style="float:right;margin:0;height:24px;max-width:30%;margin-right:20px" id="selLanguage" title="If you select English, the text will be run through the lyric hyphenator at juiciobrennan.com; it will only contact this site once every 5 seconds so you may have to wait a bit at times for the word syllabification to correct itself.  Unknown words are assumed to be a single syllable, and custom syllable breaks may be entered using = as in 'syl=la=ble'">
+    <option value="la">Latin</option>
+    <option value="en">English</option>
+    <option value="pl">Polish</option>
+  </select>
 <br><div class="tap"><textarea id="hymntext" lang="la" style="height: 130pt; width: 100%;">Adoro te d(e)vote, latens Deitas,&#10;Quæ sub his figuris vere latitas;&#10;Tibi se cor meum totum subjicit,&#10;Quia te contemplans totum deficit.&#10;2. Visus, tactus, gustus in te fallitur,&#10;Sed auditu solo tuto creditur.&#10;Credo quidquid dixit Dei Filius;&#10;Nil hoc verbo veritátis verius.&#10;--&#10;Amen.</textarea></div>
 </td><td width="50%">
   <label for="hymngabc" title="This text box is for the GABC notation that would normally be in parentheses, as well as the GABC header.">GABC</label>
+  <input type="checkbox" id="cbElisionHasNote"/><label for="cbElisionHasNote" title="You can signify an elision in the text by putting a vowel in parentheses.  If this box is checked, the elision will still have a punctum associated with it; if this is unchecked, that syllable will have no punctum.">Use puncta for elisions</label>
   <br>
   <div class="tap"><textarea id="hymngabc" spellcheck="false" style="height: 130pt; width: 100%;">c4 c e g g gh g. , f e d c c. ;&#10;c e g g gh g. , f e d c c. :&#10;g g hi j ji g. , h g f e d. ;&#10;e g f e dc d. , e c d c c. ::&#10;--&#10;cdc bc.. ::</textarea></div>
 </td>
@@ -483,5 +485,4 @@ textarea{
     </div>
   </div>
 </div>
-<!--/body-->
-<!--/html-->
+</html-->

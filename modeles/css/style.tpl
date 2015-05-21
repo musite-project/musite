@@ -81,7 +81,7 @@ bottom:0px;
 left:0;
 right:10px;
 min-width:506px;
-min-height:540px;
+min-height:400px;
 overflow:auto;
 padding: 4px;
 font-size: 108%;
@@ -188,15 +188,6 @@ color: red;
     position: absolute;
     top:auto;
     bottom:10px;
-}
-
-.btn-groups {
-  width: 30%;
-  position: absolute;
-  left: 0px;
-  right: auto;
-  top: auto;
-  bottom: auto;
 }
 
 {{ext}}
