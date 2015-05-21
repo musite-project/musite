@@ -82,6 +82,7 @@ left:0;
 right:10px;
 min-width:506px;
 min-height:400px;
+height: auto;
 overflow:auto;
 padding: 4px;
 font-size: 108%;

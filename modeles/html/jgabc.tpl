@@ -14,8 +14,8 @@
 <script src="/static/jgabc/js/main.js"></script>
 <style>
 .btn-groups {
-  width: 380px;
-  height: 100%;
+  width: 370px;
+  height: auto;
   overflow-y: auto;
   float: left;
   margin-left: 5px;
@@ -41,12 +41,12 @@ td{
 #chant-parent2{
   width:auto;
   margin-left:385px;
-  height:100%;
+  height:auto;
 }
 #chant-parent{
   border:1px solid #aaa;
   overflow-y:auto;
-  height:90%;
+  height:auto;
 }
 #chant-pad{
   padding:0 0.1in;
@@ -63,14 +63,6 @@ textarea{
   float:right;
 }
 </style>
-<form id="pdfForm" method="post" >
-  <!--<input type='hidden' name='pdf' value='1'/>-->
-  <input type='hidden' name='crop' value='0'/>
-</form>
-<form id="pdfFormDirect" method="post">
-  <input type="hidden" id="pdff_gabc" name="gabc[]"/>
-  <input type="hidden" name="action" value="enregistrer"/>
-</form>
 
 
 <div style="width:100%;margin-bottom:5px" class="titre">
@@ -85,26 +77,34 @@ textarea{
 
 <div id="groupes" class="btn-groups">
     <b>Caractères spéciaux </b> <br>
-        <div style="text-align:center">
-           <button class="btn" onclick="ecriretexte('℟')">℟</button>
-           <button class="btn" onclick="ecriretexte('℣')">℣</button>
-           <button class="btn" onclick="ecriretexte('†')">†</button>
-           <button class="btn" onclick="ecriretexte('✠')">✠</button>
-           <button class="btn" onclick="ecriretexte('æ')">æ</button>
-           <button class="btn" onclick="ecriretexte('ǽ')">ǽ</button>
-           <button class="btn" onclick="ecriretexte('œ')">œ</button>
-           <button class="btn" onclick="ecriretexte('œ́')">œ́</button>
-        </div>
-        <div style="text-align:center">
+        <div style="float:left">
            <button class="btn" onclick="ecriretexte('á')">á</button>
            <button class="btn" onclick="ecriretexte('é')">é</button>
            <button class="btn" onclick="ecriretexte('í')">í</button>
+           <br>
            <button class="btn" onclick="ecriretexte('ó')">ó</button>
            <button class="btn" onclick="ecriretexte('ú')">ú</button>
            <button class="btn" onclick="ecriretexte('ý')">ý</button>
         </div>
+        <div style="float:right">
+           <button class="btn" onclick="ecriretexte('℟')">℟</button>
+           <button class="btn" onclick="ecriretexte('℣')">℣</button>
+           <br>
+           <button class="btn" onclick="ecriretexte('†')">†</button>
+           <button class="btn" onclick="ecriretexte('✠')">✠</button>
+        </div>
+        <div style="text-align:center;">
+           <button class="btn" onclick="ecriretexte('æ')">æ</button>
+           <button class="btn" onclick="ecriretexte('ǽ')">ǽ</button>
+           <br>
+           <button class="btn" onclick="ecriretexte('œ')">œ</button>
+           <button class="btn" onclick="ecriretexte('œ́')">œ́</button>
+        </div>
     <b>Palette</b>
     <div id="groupe_1" class="btn-mini-group">
+        <div style="float:right">
+                <button class="btn" onclick="ecrirepartition(' ')">Syllabe<br>suivante</button>
+        </div>
         <div style="float:left">
             <a>Hauteurs</a></br>
             <button class="btn-mini" onclick="ecrirepartition('a')"><img src="/static/jgabc/img/note1.png" class="img"></button>
@@ -121,14 +121,6 @@ textarea{
             <button class="btn-mini" onclick="ecrirepartition('l')"><img src="/static/jgabc/img/note12.png" class="img"></button>
             <button class="btn-mini" onclick="ecrirepartition('m')"><img src="/static/jgabc/img/note13.png" class="img"></button>
         </div>
-        <div style="float:right">
-            <a>Durées</a><br />
-            <div><button class="btn" onclick="ecrirepartition('.')">·</button></div>
-            <div>
-                <button class="btn" onclick="ecrirepartition('_')">−</button>
-                <button class="btn" onclick="ecrirepartition('\'')">'</button>
-            </div>
-        </div>
     </div>
 
     <br><br><br><br><br>
@@ -139,12 +131,24 @@ textarea{
             <button class="btn-mini" onclick="ecrirepartition('y')" style="font-size:18px"><img src="/static/jgabc/img/becarre.png" class="img"></button>
             <button class="btn-mini" onclick="ecrirepartition('#')" style="font-size:18px"><img src="/static/jgabc/img/dieze.png" class="img"></button>
         </div>
-        <div style="float:right">
-                <button class="btn" onclick="ecrirepartition(' ')">Syllabe suivante</button>
+        <div style="margin-left:100px">
+            <a>Durées</a><br />
+            <div>
+                <button class="btn" onclick="ecrirepartition('.')">·</button>
+                <button class="btn" onclick="ecrirepartition('_')">−</button>
+                <button class="btn" onclick="ecrirepartition('\'')">'</button>
+            </div>
+        </div>
+        <div style="margin-left:100px">
+            <a>Coupures</a><br />
+            <div>
+                <button class="btn" onclick="ecrirepartition('!')">!</button>
+                <button class="btn" onclick="ecrirepartition('/')">/</button>
+                <button class="btn" onclick="ecrirepartition('//')">//</button>
+                <button class="btn" onclick="ecrirepartition('\\ ')"> </button>
         </div>
     </div>
 
-    <br><br><br><br><br>
     <div id="groupe_3" class="btn-mini-group">
         <div style="float:left">
         <a >Neumes simples</a><br />
@@ -203,109 +207,104 @@ textarea{
                 </ul>
         </div>
         </div>
-        <div style="margin-right:10%;float:right">
-            <a>Coupures</a><br />
-            <div>
-                <button class="btn" onclick="ecrirepartition('!')">!</button>
-                <button class="btn" onclick="ecrirepartition('/')">/</button>
-                <button class="btn" onclick="ecrirepartition('//')">//</button>
-                <button class="btn" onclick="ecrirepartition('\\ ')"> </button>
-        </div>
     </div>
     <br><br><br>
-    <a >Liquescences</a><br />
-    <div class="btn-group">
-        <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume5.png" class="img"></button>
-            <ul class="dropdown-menu">
-                    <button class="btn-mini" onclick="ecrirepartition('a~')"><img src="/static/jgabc/img/note1.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('b~')"><img src="/static/jgabc/img/note2.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('c~')"><img src="/static/jgabc/img/note3.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('d~')"><img src="/static/jgabc/img/note4.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('e~')"><img src="/static/jgabc/img/note5.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('f~')"><img src="/static/jgabc/img/note6.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('g~')"><img src="/static/jgabc/img/note7.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('h~')"><img src="/static/jgabc/img/note8.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('i~')"><img src="/static/jgabc/img/note9.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('j~')"><img src="/static/jgabc/img/note10.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('k~')"><img src="/static/jgabc/img/note11.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('l~')"><img src="/static/jgabc/img/note12.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('m~')"><img src="/static/jgabc/img/note13.png" class="img"></button>
-            </ul>
-    </div>
-    <div class="btn-group">
-        <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume7.png" class="img"></button>
-            <ul class="dropdown-menu">
-                    <button class="btn-mini" onclick="ecrirepartition('a>')"><img src="/static/jgabc/img/note1.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('b>')"><img src="/static/jgabc/img/note2.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('c>')"><img src="/static/jgabc/img/note3.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('d>')"><img src="/static/jgabc/img/note4.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('e>')"><img src="/static/jgabc/img/note5.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('f>')"><img src="/static/jgabc/img/note6.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('g>')"><img src="/static/jgabc/img/note7.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('h>')"><img src="/static/jgabc/img/note8.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('i>')"><img src="/static/jgabc/img/note9.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('j>')"><img src="/static/jgabc/img/note10.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('k>')"><img src="/static/jgabc/img/note11.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('l>')"><img src="/static/jgabc/img/note12.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('m>')"><img src="/static/jgabc/img/note13.png" class="img"></button>
-            </ul>
-    </div>
-    <div class="btn-group">
-        <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume6.png" class="img"></button>
-            <ul class="dropdown-menu">
-                    <button class="btn-mini" onclick="ecrirepartition('a<')"><img src="/static/jgabc/img/note1.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('b<')"><img src="/static/jgabc/img/note2.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('c<')"><img src="/static/jgabc/img/note3.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('d<')"><img src="/static/jgabc/img/note4.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('e<')"><img src="/static/jgabc/img/note5.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('f<')"><img src="/static/jgabc/img/note6.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('g<')"><img src="/static/jgabc/img/note7.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('h<')"><img src="/static/jgabc/img/note8.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('i<')"><img src="/static/jgabc/img/note9.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('j<')"><img src="/static/jgabc/img/note10.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('k<')"><img src="/static/jgabc/img/note11.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('l<')"><img src="/static/jgabc/img/note12.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('m<')"><img src="/static/jgabc/img/note13.png" class="img"></button>
-            </ul>
-    </div>
-    <div class="btn-group">
-            <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume3.png" class="img"></button>
+    <div style="float:right">
+        <a >Liquescences</a><br />
+        <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume5.png" class="img"></button>
                 <ul class="dropdown-menu">
-                    <button class="btn-mini" onclick="ecrirepartition('A~')"><img src="/static/jgabc/img/note1.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('B~')"><img src="/static/jgabc/img/note2.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('C~')"><img src="/static/jgabc/img/note3.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('D~')"><img src="/static/jgabc/img/note4.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('E~')"><img src="/static/jgabc/img/note5.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('F~')"><img src="/static/jgabc/img/note6.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('G~')"><img src="/static/jgabc/img/note7.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('H~')"><img src="/static/jgabc/img/note8.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('I~')"><img src="/static/jgabc/img/note9.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('J~')"><img src="/static/jgabc/img/note10.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('K~')"><img src="/static/jgabc/img/note11.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('L~')"><img src="/static/jgabc/img/note12.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('M~')"><img src="/static/jgabc/img/note13.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('a~')"><img src="/static/jgabc/img/note1.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('b~')"><img src="/static/jgabc/img/note2.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('c~')"><img src="/static/jgabc/img/note3.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('d~')"><img src="/static/jgabc/img/note4.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('e~')"><img src="/static/jgabc/img/note5.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('f~')"><img src="/static/jgabc/img/note6.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('g~')"><img src="/static/jgabc/img/note7.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('h~')"><img src="/static/jgabc/img/note8.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('i~')"><img src="/static/jgabc/img/note9.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('j~')"><img src="/static/jgabc/img/note10.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('k~')"><img src="/static/jgabc/img/note11.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('l~')"><img src="/static/jgabc/img/note12.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('m~')"><img src="/static/jgabc/img/note13.png" class="img"></button>
                 </ul>
+        </div>
+        <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume7.png" class="img"></button>
+                <ul class="dropdown-menu">
+                        <button class="btn-mini" onclick="ecrirepartition('a>')"><img src="/static/jgabc/img/note1.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('b>')"><img src="/static/jgabc/img/note2.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('c>')"><img src="/static/jgabc/img/note3.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('d>')"><img src="/static/jgabc/img/note4.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('e>')"><img src="/static/jgabc/img/note5.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('f>')"><img src="/static/jgabc/img/note6.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('g>')"><img src="/static/jgabc/img/note7.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('h>')"><img src="/static/jgabc/img/note8.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('i>')"><img src="/static/jgabc/img/note9.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('j>')"><img src="/static/jgabc/img/note10.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('k>')"><img src="/static/jgabc/img/note11.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('l>')"><img src="/static/jgabc/img/note12.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('m>')"><img src="/static/jgabc/img/note13.png" class="img"></button>
+                </ul>
+        </div>
+        <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume6.png" class="img"></button>
+                <ul class="dropdown-menu">
+                        <button class="btn-mini" onclick="ecrirepartition('a<')"><img src="/static/jgabc/img/note1.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('b<')"><img src="/static/jgabc/img/note2.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('c<')"><img src="/static/jgabc/img/note3.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('d<')"><img src="/static/jgabc/img/note4.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('e<')"><img src="/static/jgabc/img/note5.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('f<')"><img src="/static/jgabc/img/note6.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('g<')"><img src="/static/jgabc/img/note7.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('h<')"><img src="/static/jgabc/img/note8.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('i<')"><img src="/static/jgabc/img/note9.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('j<')"><img src="/static/jgabc/img/note10.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('k<')"><img src="/static/jgabc/img/note11.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('l<')"><img src="/static/jgabc/img/note12.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('m<')"><img src="/static/jgabc/img/note13.png" class="img"></button>
+                </ul>
+        </div>
+        <br>
+        <div class="btn-group">
+                <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume3.png" class="img"></button>
+                    <ul class="dropdown-menu">
+                        <button class="btn-mini" onclick="ecrirepartition('A~')"><img src="/static/jgabc/img/note1.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('B~')"><img src="/static/jgabc/img/note2.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('C~')"><img src="/static/jgabc/img/note3.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('D~')"><img src="/static/jgabc/img/note4.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('E~')"><img src="/static/jgabc/img/note5.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('F~')"><img src="/static/jgabc/img/note6.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('G~')"><img src="/static/jgabc/img/note7.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('H~')"><img src="/static/jgabc/img/note8.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('I~')"><img src="/static/jgabc/img/note9.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('J~')"><img src="/static/jgabc/img/note10.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('K~')"><img src="/static/jgabc/img/note11.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('L~')"><img src="/static/jgabc/img/note12.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('M~')"><img src="/static/jgabc/img/note13.png" class="img"></button>
+                    </ul>
+        </div>
+        <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume4.png" class="img"></button>
+                <ul class="dropdown-menu">
+                        <button class="btn-mini" onclick="ecrirepartition('A>')"><img src="/static/jgabc/img/note1.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('B>')"><img src="/static/jgabc/img/note2.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('C>')"><img src="/static/jgabc/img/note3.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('D>')"><img src="/static/jgabc/img/note4.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('E>')"><img src="/static/jgabc/img/note5.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('F>')"><img src="/static/jgabc/img/note6.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('G>')"><img src="/static/jgabc/img/note7.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('H>')"><img src="/static/jgabc/img/note8.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('I>')"><img src="/static/jgabc/img/note9.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('J>')"><img src="/static/jgabc/img/note10.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('K>')"><img src="/static/jgabc/img/note11.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('L>')"><img src="/static/jgabc/img/note12.png" class="img"></button>
+                        <button class="btn-mini" onclick="ecrirepartition('M>')"><img src="/static/jgabc/img/note13.png" class="img"></button>
+                </ul>
+        </div>
     </div>
-    <div class="btn-group">
-        <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume4.png" class="img"></button>
-            <ul class="dropdown-menu">
-                    <button class="btn-mini" onclick="ecrirepartition('A>')"><img src="/static/jgabc/img/note1.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('B>')"><img src="/static/jgabc/img/note2.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('C>')"><img src="/static/jgabc/img/note3.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('D>')"><img src="/static/jgabc/img/note4.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('E>')"><img src="/static/jgabc/img/note5.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('F>')"><img src="/static/jgabc/img/note6.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('G>')"><img src="/static/jgabc/img/note7.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('H>')"><img src="/static/jgabc/img/note8.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('I>')"><img src="/static/jgabc/img/note9.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('J>')"><img src="/static/jgabc/img/note10.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('K>')"><img src="/static/jgabc/img/note11.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('L>')"><img src="/static/jgabc/img/note12.png" class="img"></button>
-                    <button class="btn-mini" onclick="ecrirepartition('M>')"><img src="/static/jgabc/img/note13.png" class="img"></button>
-            </ul>
-    </div>
-    <br><br>
-    <a >Quilisma, oriscus et strophas</a><br />
+    <div>
+    <a >Neumes spéciaux</a><br>
         <div class="btn-group">
             <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume11.png" class="img"></button>
                 <ul class="dropdown-menu">
@@ -360,6 +359,7 @@ textarea{
                                     <button class="btn-mini" onclick="ecrirepartition('mo~')"><img src="/static/jgabc/img/note13.png" class="img"></button>
                 </ul>
         </div>
+        <br>
         <div class="btn-group">
             <button class="btn dropdown-toggle" data-toggle="dropdown"><img src="/static/jgabc/img/neume10.png" class="img"></button>
                 <ul class="dropdown-menu">
@@ -414,7 +414,8 @@ textarea{
                                     <button class="btn-mini" onclick="ecrirepartition('ms<')"><img src="/static/jgabc/img/note13.png" class="img"></button>
                 </ul>
         </div>
-        <br><br/>
+    </div>
+        <br>
         <div>
             <div id="groupe_4" class="btn-mini-group" style="float:left">
                 <a >Cl&eacute;s</a><br />
@@ -485,4 +486,13 @@ textarea{
     </div>
   </div>
 </div>
+
+<form id="pdfForm" method="post" >
+  <!--<input type='hidden' name='pdf' value='1'/>-->
+  <input type='hidden' name='crop' value='0'/>
+</form>
+<form id="pdfFormDirect" method="post">
+  <input type="hidden" id="pdff_gabc" name="gabc[]"/>
+  <input type="hidden" name="action" value="enregistrer"/>
+</form>
 </html-->
