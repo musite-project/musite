@@ -28,14 +28,23 @@ class Document(txt.Document):
             # - la valeur par défaut de ces propriétés.
             formats={
                 'pdf': (self.pdf, {
-                    'papier':           (_("Taille de la page"), 'a4'),
-                    'marge':
-                        (
-                            _("Marges (haut, bas, gauche, droite)"),
-                            ('20mm', '20mm', '20mm', '20mm')
-                        ),
-                    'police':           (_("Police"), 'libertine'),
-                    'taillepolice':     (_("Taille de la police"), '12pt'),
+                    'document': (_("Document"), {
+                        'ba_papier':
+                            (_("Taille de la page"), 'a4'),
+                        'marge':
+                            (
+                                _("Marges (haut, bas, gauche, droite)"),
+                                ('25mm', '35mm', '25mm', '25mm')
+                            ),
+                        'page_numero':
+                            (_("Numéros de page"), True),
+                    }),
+                    'police': (_("Police"), {
+                        'police_famille':
+                            (_("Nom"), 'libertine'),
+                        'police_taille':
+                            (_("Taille de la police"), '12pt'),
+                    })
                 }),
                 'reveal.js': (self.revealjs, {
                     'theme':            (_("Thème"), 'black')
@@ -96,23 +105,33 @@ class Document(txt.Document):
         if ext == 'pdf':
             arguments = [
                 '--latex-engine=lualatex',
-                '--variable=documentclass:scrbook',
-                '--variable=fontfamily:'
-                + self.proprietes['pdf']['police'],
-                '--variable=fontsize:'
-                + self.proprietes['pdf']['taillepolice'],
-                '--variable=papersize:'
-                + self.proprietes['pdf']['papier']
-                + 'paper',
-                "--variable=geometry:top="
-                + self.proprietes['pdf']['marge'][0],
-                "--variable=geometry:bottom="
-                + self.proprietes['pdf']['marge'][1],
-                "--variable=geometry:left="
-                + self.proprietes['pdf']['marge'][2],
-                "--variable=geometry:right="
-                + self.proprietes['pdf']['marge'][3],
+                '--variable=documentclass:scrartcl',
+                '--variable=fontfamily:' +
+                self.proprietes['pdf']['police_famille'],
+                '--variable=fontsize:' +
+                self.proprietes['pdf']['police_taille'],
+                '--variable=papersize:' +
+                self.proprietes['pdf']['ba_papier'] +
+                'paper',
+                "--variable=geometry:top=" +
+                self.proprietes['pdf']['marge'][0],
+                "--variable=geometry:bottom=" +
+                self.proprietes['pdf']['marge'][1],
+                "--variable=geometry:left=" +
+                self.proprietes['pdf']['marge'][2],
+                "--variable=geometry:right=" +
+                self.proprietes['pdf']['marge'][3],
             ]
+            if not self.proprietes['pdf']['page_numero']:
+                arguments.append(
+                    '--variable=header-includes:' +
+                    "\\pagestyle{empty}"
+                )
+                arguments.append(
+                    '--variable=include-before:' +
+                    "\\thispagestyle{empty}"
+                )
+            print(arguments)
         if ext == 'html':
             arguments = []
             if fmt == 'revealjs':
