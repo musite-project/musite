@@ -35,7 +35,7 @@ class Document(txt.Document):
                             ('20mm', '20mm', '20mm', '20mm')
                         ),
                     'police':           (_("Police"), 'libertine'),
-                    'taillepolice':     (_("Taille de la police"), '12'),
+                    'taillepolice':     (_("Taille de la police"), '12pt'),
                 }),
                 'reveal.js': (self.revealjs, {
                     'theme':            (_("Thème"), 'black')
@@ -96,6 +96,7 @@ class Document(txt.Document):
         if ext == 'pdf':
             arguments = [
                 '--latex-engine=lualatex',
+                '--variable=documentclass:scrbook',
                 '--variable=fontfamily:'
                 + self.proprietes['pdf']['police'],
                 '--variable=fontsize:'
