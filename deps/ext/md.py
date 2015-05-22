@@ -121,6 +121,8 @@ class Document(txt.Document):
                 self.proprietes['pdf']['marge'][2],
                 "--variable=geometry:right=" +
                 self.proprietes['pdf']['marge'][3],
+                '--variable=include-before:' +
+                '\\widowpenalty=10000\\clubpenalty=10000',
             ]
             if not self.proprietes['pdf']['page_numero']:
                 arguments.append(
@@ -131,7 +133,6 @@ class Document(txt.Document):
                     '--variable=include-before:' +
                     "\\thispagestyle{empty}"
                 )
-            print(arguments)
         if ext == 'html':
             arguments = []
             if fmt == 'revealjs':
