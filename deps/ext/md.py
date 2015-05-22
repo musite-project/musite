@@ -29,6 +29,12 @@ class Document(txt.Document):
             formats={
                 'pdf': (self.pdf, {
                     'papier':           (_("Taille de la page"), 'a4'),
+                    'marge':
+                        (
+                            _("Marges (haut, bas, gauche, droite)"),
+                            ('20mm', '20mm', '20mm', '20mm')
+                        ),
+                    'police':           (_("Police"), 'libertine'),
                     'taillepolice':     (_("Taille de la police"), '12'),
                 }),
                 'reveal.js': (self.revealjs, {
@@ -89,11 +95,22 @@ class Document(txt.Document):
         arguments = []
         if ext == 'pdf':
             arguments = [
+                '--latex-engine=lualatex',
+                '--variable=fontfamily:'
+                + self.proprietes['pdf']['police'],
                 '--variable=fontsize:'
                 + self.proprietes['pdf']['taillepolice'],
                 '--variable=papersize:'
                 + self.proprietes['pdf']['papier']
                 + 'paper',
+                "--variable=geometry:top="
+                + self.proprietes['pdf']['marge'][0],
+                "--variable=geometry:bottom="
+                + self.proprietes['pdf']['marge'][1],
+                "--variable=geometry:left="
+                + self.proprietes['pdf']['marge'][2],
+                "--variable=geometry:right="
+                + self.proprietes['pdf']['marge'][3],
             ]
         if ext == 'html':
             arguments = []
