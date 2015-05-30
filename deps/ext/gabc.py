@@ -58,7 +58,7 @@ class Document(txt.Document):
                             ),
                         'marge':
                             (
-                                _("Marges (haut, bas, gauche, droite"),
+                                _("Marges (haut, bas, gauche, droite)"),
                                 ('20mm', '20mm', '20mm', '20mm')
                             ),
                     }),
@@ -106,6 +106,25 @@ class Document(txt.Document):
         mode = self._gabc_entete('mode')
         if len(mode) == 1:
             mode += '.'
+        try:
+            type_piece = {
+                '':             '',
+                'alleluia':     '',
+                'antiphona':    'Ant.',
+                'communio':     'Comm.',
+                'graduale':     'Grad.',
+                'hymnus':       'Hymn.',
+                'introitus':    'Intr.',
+                'offertorium':  'Off.',
+                'responsorium': 'Resp.',
+                'sequentia':    'Seq.',
+                'tractus':      'Tract.',
+                'varia':        '',
+                'versus':       '℣.',
+            }[self._gabc_entete('office-part')]
+        except KeyError as err:
+            traiter_erreur(err)
+            type_piece = ''
         if not proprietes:
             # Ces propriétés par défaut nécessitant de lire le gabc
             # correspondant, ce qui suppose que l'instance de classe soit
@@ -113,21 +132,7 @@ class Document(txt.Document):
             proprietes = {
                 'aa_titre':     self._gabc_entete('name'),
                 'ab_mode':      mode,
-                'ab_type': {
-                    '':             '',
-                    'alleluia':     '',
-                    'antiphona':    'Ant.',
-                    'communio':     'Comm.',
-                    'graduale':     'Grad.',
-                    'hymnus':       'Hymn.',
-                    'introitus':    'Intr.',
-                    'offertorium':  'Off.',
-                    'responsorium': 'Resp.',
-                    'sequentia':    'Seq.',
-                    'tractus':      'Tract.',
-                    'varia':        '',
-                    'versus':       '℣.',
-                }[self._gabc_entete('office-part')]
+                'ab_type':      type_piece
             }
             self.proprietes['pdf'] = self._traiter_options(
                 'pdf', self.proprietes_detail['pdf'], proprietes
@@ -152,6 +157,9 @@ class Document(txt.Document):
             traiter_erreur(err)
             return ''
 
+    def partition(self, transposition=None):
+        return self._gabc.partition(transposition=transposition)
+
     def afficher(self):
         return self.afficher_pdf()
 
@@ -174,13 +182,13 @@ class Document(txt.Document):
     def ly(self, chemin=False, indice=''):  # pylint: disable=C0103
         """Format lilypond
         """
-        return self.gabc('ly', chemin, indice)
+        return self.gabc(fmt='ly', chemin=chemin, indice=indice)
 
     def midi(self, chemin=False, indice=''):
         """Format midi
         """
         try:
-            return self.gabc('midi', chemin, indice)
+            return self.gabc(fmt='midi', chemin=chemin, indice=indice)
         except ErreurCompilation as err:
             traiter_erreur(err)
 
@@ -212,14 +220,15 @@ class Document(txt.Document):
         """
         dest = destination if destination else self._fichier(fmt)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        partition = Partition(
-            gabc=self._gabc.partition,
-            transposition=self.proprietes[fmt]['transposition']
-        )
         fichier = {
             'midi': Midi,
             'ly':   Lily
-        }[fmt](partition, self.proprietes[fmt]['tempo'])
+        }[fmt](
+            partition=self.partition(
+                transposition=self.proprietes[fmt]['transposition']
+            ),
+            tempo=self.proprietes[fmt]['tempo']
+        )
         fichier.ecrire(dest)
 
 

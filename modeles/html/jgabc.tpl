@@ -458,12 +458,12 @@ textarea{
     <option value="en">English</option>
     <option value="pl">Polish</option>
   </select>
-<br><div class="tap"><textarea id="hymntext" lang="la" style="height: 130pt; width: 100%;">Adoro te d(e)vote, latens Deitas,&#10;Quæ sub his figuris vere latitas;&#10;Tibi se cor meum totum subjicit,&#10;Quia te contemplans totum deficit.&#10;2. Visus, tactus, gustus in te fallitur,&#10;Sed auditu solo tuto creditur.&#10;Credo quidquid dixit Dei Filius;&#10;Nil hoc verbo veritátis verius.&#10;--&#10;Amen.</textarea></div>
+<br><div class="tap"><textarea id="hymntext" lang="la" style="height: 130pt; width: 100%; text-align:left;">{{paroles}}</textarea></div>
 </td><td width="50%">
   <label for="hymngabc" title="This text box is for the GABC notation that would normally be in parentheses, as well as the GABC header.">GABC</label>
   <input type="checkbox" id="cbElisionHasNote"/><label for="cbElisionHasNote" title="You can signify an elision in the text by putting a vowel in parentheses.  If this box is checked, the elision will still have a punctum associated with it; if this is unchecked, that syllable will have no punctum.">Use puncta for elisions</label>
   <br>
-  <div class="tap"><textarea id="hymngabc" spellcheck="false" style="height: 130pt; width: 100%;">c4 c e g g gh g. , f e d c c. ;&#10;c e g g gh g. , f e d c c. :&#10;g g hi j ji g. , h g f e d. ;&#10;e g f e dc d. , e c d c c. ::&#10;--&#10;cdc bc.. ::</textarea></div>
+  <div class="tap"><textarea id="hymngabc" spellcheck="false" style="height: 130pt; width: 100%; text-align:left;">{{melodie}}</textarea></div>
 </td>
 </table>
 </div>

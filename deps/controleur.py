@@ -154,12 +154,11 @@ class Document:
     """
     def __init__(self, projet, element, ext):
         self.projet = projet
-        self.element = element
         self.ext = ext
         self.chemin = '/'.join((projet, element + ('.' + ext if ext else '')))
         self.fichier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
         self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
-        self.depot = Depot(self.projet)
+        self.document = EXT[self.ext].Document(self.chemin)
 
     def afficher(self, contenu):
         """Propriétés communes des pages de gestion de documents
@@ -188,7 +187,7 @@ class Document:
         try:
             exports = {
                 fmt: self.chemin + '?fmt=' + fmt
-                for fmt in EXT[self.ext].Document(self.chemin).proprietes
+                for fmt in self.document.proprietes
             }
         except (AttributeError, KeyError) as err:
             f.traiter_erreur(err)
@@ -196,7 +195,7 @@ class Document:
             # de format d'export.
             exports = {}
         try:
-            midi = EXT[self.ext].Document(self.chemin).midi()
+            midi = self.document.midi()
         except (AttributeError, KeyError) as err:
             f.traiter_erreur(err)
             # Cette exception est levée quand le module concerné ne définit pas
@@ -222,7 +221,7 @@ class Document:
         """
         try:
             return self.afficher(
-                EXT[self.ext].Document(self.chemin).afficher()
+                self.document.afficher()
             )
         except (KeyError, AttributeError) as err:
             f.traiter_erreur(err)
@@ -247,7 +246,7 @@ class Document:
         """
         try:
             return self.afficher(
-                EXT[self.ext].Document(self.chemin).afficher_source()
+                self.document.afficher_source()
             )
         except (KeyError, AttributeError) as err:
             f.traiter_erreur(err)
@@ -288,7 +287,7 @@ class Document:
         """Suppression du document
         """
         try:
-            EXT[self.ext].Document(self.chemin).supprimer()
+            self.document.supprimer()
         except KeyError as err:
             f.traiter_erreur(err)
             TXT.Document(self.chemin).supprimer()
@@ -302,7 +301,7 @@ class Document:
         """
         try:
             return self.afficher(
-                EXT[self.ext].Document(self.chemin).editer(creation)
+                self.document.editer(creation)
             )
         except KeyError as err:
             f.traiter_erreur(err)
@@ -332,7 +331,7 @@ class Document:
         """Enregistrement du document
         """
         try:
-            EXT[self.ext].Document(self.chemin).enregistrer(contenu)
+            self.document.enregistrer(contenu)
         except (AttributeError, KeyError) as err:
             f.traiter_erreur(err)
             TXT.Document(self.chemin).enregistrer(self.chemin)
@@ -396,14 +395,13 @@ merci de signaler le problème.
     def exporter_infos(self, fmt):
         """Informations pour l'export
         """
-        doc = EXT[self.ext].Document(self.chemin)
         return self.afficher(b.template(
             'export',
             {
                 'listeproprietes':
-                    doc.proprietes_detail[fmt],
+                    self.document.proprietes_detail[fmt],
                 'proprietes':
-                    doc.proprietes_liste[fmt]
+                    self.document.proprietes_liste[fmt]
             }
         ))
 
@@ -489,7 +487,7 @@ class Dossier:
         dest = os.path.join(cfg.DATA, destination)
         if not os.path.exists(dest) or ecraser:
             shutil.move(self.dossier, dest)
-            self.depot.sauvegarder(
+            self.projet.depot.sauvegarder(
                 message=(
                     self.nom
                     + ' -> ' + '/'.join(destination.split('/')[1:])
@@ -503,7 +501,7 @@ class Dossier:
         dest = os.path.join(cfg.DATA, destination)
         if not os.path.exists(dest) or ecraser:
             shutil.copytree(self.dossier, dest)
-            self.depot.sauvegarder(
+            self.projet.depot.sauvegarder(
                 message=(
                     _('copie')
                     + ' ' + self.nom
@@ -526,7 +524,7 @@ class Dossier:
         """
         try:
             fichier.save(self.dossier, int(ecraser))
-            self.depot.sauvegarder(
+            self.projet.depot.sauvegarder(
                 message=str(_(
                     "Envoi du fichier {}".format(fichier.filename)
                 ))
@@ -755,3 +753,31 @@ class Projet(Dossier):
             # Cette exception est levée quand le projet n'existe pas.
             return self.afficher(_('''C'est drôle, ce que vous me demandez :
                 il n'y a pas de projet ici !'''), suppression=True)
+
+
+class DocumentGabc(Document):
+    """Gestion des documents gabc
+
+    Cet objet est rendu nécessaire du fait de l'interface d'édition
+    spécifique au gabc.
+    """
+    def __init__(self, projet, element, ext):
+        Document.__init__(self, projet, element, ext)
+
+    def editer_gabc(self, creation=False):
+        try:
+            return self.afficher(b.template(
+                'jgabc',
+                paroles=self.document.partition().texte,
+                melodie=self.document.partition().gabc,
+            ))
+        except FileNotFoundError:
+            if creation:
+                return self.afficher(b.template(
+                    'jgabc',
+                    texte=self.document.partition().texte,
+                    melodie=self.document.partition().gabc,
+                ))
+            else:
+                b.abort(404)
+

@@ -19,18 +19,20 @@ __license__ = 'MIT'
 
 import os
 import sys
+
 LIB = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'deps')
 sys.path.insert(0, LIB)
 import bottle as b
 from bottle import request as rq
 from deps.i18n import I18NPlugin as Traduction
-from deps.controleur import Document, Dossier, Projet
+from deps import HTMLTags as h
+from deps.mistune import markdown
+
+from deps.controleur import Projet, Dossier, Document, DocumentGabc
 from deps import outils as f
 from deps.outils import i18n_path, _
 from deps import auth as a
 from deps import utilisateurs as u
-from deps import HTMLTags as h
-from deps.mistune import markdown
 from etc import config as cfg
 
 
@@ -698,7 +700,7 @@ def document_editer(nom, element='', ext=''):
 def document_gabc_editer(nom, element='', ext=''):
     """ Page d'édition d'un document
     """
-    return {'corps': b.template('jgabc')}
+    return DocumentGabc(nom, element, ext).editer_gabc()
 
 
 # Export d'un document
