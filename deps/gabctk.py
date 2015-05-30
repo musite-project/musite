@@ -277,7 +277,10 @@ class Gabc:
     def entetes(self):
         """En-têtes du gabc, sous forme d'un dictionnaire"""
         resultat = {
-            info[0]: ':'.join(info[1:]).replace(';', '').replace('\r', '')
+            info[0]: re.sub(
+                '^ +| +$', '',
+                ':'.join(info[1:]).replace(';', '').replace('\r', '')
+            )
             for info in [
                 ligne.split(':')
                 for ligne in self.parties[0].split('\n')
@@ -643,7 +646,7 @@ class Neume(list):
             SigneRythmique: re.compile("[_.'w~]"),
             NoteSpeciale:   re.compile("[osvOSV]"),
             Barre:          re.compile("[`,;:]"),
-            Alteration:     re.compile("[xy]"),
+            Alteration:     re.compile("[xy#]"),
             Coupure:        re.compile("[/ ]"),
             Custo:          re.compile("\+"),
             Fin:            re.compile("z"),
@@ -738,19 +741,20 @@ class Alteration(Signe):
         self.neume.pop()
 
     @property
-    def bemol(self):
-        """Liste des bémols
+    def alterations(self):
+        """Liste des altérations
 
-        Sous forme d'une chaîne de caractères.
+        Sous forme d'un dictionnaire, où les notes marquées d'un bémol sont
+        associées à la valeur -1, marquées d'un dièze à 1, les autres à 0.
         """
         try:
-            bemol = self.precedent.bemol
+            alterations = self.precedent.alterations
         except AttributeError:
-            bemol = ''
-        if self.gabc[1] == 'x':
-            return bemol + self.gabc[0]
-        elif self.gabc == 'y':
-            return bemol.replace(self.gabc[0], '')
+            alterations = {
+                chr(lettre): 0 for lettre in range(ord('a'), ord('p') + 1)
+            }
+        alterations[self.gabc[0]] = {'x': -1, 'y': 0, '#': 1}[self.gabc[1]]
+        return alterations
 
 
 class Barre(Signe):
@@ -1049,14 +1053,17 @@ class Note(Signe):
         # N.B : c1, f1 et f2 n'existent pas normalement, mais cela ne
         # nous regarde pas !
         cle = self.neume.syllabe.mot.cle.gabc
+        alterations = {
+                chr(lettre):0 for lettre in range(ord('a'), ord('p') + 1)
+            }
         try:
-            bmol = self.bemol if self.bemol else ''
+            alterations = self.alterations if self.alterations else alterations
         except AttributeError:
-            bmol = ''
+            pass
         # Traitement des bémols à la clé.
         if len(cle) == 3:
             cle = cle[0] + cle[2]
-            bmol += {
+            alterations[{
                 "c4": 'bi',
                 "c3": 'g',
                 "c2": 'el',
@@ -1065,7 +1072,7 @@ class Note(Signe):
                 "f3": 'dk',
                 "f2": 'bi',
                 "f1": 'g'
-            }[cle]
+            }[cle]] = -1
         decalage = {
             "c4": 0,
             "c3": 2,
@@ -1089,18 +1096,14 @@ class Note(Signe):
             hauteurs[j] = gamme['hauteurs'][i] + octve
         lettre = gabc.lower()[0]
         hauteur = hauteurs[lettre]
+        hauteur += alterations[lettre]
         # Si la note est altérée par un bémol, l'abaisser d'un demi-ton.
         # N.B : le grégorien n'admet que le si bémol, mais il n'y avait
         # pas de raison de se limiter à ce dernier. Cependant, on
         # renvoie un avertissement si un autre bémol est rencontré, car
         # il peut s'agir d'une erreur.
-        try:
-            if lettre in bmol:
-                if notes[lettre] != 'si':
-                    sys.stderr.write(notes[lettre] + ' bémol rencontré')
-                hauteur -= 1
-        except AttributeError:
-            pass
+        if alterations[lettre] == -1 and notes[lettre] != 'si':
+            sys.stderr.write(notes[lettre] + ' bémol rencontré')
         return hauteur
 
 
