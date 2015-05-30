@@ -178,6 +178,8 @@ class Document:
                 actions[_('Déplacer')] = '_deplacer/' + self.chemin
                 actions[_('Éditer')] = '_editer/' + self.chemin
                 actions[_('Supprimer')] = '_supprimer/' + self.chemin
+                if self.ext == 'gabc':
+                    actions[_('Éditer gabc')] = '_gabc_editer/' + self.chemin
         except TypeError as err:
             f.traiter_erreur(err)
         liens = {
