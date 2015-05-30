@@ -339,7 +339,10 @@ class Document:
             os.path.join(
                 cfg.DATA, self.projet
             )
-        ).sauvegardefichier(f.Fichier(self.fichier), rq.auth[0])
+        ).sauvegardefichier(
+            f.Fichier(self.fichier),
+            rq.auth[0] if rq.auth else _('anonyme')
+        )
         b.redirect(i18n_path('/' + self.chemin))
 
     def copier(self, destination, ecraser=False):
@@ -768,15 +771,25 @@ class DocumentGabc(Document):
         try:
             return self.afficher(b.template(
                 'jgabc',
-                paroles=self.document.partition().texte,
+                emplacement=self.document.chemin,
+                paroles=re.sub('  +', ' ', self.document.partition().texte),
                 melodie=self.document.partition().gabc,
+                entetes='\n'.join(
+                    '{}:{};'.format(entete, valeur)
+                    for entete, valeur in self.document.entetes.items()
+                )
             ))
         except FileNotFoundError:
             if creation:
                 return self.afficher(b.template(
                     'jgabc',
-                    texte=self.document.partition().texte,
+                    emplacement=self.document.chemin,
+                    paroles=re.sub('  +', ' ', self.document.partition().texte),
                     melodie=self.document.partition().gabc,
+                    entetes='\n'.join(
+                        '{}:{};'.format(entete, valeur)
+                        for entete, valeur in self.document.entetes.items()
+                    )
                 ))
             else:
                 b.abort(404)

@@ -157,6 +157,10 @@ class Document(txt.Document):
             traiter_erreur(err)
             return ''
 
+    @property
+    def entetes(self):
+        return self._gabc.entetes
+
     def partition(self, transposition=None):
         return self._gabc.partition(transposition=transposition)
 
@@ -224,6 +228,7 @@ class Document(txt.Document):
             'midi': Midi,
             'ly':   Lily
         }[fmt](
+            titre=self._gabc_entete('name'),
             partition=self.partition(
                 transposition=self.proprietes[fmt]['transposition']
             ),

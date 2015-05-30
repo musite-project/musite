@@ -33,7 +33,7 @@
 </div>
 
 %if ext != 'gabc':
-<script src="/static/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/jquery/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 %if ext in ['tex', 'sty']:
 <script src="/static/js/ace/mode-tex.js" type="text/javascript" charset="utf-8"></script>
