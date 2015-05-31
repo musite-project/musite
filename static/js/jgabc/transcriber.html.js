@@ -444,21 +444,8 @@ $(function() {
     if(!header.name) header.name = '';
     return gabc = header + gabc.slice(header.original.length);
   }
-  //~ $('#lnkPdf').click(function(e){
-    //~ var result=getGabc();
-    //~ if(e && typeof(e.preventDefault)=="function"){
-      //~ e.preventDefault();
-    //~ }
-    //~ $('#pdfForm').submit();
-  //~ });
-  $('#lnkPdf').click(function(e){
-    var result=getGabc();
-    if(e && typeof(e.preventDefault)=="function"){
-      e.preventDefault();
-    }
-    $('#pdfForm').append($('<input type="hidden" name="contenu"/>').val(result)).submit();
-  });
   $('#lnkPdfDirect').click(function(e){
+    window.onbeforeunload = null
     var gabcs=[getGabc()];
     if(e && typeof(e.preventDefault)=="function"){
       e.preventDefault();

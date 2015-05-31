@@ -10,7 +10,7 @@ http://gregorio-project.github.io/
 from . import txt, tex
 from etc import config as cfg
 from deps.outils import templateperso, url, traiter_erreur, _
-from deps.gabctk import Gabc, Lily, Midi, Partition
+from deps.gabctk import Gabc, Lily, Midi
 import os
 import shutil
 
@@ -159,9 +159,17 @@ class Document(txt.Document):
 
     @property
     def entetes(self):
+        """Entêtes d'un document gabc
+
+        Renvoie le dictionnaire contenant les entêtes.
+        """
         return self._gabc.entetes
 
     def partition(self, transposition=None):
+        """Partition extraite du gabc
+
+        Renvoie un objet partition défini dans gabctk
+        """
         return self._gabc.partition(transposition=transposition)
 
     def afficher(self):

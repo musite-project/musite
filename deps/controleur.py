@@ -159,6 +159,7 @@ class Document:
         self.fichier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
         self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
         self.document = EXT[self.ext].Document(self.chemin)
+        self.depot = Depot(self.projet)
 
     def afficher(self, contenu):
         """Propriétés communes des pages de gestion de documents
@@ -337,13 +338,9 @@ class Document:
         except (AttributeError, KeyError) as err:
             f.traiter_erreur(err)
             TXT.Document(self.chemin).enregistrer(self.chemin)
-        f.Depot(
-            os.path.join(
-                cfg.DATA, self.projet
-            )
-        ).sauvegardefichier(
-            f.Fichier(self.fichier),
-            rq.auth[0] if rq.auth else _('anonyme')
+        self.depot.sauvegarder(
+            fichier = f.Fichier(self.fichier),
+            message = os.path.basename(self.fichier)
         )
         b.redirect(i18n_path('/' + self.chemin))
 
@@ -620,11 +617,7 @@ class Dossier:
         """Suppression d'un dossier et de son contenu
         """
         shutil.rmtree(self.dossier, ignore_errors=True)
-        f.Depot(
-            os.path.join(
-                cfg.DATA, self.projet
-            )
-        ).sauvegardecomplete(
+        self.depot.sauvegardecomplete(
             _('Suppression du dossier {}').format(self.chemin),
             rq.auth[0]
         )

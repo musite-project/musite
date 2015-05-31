@@ -778,6 +778,7 @@ def document_afficher(nom, element=None, ext=None):
 # Enregistrement des documents après édition
 @APP.post('/<nom>/<element:path>')
 @APP.post('/<nom>/<element:path>.<ext>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
 def document_enregistrer(nom, element='', ext=''):
     """Enregistrement d'un document

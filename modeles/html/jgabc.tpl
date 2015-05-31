@@ -11,6 +11,11 @@
 <script src="/static/js/jgabc/sink.js"></script>
 <script src="/static/js/jgabc/audiolet.js"></script>
 <script src="/static/js/jgabc/transcriber.html.js"></script>
+<script type="text/javascript">
+    window.onbeforeunload = function(){
+        return "Attention : si vous quittez cette page, vos modifications seront perdues.";
+};
+</script>
 <style>
 .btn-groups {
   width: 370px;
@@ -491,10 +496,6 @@ textarea{
   </div>
 </div>
 
-<form id="pdfForm" method="post" >
-  <!--<input type='hidden' name='pdf' value='1'/>-->
-  <input type='hidden' name='crop' value='0'/>
-</form>
 <form id="pdfFormDirect" method="post" action={{i18n_path('/' + emplacement)}}>
   <input type="hidden" id="pdff_gabc" name="gabc[]"/>
   <input type="hidden" name="action" value="enregistrer"/>
