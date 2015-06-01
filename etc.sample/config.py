@@ -12,7 +12,7 @@ from pathlib import Path
 TITRE = 'Musite'
 
 HOTE = '0.0.0.0'
-PORT = 8080
+PORT = 8081
 
 PWD = Path(os.path.realpath(__file__)).parents[1]
 ETC = PWD / 'etc'
