@@ -4,9 +4,10 @@ data/
 etc/groupes
 etc/utilisateurs
 log
-static/pdf/
-static/midi/
+static/archive/
 static/ly/
+static/midi/
+static/pdf/
 tmp/
 test.py
 rapport_pylint

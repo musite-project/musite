@@ -14,7 +14,7 @@ from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 from . import outils as f
-from .outils import i18n_path, _
+from .outils import i18n_path, url, motaleatoire, _
 from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
@@ -453,7 +453,9 @@ class Dossier:
         C'est ici qu'il faut définir ce qui est commun à toutes les pages
         proposant une opération sur un dossier.
         """
-        actions = {}
+        actions = {
+            _('Télécharger'): '_telechargerdossier/' + self.chemin,
+        }
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]) and not suppression:
                 actions[_('Créer document')] = '_creer/' + self.chemin
@@ -623,6 +625,31 @@ class Dossier:
         )
         return self.afficher(_('Dossier supprimé !'))
 
+    def telecharger(self):
+        """Téléchargement d'un dossier sous forme d'archive
+        """
+        rnd = os.path.join(cfg.STATIC, 'archive', motaleatoire(6))
+        dossier = re.sub('/$', '', self.dossier)
+        archive = os.path.basename(dossier)
+        dossier = os.path.dirname(dossier)
+        os.makedirs(rnd, exist_ok=True)
+        try:
+            os.chdir(rnd)
+            shutil.make_archive(
+                archive,
+                'zip',
+                root_dir=dossier,
+                base_dir=archive
+            )
+        finally:
+            os.chdir(cfg.PWD)
+        b.redirect(
+            i18n_path(
+                '/{}/{}.zip?action=telecharger'.format(url(rnd), archive)
+                .replace('//','/')
+            )
+        )
+
 
 class Projet(Dossier):
     """Gestion des projets
@@ -640,7 +667,10 @@ class Projet(Dossier):
         C'est ici qu'il faut définir ce qui est commun à toutes les pages
         proposant une opération sur un projet.
         """
-        actions = {_('Historique'): '_historique/' + self.chemin}
+        actions = {
+            _('Historique'): '_historique/' + self.chemin,
+            _('Télécharger'): '_telechargerdossier/' + self.projet,
+        }
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 if not suppression:

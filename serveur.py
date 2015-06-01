@@ -289,6 +289,15 @@ def dossier_creer(nom, element=''):
         b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
+@APP.get('/_telechargerdossier/<nom>')
+@APP.get('/_telechargerdossier/<nom>/<element:path>')
+@page
+def dossier_creer_infos(nom, element=''):
+    """ Page de téléchargement d'un dossier
+    """
+    return Dossier(nom, element).telecharger()
+
+
 @APP.get('/_clonerprojet')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
