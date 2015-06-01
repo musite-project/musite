@@ -158,7 +158,10 @@ class Document:
         self.chemin = '/'.join((projet, element + ('.' + ext if ext else '')))
         self.fichier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
         self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
-        self.document = EXT[self.ext].Document(self.chemin)
+        try:
+            self.document = EXT[self.ext].Document(self.chemin)
+        except KeyError:
+            self.document = TXT.Document(self.chemin)
         self.depot = Depot(self.projet)
 
     def afficher(self, contenu):
@@ -226,7 +229,7 @@ class Document:
             return self.afficher(
                 self.document.afficher()
             )
-        except (KeyError, AttributeError) as err:
+        except AttributeError as err:
             f.traiter_erreur(err)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage,
             # on essaie de le traiter comme un document texte.
@@ -239,7 +242,7 @@ class Document:
             except FileNotFoundError as err:
                 f.traiter_erreur(err)
                 b.abort(404)
-        except EXT[self.ext].FichierIllisible as err:
+        except TXT.FichierIllisible as err:
             f.traiter_erreur(err)
             return self.afficher(_("Ce fichier est illisible."))
 
@@ -251,7 +254,7 @@ class Document:
             return self.afficher(
                 self.document.afficher_source()
             )
-        except (KeyError, AttributeError) as err:
+        except AttributeError as err:
             f.traiter_erreur(err)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage
             # de la source, on essaie de le traiter comme un document texte.
@@ -277,7 +280,7 @@ class Document:
             except NameError as err:
                 f.traiter_erreur(err)
                 b.abort(404)
-        except EXT[self.ext].FichierIllisible as err:
+        except TXT.FichierIllisible as err:
             f.traiter_erreur(err)
             return self.afficher(_("Ce fichier est illisible."))
 
@@ -293,7 +296,7 @@ class Document:
             self.document.supprimer()
         except KeyError as err:
             f.traiter_erreur(err)
-            TXT.Document(self.chemin).supprimer()
+            self.document.supprimer()
         self.depot.sauvegarder(
             message=_('Suppression du document {}').format(self.chemin)
         )
@@ -306,36 +309,17 @@ class Document:
             return self.afficher(
                 self.document.editer(creation)
             )
-        except KeyError as err:
-            f.traiter_erreur(err)
-            # Si le type de document est inconnu, on essaie de le traiter
-            # comme un document texte. Sinon, on abandonne.
-            try:
-                return self.afficher(
-                    TXT.Document(self.chemin).editer(creation)
-                )
-            except TXT.FichierIllisible as err:
-                f.traiter_erreur(err)
-                return self.afficher(
-                    _("Ce type de document n'est pas éditable.")
-                )
-        except AttributeError as err:
+        except (AttributeError, TXT.FichierIllisible) as err:
             f.traiter_erreur(err)
             # Si le type de document ne prévoit pas d'édition, on abandonne.
             return self.afficher(_("Ce type de document n'est pas éditable."))
-        except EXT[self.ext].FichierIllisible as err:
-            f.traiter_erreur(err)
-            return self.afficher(
-                '''Si je ne puis même pas lire ce fichier,
-                comment voulez-vous que je l'édite ?'''
-                )
 
     def enregistrer(self, contenu):
         """Enregistrement du document
         """
         try:
             self.document.enregistrer(contenu)
-        except (AttributeError, KeyError) as err:
+        except AttributeError as err:
             f.traiter_erreur(err)
             TXT.Document(self.chemin).enregistrer(self.chemin)
         self.depot.sauvegarder(
