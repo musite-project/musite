@@ -42,7 +42,7 @@
 \def\rubrinit{}
 %end
 %if proprietes['notes_couleur_lignes']:
-\grecoloredlines{<<<'}{'.join(str(int(c)) for c in proprietes['couleur'])>>>}
+\grecoloredlines{gregoriocolor}
 %end
 %if proprietes['texte_symboles_couleur']:
 \let\rubrsym\rubrum
