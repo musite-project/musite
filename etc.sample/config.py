@@ -39,4 +39,4 @@ MODELES = [
 ]
 
 # Mettez le paramètre suivant à False en production.
-DEVEL = True
+DEVEL = False
