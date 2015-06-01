@@ -1,5 +1,13 @@
 %from etc import config as cfg
 %from deps.outils import i18n_path, _
+<script type="text/javascript">
+    window.onbeforeunload = function(){
+        return "Attention : si vous quittez cette page, vos modifications seront perdues.";
+};
+    function avant_enregistrement(){
+        window.onbeforeunload = null;
+};
+</script>
 %if ext in ['gabc']:
 <script language="javascript" type="text/javascript" src="/static/js/edit_area/edit_area_full.js"></script>
 <script language="javascript" type="text/javascript">
@@ -11,14 +19,6 @@
         ,start_highlight: true
         ,word_wrap: false
     });
-</script>
-<script type="text/javascript">
-    window.onbeforeunload = function(){
-        return "Attention : si vous quittez cette page, vos modifications seront perdues.";
-};
-    function avant_enregistrement(){
-        window.onbeforeunload = null;
-};
 </script>
 %end
 
