@@ -12,6 +12,14 @@
         ,word_wrap: false
     });
 </script>
+<script type="text/javascript">
+    window.onbeforeunload = function(){
+        return "Attention : si vous quittez cette page, vos modifications seront perdues.";
+};
+    function avant_enregistrement(){
+        window.onbeforeunload = null;
+};
+</script>
 %end
 
 <div id="zonesaisie">
@@ -25,7 +33,7 @@
         %end
         <textarea type="hidden" name="contenu" id="t_saisie" placeholder="{{_("Texte")}}">{{texte}}</textarea>
         <div id="boutons_editeur">
-                <button type="submit" name="action" id="enregistrer" value="enregistrer">{{_("Enregistrer")}}</button>
+                <button type="submit" name="action" id="enregistrer" value="enregistrer" onClick="avant_enregistrement();">{{_("Enregistrer")}}</button>
                 &nbsp
                 <button type="submit" name="action" value="annuler">{{_("Annuler")}}</button>
         </div>
