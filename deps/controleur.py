@@ -547,7 +547,8 @@ class Dossier:
                         '../',
                         href=i18n_path('/{}'.format(
                             '/'.join(self.chemin.split('/')[:-1])
-                        ))
+                        )),
+                        Class='dossier'
                     )
                 ]
             else:
@@ -579,7 +580,8 @@ class Dossier:
                 dossier,
                 href=i18n_path('/{}/{}/{}'.format(
                     self.projet, self.nom, dossier
-                ).replace('//', '/'))
+                ).replace('//', '/')),
+                Class='dossier'
             )
             for dossier in listedossiers
         ]
@@ -588,7 +590,8 @@ class Dossier:
                 fichier,
                 href=i18n_path('/{}/{}/{}'.format(
                     self.projet, self.nom, fichier
-                ).replace('//', '/'))
+                ).replace('//', '/')),
+                Class='fichier'
             )
             for fichier in listefichiers
         ]

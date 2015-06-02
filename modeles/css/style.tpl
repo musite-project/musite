@@ -130,6 +130,14 @@ counter-reset: h1 h2 h3;
 font-size: 90%;
 }
 
+ul.listefichiers {
+list-style: none;
+}
+
+a.dossier {
+font-weight: bold;
+}
+
 #menu ul {
 list-style: none;
 margin-top: 0px;

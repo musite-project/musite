@@ -1,4 +1,4 @@
-<ul>
+<ul class="listefichiers">
     %for element in liste:
     <li>{{!element}}</li>
     %end
