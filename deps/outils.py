@@ -205,8 +205,8 @@ class Depot():
         """Sauvegarde d'un fichier isolé
         """
         self.sauvegarde(
-            fichier.chemin.replace(self.dossier + os.sep, ''),
-            fichier.nom,
+            fichier.replace(self.dossier + os.sep, ''),
+            fichier,
             auteur
         )
 

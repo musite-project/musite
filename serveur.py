@@ -292,10 +292,35 @@ def dossier_creer(nom, element=''):
 @APP.get('/_telechargerdossier/<nom>')
 @APP.get('/_telechargerdossier/<nom>/<element:path>')
 @page
-def dossier_creer_infos(nom, element=''):
+def dossier_telecharger_infos(nom, element=''):
     """ Page de téléchargement d'un dossier
     """
     return Dossier(nom, element).telecharger()
+
+
+@APP.get('/_envoyerdossier/<nom>')
+@APP.get('/_envoyerdossier/<nom>/<element:path>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def dossier_telecharger_envoi_infos(nom, element=''):
+    """ Page d'envoi d'un dossier
+    """
+    return Dossier(nom, element).telecharger_envoi_infos()
+
+
+@APP.post('/_envoyerdossier/<nom>')
+@APP.post('/_envoyerdossier/<nom>/<element:path>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def dossier_telecharger_envoi(nom, element=''):
+    """ Envoi effectif de l'archive
+    """
+    if rq.forms.action == 'envoi':
+        return Dossier(
+            nom, element
+        ).telecharger_envoi(rq.files.get('fichier'))
+    else:
+        b.redirect(i18n_path('/{}/{}'.format(nom, element)))
 
 
 @APP.get('/_clonerprojet')

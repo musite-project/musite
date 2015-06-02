@@ -442,20 +442,25 @@ class Dossier:
         }
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]) and not suppression:
-                actions[_('Créer document')] = '_creer/' + self.chemin
-                actions[_('Créer dossier')] = '_creerdossier/' + self.chemin
-                actions[_('Copier')] = '_copier/' + self.chemin
-                actions[_('Déplacer')] = '_deplacer/' + self.chemin
-                actions[_('Envoyer fichier')] = '_envoyer/' + self.chemin
+                actions[_('Créer document')] = \
+                    '_creer/' + self.chemin
+                actions[_('Créer dossier')] = \
+                    '_creerdossier/' + self.chemin
+                actions[_('Copier')] = \
+                    '_copier/' + self.chemin
+                actions[_('Déplacer')] = \
+                    '_deplacer/' + self.chemin
+                actions[_('Envoyer fichier')] = \
+                    '_envoyer/' + self.chemin
+                actions[_('Envoyer dossier')] = \
+                    '_envoyerdossier/' + self.chemin
                 actions[_('Supprimer')] = \
                     '_supprimerdossier/' + self.chemin
         except TypeError as err:
             f.traiter_erreur(err)
         liens = {
             _('Projet'): self.projet,
-            _('Parent'): self.projet + (
-                '/'.join(self.nom.split('/')[:-1])
-            )
+            _('Parent'): '/'.join(self.chemin.split('/')[:-1])
         }
         return {
             'corps': contenu,
@@ -475,7 +480,7 @@ class Dossier:
         dest = os.path.join(cfg.DATA, destination)
         if not os.path.exists(dest) or ecraser:
             shutil.move(self.dossier, dest)
-            self.projet.depot.sauvegarder(
+            self.depot.sauvegarder(
                 message=(
                     self.nom
                     + ' -> ' + '/'.join(destination.split('/')[1:])
@@ -489,7 +494,7 @@ class Dossier:
         dest = os.path.join(cfg.DATA, destination)
         if not os.path.exists(dest) or ecraser:
             shutil.copytree(self.dossier, dest)
-            self.projet.depot.sauvegarder(
+            self.depot.sauvegarder(
                 message=(
                     _('copie')
                     + ' ' + self.nom
@@ -512,7 +517,7 @@ class Dossier:
         """
         try:
             fichier.save(self.dossier, int(ecraser))
-            self.projet.depot.sauvegarder(
+            self.depot.sauvegarder(
                 message=str(_(
                     "Envoi du fichier {}".format(fichier.filename)
                 ))
@@ -603,7 +608,7 @@ class Dossier:
         """Suppression d'un dossier et de son contenu
         """
         shutil.rmtree(self.dossier, ignore_errors=True)
-        self.depot.sauvegardecomplete(
+        self.depot.sauvegarder(
             _('Suppression du dossier {}').format(self.chemin),
             rq.auth[0]
         )
@@ -634,6 +639,30 @@ class Dossier:
             )
         )
 
+    def telecharger_envoi(self, archive):
+        """Intégration d'une archive au sein d'un dossier
+        """
+        tmp = os.path.join(cfg.TMP, motaleatoire(6))
+        archive.save(tmp)
+        try:
+            shutil.unpack_archive(
+                tmp,
+                extract_dir=self.dossier,
+                format='zip',
+            )
+            self.depot.sauvegarder(
+                message="Intégration d'une archive"
+            )
+            b.redirect(i18n_path('/' + self.chemin))
+        except shutil.ReadError as err:
+            f.traiter_erreur(err)
+            return self.afficher(_("Ceci n'est pas une archive zip."))
+
+    def telecharger_envoi_infos(self):
+        """Informations pour l'envoi d'un fichier
+        """
+        return self.afficher(b.template('envoi_dossier'))
+
 
 class Projet(Dossier):
     """Gestion des projets
@@ -658,16 +687,22 @@ class Projet(Dossier):
         try:
             if a.authentifier(rq.auth[0], rq.auth[1]):
                 if not suppression:
-                    actions[_('Créer document')] = '_creer/' + self.chemin
+                    actions[_('Créer document')] = \
+                        '_creer/' + self.chemin
                     actions[_('Créer dossier')] = \
                         '_creerdossier/' + self.chemin
-                    actions[_('Copier')] = '_copier/' + self.chemin
+                    actions[_('Copier')] = \
+                        '_copier/' + self.chemin
                     actions[_('Distant-envoi')] = \
                         '_envoyerprojet/' + self.chemin
                     actions[_('Distant-réception')] = \
                         '_recevoirprojet/' + self.chemin
-                    actions[_('Envoyer fichier')] = '_envoyer/' + self.chemin
-                    actions[_('Renommer')] = '_deplacer/' + self.chemin
+                    actions[_('Envoyer fichier')] = \
+                        '_envoyer/' + self.chemin
+                    actions[_('Envoyer dossier')] = \
+                        '_envoyerdossier/' + self.chemin
+                    actions[_('Renommer')] = \
+                        '_deplacer/' + self.chemin
                     actions[_('Supprimer')] = \
                         '_supprimerprojet/' + self.chemin
                 else:
