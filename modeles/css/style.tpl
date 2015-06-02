@@ -54,11 +54,12 @@ font-size: 93%;
 width: 120px;
 padding: 0px;
 float:left;
+overflow:auto;
 text-align:left;
 }
 
 #acces {
-position:absolute;
+position:relative;
 top:auto;
 bottom:0px;
 left:0px;
