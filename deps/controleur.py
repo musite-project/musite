@@ -14,7 +14,7 @@ from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 from . import outils as f
-from .outils import i18n_path, url, motaleatoire, _
+from .outils import i18n_path, url, motaleatoire, ls, _
 from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
@@ -642,21 +642,41 @@ class Dossier:
         """Intégration d'une archive au sein d'un dossier
         """
         tmp = os.path.join(cfg.TMP, motaleatoire(6))
-        archive.save(tmp)
+        os.mkdir(tmp)
+        tmp_archive = os.path.join(tmp, archive.filename)
+        archive.save(tmp_archive)
         try:
+            os.chdir(tmp)
             shutil.unpack_archive(
-                tmp,
-                extract_dir=self.dossier,
+                tmp_archive,
+                extract_dir=tmp,
                 format='zip',
             )
-            os.remove(tmp)
+            os.remove(tmp_archive)
+            for racine, dossiers, fichiers in os.walk('.'):
+                if '.git' not in racine:
+                    for fichier in fichiers:
+                        os.renames(
+                            os.path.join(racine, fichier),
+                            os.path.join(self.dossier, racine, fichier)
+                        )
+                    if '.git' in dossiers:
+                        dossiers.remove('.git')
+                    for dossier in dossiers:
+                        os.renames(
+                            os.path.join(racine, dossier),
+                            os.path.join(self.dossier, racine, dossier)
+                        )
             self.depot.sauvegarder(
-                message="Intégration d'une archive"
+                message="Intégration de l'archive " + archive.filename
             )
             b.redirect(i18n_path('/' + self.chemin))
         except shutil.ReadError as err:
             f.traiter_erreur(err)
             return self.afficher(_("Ceci n'est pas une archive zip."))
+        finally:
+            os.chdir(cfg.PWD)
+            shutil.rmtree(tmp)
 
     def telecharger_envoi_infos(self):
         """Informations pour l'envoi d'un fichier
