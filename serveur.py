@@ -121,7 +121,7 @@ def lister_projets():
         f.traiter_erreur(err)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
-    listefichiers = f.Dossier(cfg.DATA).lister(1)
+    listefichiers = f.Dossier(cfg.DATA).lister(profondeur=1)
     # Formatage de la liste des fichiers.
     liste = [
         h.A(

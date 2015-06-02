@@ -219,7 +219,7 @@ class Dossier():
         if not os.path.isdir(dossier):
             raise TypeError(dossier + _(" n'est pas un dossier"))
 
-    def lister(self, profondeur=1):
+    def lister(self, expression='*', profondeur=1):
         """Liste du contenu d'un dossier
 
         Sous la forme d'un dictionnaire, chaque sous-dossier étant une clé
@@ -228,18 +228,21 @@ class Dossier():
         liste = {
             self.dossier: [
                 os.path.split(fichier)[-1]
-                for fichier in ls(self.dossier + '/*')
+                for fichier in ls(self.dossier + '/' + expression)
             ]
         }
         if profondeur > 1:
             for sousdossier in liste[self.dossier]:
-                contenu = Dossier(
-                    os.path.join(self.dossier, sousdossier)
-                ).lister(profondeur - 1)
-                if contenu[os.path.join(self.dossier, sousdossier)] != []:
-                    liste = dict(
-                        liste, **contenu
-                    )
+                try:
+                    contenu = Dossier(
+                        os.path.join(self.dossier, sousdossier)
+                    ).lister(profondeur=profondeur - 1)
+                    if contenu[os.path.join(self.dossier, sousdossier)] != []:
+                        liste = dict(
+                            liste, **contenu
+                        )
+                except TypeError:
+                    pass
         return liste
 
 

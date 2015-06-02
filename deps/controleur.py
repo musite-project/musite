@@ -538,7 +538,7 @@ class Dossier:
     def lister(self):
         """Affichage des fichiers présents dans un dossier
         """
-        fichiers = f.Dossier(self.dossier).lister(1)[self.dossier]
+        fichiers = f.Dossier(self.dossier).lister(profondeur=1)[self.dossier]
         # Si l'on n'est pas à la racine, on affiche un lien vers le parent.
         try:
             if self.chemin[:-1] != self.projet:
@@ -609,8 +609,7 @@ class Dossier:
         """
         shutil.rmtree(self.dossier, ignore_errors=True)
         self.depot.sauvegarder(
-            _('Suppression du dossier {}').format(self.chemin),
-            rq.auth[0]
+            message=_('Suppression du dossier {}').format(self.chemin)
         )
         return self.afficher(_('Dossier supprimé !'))
 
@@ -650,6 +649,7 @@ class Dossier:
                 extract_dir=self.dossier,
                 format='zip',
             )
+            os.remove(tmp)
             self.depot.sauvegarder(
                 message="Intégration d'une archive"
             )
