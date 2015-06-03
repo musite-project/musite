@@ -105,7 +105,6 @@ class Document(txt.Document):
         if ext == 'pdf':
             arguments = [
                 '--latex-engine=lualatex',
-                '--variable=documentclass:scrartcl',
                 '--variable=fontfamily:' +
                 self.proprietes['pdf']['police_famille'],
                 '--variable=fontsize:' +
@@ -133,6 +132,8 @@ class Document(txt.Document):
                     '--variable=include-before:' +
                     "\\thispagestyle{empty}"
                 )
+            if fmt != 'beamer':
+                arguments.append('--variable=documentclass:scrartcl')
         if ext == 'html':
             arguments = []
             if fmt == 'revealjs':
