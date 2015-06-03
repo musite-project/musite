@@ -148,7 +148,10 @@ def authentifier():
         'corps':
             _('Bonjour, {} !').format(rq.auth[0])
             + h.BR() + h.BR()
-            + h.A(_('Retour à la page précédente'), href=rq['HTTP_REFERER']),
+            + (
+                h.A(_('Retour à la page précédente'), href=rq['HTTP_REFERER'])
+                if 'HTTP_REFERER' in rq else ''
+            ),
     }
 
 
