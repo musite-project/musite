@@ -106,7 +106,7 @@
                     %try:
                     %if a.authentifier(rq.auth[0], rq.auth[1]) and rq.auth[0] != 'anonyme':
                     <li>
-                        <a href={{url.replace(hote, 'anonyme@' + hote) + i18n_path()}}>
+                        <a href={{(url.replace(hote, 'anonyme@' + hote) + i18n_path()).replace('//', '/')}}>
                             {{_("Déconnexion")}}
                         </a>
                     </li>
