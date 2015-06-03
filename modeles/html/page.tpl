@@ -1,12 +1,12 @@
 <html>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+%import re
 %from deps import auth as a
 %from deps import outils as o
 %from etc import config as cfg
 %hote = rq.headers['Host']
-%url = rq.url
+%prefixe = rq.url.split(':')[0]
 %if cfg.DEVEL: print('\n', dict(rq), '\n'); end
-%if cfg.DEVEL: print('\n', rq.url, '\n'); end
     <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
     <link rel="stylesheet" href="/css">
@@ -106,20 +106,20 @@
                     %try:
                     %if a.authentifier(rq.auth[0], rq.auth[1]) and rq.auth[0] != 'anonyme':
                     <li>
-                        <a href={{(url.replace(hote, 'anonyme@' + hote) + i18n_path()).replace('//', '/')}}>
+                        <a href={{prefixe + '://anonyme@' + hote + i18n_path()}}>
                             {{_("Déconnexion")}}
                         </a>
                     </li>
                     %else:
                     <li>
-                        <a href={{url + 'authentification'}}>
+                        <a href={{prefixe + '://' + hote + '/' + 'authentification'}}>
                             {{_("S'authentifier")}}
                         </a>
                     </li>
                     %end
                     %except TypeError:
                     <li>
-                        <a href={{url + 'authentification'}}>
+                        <a href={{prefixe + '://' + hote + '/' + 'authentification'}}>
                             {{_("S'authentifier")}}
                         </a>
                     </li>
