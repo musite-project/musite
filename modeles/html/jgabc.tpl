@@ -78,7 +78,7 @@ textarea{
 
 <!-- Ceci est importé depuis Creat'Partition -->
 
-<div id="groupes" class="btn-groups">
+<div id="palette" class="btn-groups">
     <b>Caractères spéciaux </b> <br>
         <div style="float:left">
            <button class="btn" onclick="ecriretexte('á')">á</button>

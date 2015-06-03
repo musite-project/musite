@@ -145,6 +145,14 @@ margin-left: 1ex;
 padding-left: 0;
 }
 
+#groupes {
+position:absolute;
+top:0px;
+bottom:0px;
+right:0px;
+left:51%;
+}
+
 table {
 font-size: 100%;
 }
