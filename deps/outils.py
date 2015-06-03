@@ -8,6 +8,8 @@ en plusieurs points du programme.
 """
 import os
 import re
+import shutil
+from time import time
 import subprocess
 from glob import glob as ls
 import random as rd
@@ -272,6 +274,25 @@ class Fichier():
         contenu = fichier.read(-1)
         fichier.close()
         return contenu
+
+
+def nettoyertmp():
+    for ancien in (
+        fichier for fichier in ls(os.path.join(cfg.TMP,'*'))
+        if (time() - os.path.getmtime(fichier))/3600 > 3
+    ):
+        if os.path.isdir(ancien):
+            shutil.rmtree(ancien)
+        else:
+            os.remove(ancien)
+    for ancien in (
+        fichier for fichier in ls(os.path.join(cfg.STATIC, 'tmp','*'))
+        if (time() - os.path.getmtime(fichier))/3600 > 3
+    ):
+        if os.path.isdir(ancien):
+            shutil.rmtree(ancien)
+        else:
+            os.remove(ancien)
 
 
 def sansaccents(entree):
