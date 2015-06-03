@@ -4,7 +4,9 @@
 %from deps import outils as o
 %from etc import config as cfg
 %hote = rq.headers['Host']
+%url = rq.url
 %if cfg.DEVEL: print('\n', dict(rq), '\n'); end
+%if cfg.DEVEL: print('\n', rq.url, '\n'); end
     <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
     <link rel="stylesheet" href="/css">
@@ -104,20 +106,20 @@
                     %try:
                     %if a.authentifier(rq.auth[0], rq.auth[1]) and rq.auth[0] != 'anonyme':
                     <li>
-                        <a href={{'http://anonyme@' + hote + i18n_path()}}>
+                        <a href={{url.replace(hote, 'anonyme@' + hote) + i18n_path()}}>
                             {{_("Déconnexion")}}
                         </a>
                     </li>
                     %else:
                     <li>
-                        <a href={{'http://{}{}authentification'.format(hote,i18n_path('/'))}}>
+                        <a href={{url + 'authentification'}}>
                             {{_("S'authentifier")}}
                         </a>
                     </li>
                     %end
                     %except TypeError:
                     <li>
-                        <a href={{'http://{}{}authentification'.format(hote,i18n_path('/'))}}>
+                        <a href={{url + 'authentification'}}>
                             {{_("S'authentifier")}}
                         </a>
                     </li>
