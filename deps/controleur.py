@@ -538,6 +538,7 @@ class Dossier:
     def lister(self):
         """Affichage des fichiers présents dans un dossier
         """
+        f.nettoyertmp()
         fichiers = f.Dossier(self.dossier).lister(profondeur=1)[self.dossier]
         # Si l'on n'est pas à la racine, on affiche un lien vers le parent.
         try:

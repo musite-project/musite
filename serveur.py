@@ -783,7 +783,6 @@ def document_afficher(nom, element=None, ext=None):
         − la liste des fichiers si <element> pointe sur un dossier ;
         − la mise en forme du document s'il s'agit d'un fichier connu.
     #~ """
-    f.nettoyertmp()
     try:
         if not element:
             return Projet(nom).lister()
