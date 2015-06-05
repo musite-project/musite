@@ -142,8 +142,12 @@ class Document(txt.Document):
     def _gabc(self):
         """Contenu gabc du document
         """
-        with open(self._fichier(), 'r') as fch:
-            return Gabc(fch.read(-1))
+        try:
+            with open(self._fichier(), 'r') as fch:
+                return Gabc(fch.read(-1))
+        except UnicodeDecodeError as err:
+            traiter_erreur(err)
+            raise FichierIllisible
 
     def _gabc_entete(self, entete):
         """Entête d'un document gabc

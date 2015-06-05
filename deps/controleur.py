@@ -166,7 +166,8 @@ class Document:
         self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
         try:
             self.document = EXT[self.ext].Document(self.chemin)
-        except KeyError:
+        except (KeyError, EXT[self.ext].FichierIllisible) as err:
+            f.traiter_erreur(err)
             self.document = TXT.Document(self.chemin)
         self.depot = Depot(self.projet)
 
@@ -602,12 +603,18 @@ class Dossier:
             )
             for fichier in listefichiers
         ]
-        try:
-            with open(os.path.join(self.dossier, 'README.md'), 'r') as readme:
-                readme = markdown(readme.read(-1))
-        except FileNotFoundError as err:
-            f.traiter_erreur(err)
-            readme = None
+        for fichier in (
+            'README.md', 'README.MD', 'Readme.md', 'readme.md',
+            'README', 'Readme', 'readme',
+            'README.txt', 'README.TXT', 'Readme.txt', 'readme.txt',
+        ):
+            try:
+                with open(os.path.join(self.dossier, fichier), 'r') as readme:
+                    readme = markdown(readme.read(-1))
+                    break
+            except FileNotFoundError as err:
+                f.traiter_erreur(err)
+                readme = None
         return self.afficher(b.template(
             'liste',
             liste=liste,
