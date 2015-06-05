@@ -110,7 +110,8 @@ class Depot():
         ][1:]
         for element in historique:
             element[0] = element[0][:7]
-            element.pop(3)
+            if len(element) > 3:
+                element.pop(3)
         return entete + historique
 
     def journalfichier(self, fichier):

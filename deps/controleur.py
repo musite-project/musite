@@ -14,7 +14,7 @@ from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 from . import outils as f
-from .outils import i18n_path, url, motaleatoire, _
+from .outils import i18n_path, ls, url, motaleatoire, _
 from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
@@ -832,6 +832,47 @@ class Projet(Dossier):
             # Cette exception est levée quand le projet n'existe pas.
             return self.afficher(_('''C'est drôle, ce que vous me demandez :
                 il n'y a pas de projet ici !'''), suppression=True)
+
+    def telecharger_envoi(self, archive, nom):
+        """Intégration d'une archive au sein d'un dossier
+        """
+        tmp = os.path.join(cfg.TMP, motaleatoire(6))
+        os.mkdir(tmp)
+        tmp_archive = os.path.join(tmp, archive.filename)
+        archive.save(tmp_archive)
+        try:
+            os.chdir(tmp)
+            shutil.unpack_archive(
+                tmp_archive,
+                extract_dir=tmp,
+                format='zip',
+            )
+            os.remove(tmp_archive)
+            dossier = ls(tmp + '/*')
+            if len(dossier) != 1:
+                return self.afficher(markdown(_(
+                    "L'archive doit contenir un et un seul dossier, "
+                    "dans lequel doivent se trouver :\n\n"
+                    "- les fichiers du projet ;\n"
+                    "- éventuellement, le dossier `.git` contenant "
+                    "les données de gestion de version."
+                )))
+            dossier = dossier[0]
+            shutil.copytree(dossier, self.dossier)
+            if not os.path.isdir(os.path.join(self.dossier, '.git')):
+                self.depot.initialiser()
+            b.redirect(i18n_path('/' + self.chemin))
+        except shutil.ReadError as err:
+            f.traiter_erreur(err)
+            return self.afficher(_("Ceci n'est pas une archive zip."))
+        finally:
+            os.chdir(cfg.PWD)
+            shutil.rmtree(tmp)
+
+    def telecharger_envoi_infos(self):
+        """Informations pour l'envoi d'un fichier
+        """
+        return self.afficher(b.template('envoi_projet'))
 
 
 class DocumentGabc(Document):

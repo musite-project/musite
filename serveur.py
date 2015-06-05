@@ -114,6 +114,7 @@ def lister_projets():
         actions = {
             _('Créer projet'): '_creerprojet',
             _('Cloner projet'): '_clonerprojet',
+            _('Envoyer projet'): '_envoyerprojet',
         } \
             if a.authentifier(rq.auth[0], rq.auth[1]) \
             else {}
@@ -351,41 +352,30 @@ def projet_cloner():
         b.redirect(i18n_path('/_projets'))
 
 
-@APP.get('/_<action>projet/<nom>')
+@APP.get('/_envoyerprojet')
+@APP.get('/_envoyerprojet/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def projet_action_infos(action, nom):
-    """ Formulaire pour l'envoi/réception vers un dépôt distant
+def projet_telecharger_envoi_infos(nom=''):
+    """ Page d'envoi d'un projet
     """
-    try:
-        return {'corps': b.template('depot', {
-            'action': (
-                action,
-                {'recevoir': _('Recevoir'), 'envoyer': _('Envoyer')}[action]
-            ),
-            'origine': Projet(nom).depot.origine,
-            'quoi': _('projet')
-        })}
-    except KeyError as err:
-        f.traiter_erreur(err)
-        b.abort(404)
+    return Projet(nom).telecharger_envoi_infos()
 
 
-@APP.post('/_<action>projet/<nom>')
+@APP.post('/_envoyerprojet')
+@APP.post('/_envoyerprojet/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def projet_action(action, nom):
-    """ Envoi/réception vers un dépôt distant
+def projet_telecharger_envoi(nom=None):
+    """ Envoi effectif de l'archive
     """
-    forms = rq.forms.decode()
-    if action == 'recevoir' and forms.action == 'recevoir':
-        return Projet(nom).recevoir(forms.origine)
-    elif action == 'envoyer' and forms.action == 'envoyer':
-        return Projet(nom).envoyer(
-            forms.origine, forms.utilisateur, forms.mdp
+    nom = nom if nom else rq.forms.decode().nom
+    if rq.forms.action == 'envoi':
+        return Projet(nom).telecharger_envoi(
+            archive=rq.files.get('fichier'), nom=nom
         )
     else:
-        b.redirect(Projet(nom).url)
+        b.redirect(i18n_path('/{}/{}'.format(nom)))
 
 
 @APP.get('/_creerprojet')
@@ -521,7 +511,7 @@ def document_supprimer_confirmation(nom, element=False):
     else:
         return {'corps': b.template(
             'suppression',
-            {'quoi': _('le fichier {}/{}').format(nom, element)}
+            {'quoi': _('le fichier {}/{} ?').format(nom, element)}
         )}
 
 
@@ -603,6 +593,43 @@ def projet_supprimer(nom):
         return Projet(nom).supprimer()
     else:
         b.redirect(i18n_path('/{}'.format(nom)))
+
+
+@APP.get('/_<action>projet/<nom>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_action_infos(action, nom):
+    """ Formulaire pour l'envoi/réception vers un dépôt distant
+    """
+    try:
+        return {'corps': b.template('depot', {
+            'action': (
+                action,
+                {'recevoir': _('Recevoir'), 'envoyer': _('Envoyer')}[action]
+            ),
+            'origine': Projet(nom).depot.origine,
+            'quoi': _('projet')
+        })}
+    except KeyError as err:
+        f.traiter_erreur(err)
+        b.abort(404)
+
+
+@APP.post('/_<action>projet/<nom>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_action(action, nom):
+    """ Envoi/réception vers un dépôt distant
+    """
+    forms = rq.forms.decode()
+    if action == 'recevoir' and forms.action == 'recevoir':
+        return Projet(nom).recevoir(forms.origine)
+    elif action == 'envoyer' and forms.action == 'envoyer':
+        return Projet(nom).envoyer(
+            forms.origine, forms.utilisateur, forms.mdp
+        )
+    else:
+        b.redirect(Projet(nom).url)
 
 
 # Envoi d'un fichier
