@@ -5,9 +5,7 @@ etc/groupes
 etc/utilisateurs
 log
 static/archive/
-static/ly/
-static/midi/
-static/pdf/
+static/docs
 tmp/
 test.py
 rapport_pylint
