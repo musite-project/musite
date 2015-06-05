@@ -51,6 +51,7 @@ class Document(txt.Document):
                         'portee_taille': (_('Taille'), 20)
                     }),
                 }),
+                'midi': (self.midi, {})
             },
             proprietes=proprietes
         )
@@ -81,7 +82,7 @@ restrictives, qui rendent impossibles certaines opérations.
                 contenu.replace('\\layout{', '\\midi{} \\layout{')
             )
         try:
-            assert self.pdf()
+            assert self.pdf(chemin=chemin, indice=indice)
         except ErreurCompilation as err:
             traiter_erreur(err)
         if os.path.isfile(fichiermidi):
