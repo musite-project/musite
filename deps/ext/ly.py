@@ -100,7 +100,10 @@ restrictives, qui rendent impossibles certaines opérations.
             if destination else self._fichier('midi')
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         shutil.rmtree(self.rnd, ignore_errors=True)
-        shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
+        shutil.copytree(
+            self.dossier, self.dossiertmp, symlinks=True,
+            ignore=lambda x, y: '.git'
+        )
         with open(self._fichiertmp(), 'w') as tmp:
             contenu = self.contenu
             entetes = re.findall('\\\header{[^}]*}', contenu)

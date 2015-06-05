@@ -45,7 +45,10 @@ class Document(txt.Document):
         orig = self._fichiertmp('pdf')
         dest = destination if destination else self._fichier('pdf')
         shutil.rmtree(self.rnd, ignore_errors=True)
-        shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
+        shutil.copytree(
+            self.dossier, self.dossiertmp, symlinks=True,
+            ignore=lambda x, y: '.git'
+        )
         compiler_pdf(self._fichiertmp(), environnement)
         os.renames(orig, dest)
         if not cfg.DEVEL:

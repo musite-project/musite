@@ -100,7 +100,10 @@ class Document(txt.Document):
         orig = self._fichiertmp(ext)
         dest = destination if destination else self._fichier(ext)
         shutil.rmtree(self.rnd, ignore_errors=True)
-        shutil.copytree(self.dossier, self.dossiertmp, symlinks=True)
+        shutil.copytree(
+            self.dossier, self.dossiertmp, symlinks=True,
+            ignore=lambda x, y: '.git'
+        )
         arguments = []
         if ext == 'pdf':
             arguments = [
