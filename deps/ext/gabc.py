@@ -175,7 +175,7 @@ class Document(txt.Document):
     def afficher(self):
         return self.afficher_pdf()
 
-    def gabc(self, fmt, chemin=False, indice=''):
+    def gabc(self, fmt, chemin=None, indice=''):
         """Format gabc
         """
         fichier = self._fichiersortie(fmt, chemin=chemin, indice=indice)
@@ -191,12 +191,12 @@ class Document(txt.Document):
                 raise ErreurCompilation
         return url(fichier)
 
-    def ly(self, chemin=False, indice=''):  # pylint: disable=C0103
+    def ly(self, chemin=None, indice=''):  # pylint: disable=C0103
         """Format lilypond
         """
         return self.gabc(fmt='ly', chemin=chemin, indice=indice)
 
-    def midi(self, chemin=False, indice=''):
+    def midi(self, chemin=None, indice=''):
         """Format midi
         """
         try:
@@ -204,7 +204,7 @@ class Document(txt.Document):
         except ErreurCompilation as err:
             traiter_erreur(err)
 
-    def preparer_pdf(self, destination=False, environnement=None):
+    def preparer_pdf(self, destination=None, environnement=None):
         """Mise en place du pdf
         """
         fichiertmp = 'main'
@@ -227,7 +227,7 @@ class Document(txt.Document):
         if not cfg.DEVEL:
             shutil.rmtree(self.rnd, ignore_errors=True)
 
-    def preparer_gabc(self, fmt, destination=False):
+    def preparer_gabc(self, fmt, destination=None):
         """Mise en place du gabc
         """
         dest = destination if destination else self._fichier(fmt)

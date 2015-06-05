@@ -378,9 +378,9 @@ def projet_action(action, nom):
     """ Envoi/réception vers un dépôt distant
     """
     forms = rq.forms.decode()
-    if forms.action == 'recevoir':
+    if action == 'recevoir' and forms.action == 'recevoir':
         return Projet(nom).recevoir(forms.origine)
-    elif forms.action == 'envoyer':
+    elif action == 'envoyer' and forms.action == 'envoyer':
         return Projet(nom).envoyer(
             forms.origine, forms.utilisateur, forms.mdp
         )

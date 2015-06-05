@@ -14,7 +14,7 @@ from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 from . import outils as f
-from .outils import i18n_path, url, motaleatoire, ls, _
+from .outils import i18n_path, url, motaleatoire, _
 from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
@@ -113,18 +113,24 @@ class Depot:
         return b.template('tableau', tableau=tableau)
 
     def initialiser(self):
-        """Initialisation d'un nouveau dépôt.
+        """Initialisation d'un nouveau dépôt
         """
         self.depot.initialiser()
 
     @property
     def origine(self):
+        """Adresse du dépôt depuis lequel celui-ci a été clôné
+        """
         return self.depot.origine
 
     def pull(self, depot):
+        """Réception des changements distants
+        """
         self.depot.pull(depot)
 
     def push(self, depot, utilisateur, mdp):
+        """Envoi des modifications locales
+        """
         self.depot.push(depot, utilisateur, mdp)
 
     def retablir(self, commit, fichier=None, auteur=None):
@@ -323,8 +329,8 @@ class Document:
             f.traiter_erreur(err)
             TXT.Document(self.chemin).enregistrer(self.chemin)
         self.depot.sauvegarder(
-            fichier = f.Fichier(self.fichier),
-            message = os.path.basename(self.fichier)
+            fichier=f.Fichier(self. fichier),
+            message=os.path.basename(self. fichier)
         )
         b.redirect(i18n_path('/' + self.chemin))
 
@@ -620,7 +626,7 @@ class Dossier:
     def telecharger(self):
         """Téléchargement d'un dossier sous forme d'archive
         """
-        rnd = os.path.join(cfg.STATIC, 'archive', motaleatoire(6))
+        rnd = os.path.join(cfg.STATIC, 'tmp', motaleatoire(6))
         dossier = re.sub('/$', '', self.dossier)
         archive = os.path.basename(dossier)
         dossier = os.path.dirname(dossier)
@@ -638,7 +644,7 @@ class Dossier:
         b.redirect(
             i18n_path(
                 '/{}/{}.zip?action=telecharger'.format(url(rnd), archive)
-                .replace('//','/')
+                .replace('//', '/')
             )
         )
 
@@ -768,10 +774,12 @@ class Projet(Dossier):
             return self.afficher(_('Ce projet existe déjà !'))
 
     def envoyer(self, depot, utilisateur, mdp):
+        """Envoi des modifications locales"""
         self.depot.push(depot, utilisateur, mdp)
         b.redirect(self.url)
 
     def recevoir(self, depot):
+        """Réception des modifications distantes"""
         self.depot.pull(depot)
         b.redirect(self.url)
 
@@ -836,6 +844,7 @@ class DocumentGabc(Document):
         Document.__init__(self, projet, element, ext)
 
     def editer_gabc(self, creation=False):
+        """Éditeur spécifique aux fichiers gabc"""
         try:
             return self.afficher(b.template(
                 'jgabc',
@@ -852,7 +861,10 @@ class DocumentGabc(Document):
                 return self.afficher(b.template(
                     'jgabc',
                     emplacement=self.document.chemin,
-                    paroles=re.sub('  +', ' ', self.document.partition().texte),
+                    paroles=re.sub(
+                        '  +', ' ',
+                        self.document.partition().texte
+                    ),
                     melodie=self.document.partition().gabc,
                     entetes='\n'.join(
                         '{}:{};'.format(entete, valeur)
@@ -861,4 +873,3 @@ class DocumentGabc(Document):
                 ))
             else:
                 b.abort(404)
-

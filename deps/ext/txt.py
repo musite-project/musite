@@ -60,7 +60,7 @@ class Document:
         """
         if ext:
             return os.path.join(
-                cfg.PWD, cfg.STATIC, ext,
+                cfg.PWD, cfg.STATIC, 'docs', ext,
                 self._fichierrelatif(ext)
             )
         else:
@@ -171,7 +171,7 @@ class Document:
 
     afficher_source = afficher
 
-    def afficher_pdf(self, message=''):
+    def afficher_pdf(self, message_erreur=''):
         """Affichage du document pdf en html (base 64)
         """
         try:
@@ -194,7 +194,8 @@ certain du contraire, merci de signaler le problème.
 Voici la sortie de la commande :
 
                 """
-            ).format(message)) + traiter_erreur_compilation(self.dossiertmp))
+            ).format(message_erreur)) +
+            traiter_erreur_compilation(self.dossiertmp))
 
     @property
     def contenu(self):
@@ -246,7 +247,7 @@ Voici la sortie de la commande :
         """
         return self.fmt[fmt][0]
 
-    def pdf(self, chemin=False, indice=''):
+    def pdf(self, chemin=None, indice=''):
         """Format pdf
         """
         chemin = chemin if chemin else 'pdf'

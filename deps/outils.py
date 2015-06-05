@@ -129,13 +129,15 @@ class Depot():
 
     @property
     def origine(self):
-        with open(os.path.join(self.dossier,'.git','config')) as gitconfig:
-            url = False
+        """Adresse du dépôt depuis lequel celui-ci a été clôné
+        """
+        with open(os.path.join(self.dossier, '.git', 'config')) as gitconfig:
+            adresse = False
             for ligne in gitconfig:
-                if url:
+                if adresse:
                     return ligne.split('url = ')[1][:-1]
                 if '[remote "origin"]' in ligne:
-                    url = True
+                    adresse = True
 
     def pull(self, depot=None):
         """Récupérer les modifications depuis un dépôt distant
@@ -277,17 +279,18 @@ class Fichier():
 
 
 def nettoyertmp():
+    """Nettoyage des fichiers temporaires"""
     for ancien in (
-        fichier for fichier in ls(os.path.join(cfg.TMP,'*'))
-        if (time() - os.path.getmtime(fichier))/3600 > 3
+            fichier for fichier in ls(os.path.join(cfg.TMP, '*'))
+            if (time() - os.path.getmtime(fichier))/3600 > 3
     ):
         if os.path.isdir(ancien):
             shutil.rmtree(ancien)
         else:
             os.remove(ancien)
     for ancien in (
-        fichier for fichier in ls(os.path.join(cfg.STATIC, 'tmp','*'))
-        if (time() - os.path.getmtime(fichier))/3600 > 3
+            fichier for fichier in ls(os.path.join(cfg.STATIC, 'tmp', '*'))
+            if (time() - os.path.getmtime(fichier))/3600 > 3
     ):
         if os.path.isdir(ancien):
             shutil.rmtree(ancien)
