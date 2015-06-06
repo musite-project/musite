@@ -162,7 +162,7 @@ class Document:
     def __init__(self, projet, element, ext):
         self.projet = projet
         self.ext = ext.lower() if ext else None
-        self.chemin = '/'.join((projet, element + ('.' + ext if ext else '')))
+        self.chemin = projet + '/' + element + ('.' + ext if ext else '')
         self.fichier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
         self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
         try:
@@ -298,6 +298,7 @@ class Document:
     def creer(self):
         """Création d'un nouveau document
         """
+        print('\t', self.chemin)
         return self.editer(creation=True)
 
     def supprimer(self):

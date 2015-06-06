@@ -268,8 +268,9 @@ def document_creer(nom, element=''):
     """
     if rq.forms.action == 'creer':
         doc = rq.forms.decode().nom.split('.')
+        print(doc)
         if len(doc) > 1:
-            element, ext = element + '.'.join((doc[:-1])), doc[-1]
+            element, ext = element + '/' + '.'.join((doc[:-1])), doc[-1]
         else:
             element, ext = doc[0], ''
         return Document(nom, element, ext).creer()
