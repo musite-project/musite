@@ -483,7 +483,8 @@ class Dossier:
         """Création d'un nouveau dossier
         """
         os.makedirs(self.dossier, exist_ok=True)
-        return self.lister()
+        print(self.chemin)
+        b.redirect(i18n_path('/' + self.chemin))
 
     def deplacer(self, destination, ecraser=False):
         """Déplacement/renommage d'un dossier (ou document)
