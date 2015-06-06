@@ -61,6 +61,11 @@ Ensuite, dans votre navigateur, saisissez l'adresse :
 
 Et voilà !
 
+Éventuellement, vous pouvez utiliser la fonction *Cloner projet* de la page *Projets* pour importer la documentation
+de musite :
+
+    https://github.com/jperon/musite-doc
+
 
 ## Configuration
 
