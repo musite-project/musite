@@ -209,7 +209,12 @@ def utilisateur_ajout():
     """
     forms = rq.forms.decode()
     if forms.mdp == forms.mdp_v:
-        u.Utilisateur(forms.nom, forms.mdp).ajouter()
+        utilisateur = u.Utilisateur(forms.nom, forms.mdp)
+        try:
+            utilisateur.ajouter()
+        except u.UtilisateurExistant as err:
+            f.traiter_erreur(err)
+            utilisateur.modifier()
     b.redirect(i18n_path('/admin/utilisateurs'))
 
 
