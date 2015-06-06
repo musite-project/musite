@@ -19,6 +19,7 @@ from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
 from etc import config as cfg
+from bottle import request as rq
 
 
 # Import des modules qui vont traiter chaque extension ########################
@@ -160,7 +161,7 @@ class Document:
     """
     def __init__(self, projet, element, ext):
         self.projet = projet
-        self.ext = ext
+        self.ext = ext.lower()
         self.chemin = '/'.join((projet, element + ('.' + ext if ext else '')))
         self.fichier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
         self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
@@ -604,6 +605,9 @@ class Dossier:
             for fichier in listefichiers
         ]
         for fichier in (
+            'README-{}.md'.format(rq.locale.upper()),
+            'README-{}.MD'.format(rq.locale.upper()),
+            'Readme-{}.md'.format(rq.locale), 'readme-{}.md'.format(rq.locale),
             'README.md', 'README.MD', 'Readme.md', 'readme.md',
             'README', 'Readme', 'readme',
             'README.txt', 'README.TXT', 'Readme.txt', 'readme.txt',
@@ -731,7 +735,7 @@ class Projet(Dossier):
                     actions[_('Copier')] = \
                         '_copier/' + self.chemin
                     actions[_('Distant-envoi')] = \
-                        '_envoyerprojet/' + self.chemin
+                        '_emettreprojet/' + self.chemin
                     actions[_('Distant-réception')] = \
                         '_recevoirprojet/' + self.chemin
                     actions[_('Envoyer fichier')] = \

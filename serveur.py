@@ -605,7 +605,7 @@ def projet_action_infos(action, nom):
         return {'corps': b.template('depot', {
             'action': (
                 action,
-                {'recevoir': _('Recevoir'), 'envoyer': _('Envoyer')}[action]
+                {'recevoir': _('Recevoir'), 'emettre': _('Envoyer')}[action]
             ),
             'origine': Projet(nom).depot.origine,
             'quoi': _('projet')

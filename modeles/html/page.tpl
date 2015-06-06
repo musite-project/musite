@@ -112,14 +112,14 @@
                     </li>
                     %else:
                     <li>
-                        <a href={{prefixe + '://' + hote + '/' + 'authentification'}}>
+                        <a href={{prefixe + '://' + hote + i18n_path('/authentification')}}>
                             {{_("S'authentifier")}}
                         </a>
                     </li>
                     %end
                     %except TypeError:
                     <li>
-                        <a href={{prefixe + '://' + hote + '/' + 'authentification'}}>
+                        <a href={{prefixe + '://' + hote + i18n_path('/authentification')}}>
                             {{_("S'authentifier")}}
                         </a>
                     </li>

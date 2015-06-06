@@ -16,7 +16,7 @@
             required
         >
         <br>
-        %elif action[0] == 'envoyer':
+        %elif action[0] == 'emettre':
         <input
             name="utilisateur"
             label="{{_("Nom d'utilisateur")}} :"
