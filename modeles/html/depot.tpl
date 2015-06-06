@@ -24,7 +24,6 @@
             name="utilisateur"
             label="{{_("Nom d'utilisateur")}} :"
             placeholder="{{_('Utilisateur')}}"
-            required
         >
         <br>
         <input
@@ -32,7 +31,6 @@
             label="{{_("Mot de passe")}} :"
             placeholder="{{_("MdP")}}"
             type="password"
-            required
         >
         <br>
         %end

@@ -636,7 +636,7 @@ def projet_action(action, nom):
     forms = rq.forms.decode()
     if action == 'recevoir' and forms.action == 'recevoir':
         return Projet(nom).recevoir(forms.origine)
-    elif action == 'envoyer' and forms.action == 'envoyer':
+    elif action == 'emettre' and forms.action == 'emettre':
         return Projet(nom).envoyer(
             forms.origine, forms.utilisateur, forms.mdp
         )
