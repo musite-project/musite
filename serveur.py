@@ -284,10 +284,7 @@ def document_creer(nom, element=''):
 def dossier_creer_infos(nom, element=None):
     """ Page de création d'un dossier
     """
-    if element:
-        return Dossier(nom, element).creer()
-    else:
-        return {'corps': b.template('creation', {'quoi': _('dossier')})}
+    return {'corps': b.template('creation', {'quoi': _('dossier')})}
 
 
 @APP.post('/_creerdossier/<nom>')
