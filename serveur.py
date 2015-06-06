@@ -274,7 +274,7 @@ def document_creer(nom, element=''):
             element, ext = doc[0], ''
         return Document(nom, element, ext).creer()
     else:
-        b.redirect(i18n_path('/{}/{}'.format(nom, element)))
+        b.redirect(i18n_path('/{}/{}'.format(nom, element).replace('//', '/')))
 
 
 @APP.get('/_creerdossier/<nom>')
@@ -300,7 +300,7 @@ def dossier_creer(nom, element=''):
     if rq.forms.action == 'creer':
         return Dossier(nom, '/'.join((element, rq.forms.decode().nom))).creer()
     else:
-        b.redirect(i18n_path('/{}/{}'.format(nom, element)))
+        b.redirect(i18n_path('/{}/{}'.format(nom, element).replace('//', '/')))
 
 
 @APP.get('/_telechargerdossier/<nom>')
@@ -334,7 +334,7 @@ def dossier_telecharger_envoi(nom, element=''):
             nom, element
         ).telecharger_envoi(rq.files.get('fichier'))
     else:
-        b.redirect(i18n_path('/{}/{}'.format(nom, element)))
+        b.redirect(i18n_path('/{}/{}'.format(nom, element).replace('//', '/')))
 
 
 @APP.get('/_clonerprojet')
@@ -538,7 +538,9 @@ def document_supprimer(nom, element=False):
             element, ext = os.path.splitext(element)
             return Document(nom, element, ext[1:]).supprimer()
         else:
-            b.redirect(i18n_path('/{}/{}'.format(nom, element)))
+            b.redirect(
+                i18n_path('/{}/{}'.format(nom, element).replace('//', '/'))
+            )
 
 
 @APP.get('/_supprimerdossier/<nom>/<element:path>')
@@ -574,7 +576,9 @@ def dossier_supprimer(nom, element=False):
         if rq.forms.action == 'supprimer':
             return Dossier(nom, element).supprimer()
         else:
-            b.redirect(i18n_path('/{}/{}'.format(nom, element)))
+            b.redirect(
+                i18n_path('/{}/{}'.format(nom, element).replace('//', '/'))
+            )
 
 
 @APP.get('/_supprimerprojet/<nom>')
