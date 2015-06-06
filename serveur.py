@@ -385,7 +385,7 @@ def projet_telecharger_envoi(nom=None):
             archive=rq.files.get('fichier'), nom=nom
         )
     else:
-        b.redirect(i18n_path('/{}/{}'.format(nom)))
+        b.redirect(i18n_path('/_projets'))
 
 
 @APP.get('/_creerprojet')
