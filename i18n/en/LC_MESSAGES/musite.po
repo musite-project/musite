@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-04 21:37+0200\n"
+"POT-Creation-Date: 2015-06-06 10:32+0200\n"
 "PO-Revision-Date: 2015-04-24 16:24+0200\n"
 "Last-Translator: Abbé Jacques Peron <cataclop@hotmail.com>\n"
 "Language-Team: French\n"
@@ -18,83 +18,200 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: serveur.py:106
-msgid "Il n'y a rien avant la création !"
-msgstr "There isn't anything before creation !"
+#: serveur.py:82 serveur.py:115 deps/controleur.py:753
+msgid "Créer projet"
+msgstr "Create project"
 
-#: serveur.py:122
-msgid "Il n'y a pas encore de modifications à signaler."
-msgstr "There aren't changes yet."
+#: serveur.py:89
+msgid "Projets"
+msgstr "Projects"
 
-#: serveur.py:148 deps/outils.py:151
-msgid "Sauvegarde complète"
-msgstr "Backup"
+#: serveur.py:116
+msgid "Cloner projet"
+msgstr "Clone project"
 
-#: serveur.py:175
-msgid "Aperçu"
-msgstr "Preview"
+#: serveur.py:117
+msgid "Envoyer projet"
+msgstr "Send project"
 
-#: serveur.py:176 serveur.py:633
-msgid "Historique"
-msgstr "History"
+#: serveur.py:143 modeles/html/page.tpl:104
+msgid "Accès réservé"
+msgstr "Restricted"
 
-#: serveur.py:177
-msgid "Source"
-msgstr ""
+#: serveur.py:150
+msgid "Bonjour, {} !"
+msgstr "Hello, {} !"
 
-#: serveur.py:181 serveur.py:463 serveur.py:640 serveur.py:1044
-msgid "Copier"
-msgstr "Copy"
+#: serveur.py:153
+msgid "Retour à la page précédente"
+msgstr "Back to previous page"
 
-#: serveur.py:182 serveur.py:464 serveur.py:998 modeles/html/deplacement.tpl:5
+#: serveur.py:161 serveur.py:187 serveur.py:197 serveur.py:206
+msgid "Vous devez être administrateur"
+msgstr "Restricted to administrator"
+
+#: serveur.py:166
+msgid "Utilisateurs"
+msgstr "Users"
+
+#: serveur.py:244 serveur.py:257 serveur.py:275 serveur.py:288 serveur.py:310
+#: serveur.py:320 serveur.py:334 serveur.py:346 serveur.py:360 serveur.py:370
+#: serveur.py:386 serveur.py:398 serveur.py:412 serveur.py:435 serveur.py:459
+#: serveur.py:477 serveur.py:507 serveur.py:522 serveur.py:538 serveur.py:559
+#: serveur.py:574 serveur.py:590 serveur.py:602 serveur.py:622 serveur.py:641
+#: serveur.py:651 serveur.py:720 serveur.py:743 serveur.py:754 serveur.py:765
+#: serveur.py:848
+msgid "Réservé aux éditeurs"
+msgstr "Restricted to editors"
+
+#: serveur.py:252
+msgid "fichier"
+msgstr "file"
+
+#: serveur.py:283
+msgid "dossier"
+msgstr "folder"
+
+#: serveur.py:340
+msgid "Cloner"
+msgstr "Clone"
+
+#: serveur.py:341 serveur.py:394 serveur.py:614
+msgid "projet"
+msgstr "project"
+
+#: serveur.py:420
+msgid "Nouvel emplacement"
+msgstr "New path"
+
+#: serveur.py:421 deps/controleur.py:193 deps/controleur.py:462
+#: modeles/html/deplacement.tpl:5
 msgid "Déplacer"
 msgstr "Move"
 
-#: serveur.py:183
+#: serveur.py:426
+msgid "Nouveau nom"
+msgstr "New name"
+
+#: serveur.py:427 deps/controleur.py:748
+msgid "Renommer"
+msgstr "Rename"
+
+#: serveur.py:467
+msgid "Destination"
+msgstr "Destination"
+
+#: serveur.py:468 deps/controleur.py:192 deps/controleur.py:460
+#: deps/controleur.py:738
+msgid "Copier"
+msgstr "Copy"
+
+#: serveur.py:517
+msgid "le fichier {}/{} ?"
+msgstr "the file {}/{} ?"
+
+#: serveur.py:583
+msgid "le projet {} et tout son contenu ? "
+msgstr "the {} project and all its files ?"
+
+#: serveur.py:584
+msgid "Attention : cette opération est irréversible !"
+msgstr "Think twice : this cannot be reverted !"
+
+#: serveur.py:611
+msgid "Recevoir"
+msgstr "Pull"
+
+#: serveur.py:611 modeles/html/envoi_dossier.tpl:6
+#: modeles/html/envoi_projet.tpl:8 modeles/html/envoi.tpl:12
+msgid "Envoyer"
+msgstr "Send"
+
+#: serveur.py:667 serveur.py:864
+msgid "Pourriez-vous expliciter votre intention ?"
+msgstr "I don't understand what you want."
+
+#: serveur.py:894
+msgid "Accès réservé !"
+msgstr "Restricted access !"
+
+#: serveur.py:907
+msgid "Il n'y a rien ici !"
+msgstr "There's nothing here."
+
+#: deps/controleur.py:95
+msgid "Il n'y a rien avant la création !"
+msgstr "There isn't anything before creation !"
+
+#: deps/controleur.py:110
+msgid "Il n'y a pas encore de modifications à signaler."
+msgstr "There aren't changes yet."
+
+#: deps/controleur.py:147 deps/outils.py:204
+msgid "Sauvegarde complète"
+msgstr "Backup"
+
+#: deps/controleur.py:186
+msgid "Aperçu"
+msgstr "Preview"
+
+#: deps/controleur.py:187 deps/controleur.py:728
+msgid "Historique"
+msgstr "History"
+
+#: deps/controleur.py:188
+msgid "Source"
+msgstr "Source"
+
+#: deps/controleur.py:194
 msgid "Éditer"
 msgstr "Edit"
 
-#: serveur.py:184 serveur.py:466 serveur.py:643
+#: deps/controleur.py:195 deps/controleur.py:468 deps/controleur.py:750
 msgid "Supprimer"
 msgstr "Delete"
 
-#: serveur.py:189 serveur.py:472 serveur.py:650
+#: deps/controleur.py:197
+msgid "Éditer gabc"
+msgstr "Edit gabc"
+
+#: deps/controleur.py:201 deps/controleur.py:473 deps/controleur.py:756
 msgid "Projet"
 msgstr "Project"
 
-#: serveur.py:190
+#: deps/controleur.py:202
 msgid "Dossier"
 msgstr "Folder"
 
-#: serveur.py:235 serveur.py:267
+#: deps/controleur.py:252 deps/controleur.py:280
 msgid "Extension inconnue : {}."
 msgstr "Unknown extension : {}"
 
-#: serveur.py:243 serveur.py:285
+#: deps/controleur.py:258 deps/controleur.py:296
 msgid "Ce fichier est illisible."
 msgstr "File cannot be read."
 
-#: serveur.py:269
+#: deps/controleur.py:282
 msgid "Voici les données de la requète :"
 msgstr "Here are the data from the request :"
 
-#: serveur.py:302
+#: deps/controleur.py:312
 msgid "Suppression du document {}"
 msgstr "Delete document {}"
 
-#: serveur.py:304
+#: deps/controleur.py:314
 msgid "Document supprimé !"
 msgstr "Document deleted !"
 
-#: serveur.py:326 serveur.py:332
+#: deps/controleur.py:326
 msgid "Ce type de document n'est pas éditable."
 msgstr "This type of documents can't be edited."
 
-#: serveur.py:366 serveur.py:508
+#: deps/controleur.py:351 deps/controleur.py:510
 msgid "copie"
 msgstr "copy"
 
-#: serveur.py:373 serveur.py:515
+#: deps/controleur.py:359 deps/controleur.py:518
 msgid ""
 "Il y a déjà quelque chose à cet emplacement.\n"
 "\n"
@@ -104,11 +221,11 @@ msgid ""
 msgstr ""
 "There's already something here.\n"
 "\n"
-"- If you intend to copy a file or folder within another folder, please "
-"give the integral path.\n"
+"- If you intend to copy a file or folder within another folder, please give "
+"the integral path.\n"
 "- If you'd like to overwrite existing file, please erase it first."
 
-#: serveur.py:397
+#: deps/controleur.py:384
 msgid ""
 "Il y a eu une erreur pendant le traitement du document.\n"
 "Ceci vient probablement d'une erreur de syntaxe ou d'une erreur dans vos\n"
@@ -122,213 +239,255 @@ msgstr ""
 "report the problem.\n"
 "                "
 
-#: serveur.py:461 serveur.py:637
+#: deps/controleur.py:452 deps/controleur.py:729
+msgid "Télécharger"
+msgstr "Download"
+
+#: deps/controleur.py:456 deps/controleur.py:734
 msgid "Créer document"
 msgstr "Create document"
 
-#: serveur.py:462 serveur.py:638
+#: deps/controleur.py:458 deps/controleur.py:736
 msgid "Créer dossier"
 msgstr "Create folder"
 
-#: serveur.py:465 serveur.py:641
+#: deps/controleur.py:464 deps/controleur.py:744
 msgid "Envoyer fichier"
 msgstr "Send file"
 
-#: serveur.py:473
-msgid "Parent"
-msgstr ""
+#: deps/controleur.py:466 deps/controleur.py:746
+msgid "Envoyer dossier"
+msgstr "Send file"
 
-#: serveur.py:528
+#: deps/controleur.py:474
+msgid "Parent"
+msgstr "Parent"
+
+#: deps/controleur.py:533
 msgid "Envoi du fichier {}"
 msgstr "Send file {}"
 
-#: serveur.py:536
+#: deps/controleur.py:540
 msgid ""
 "Le fichier existe déjà. Si vous voulez l'écraser, merci de cocher la case "
 "correspondante."
 msgstr ""
-"This file already exists. If you want to overwrite it, please check the"
-"appropriate box."
+"This file already exists. If you want to overwrite it, please check "
+"theappropriate box."
 
-#: serveur.py:612
+#: deps/controleur.py:636
 msgid "Suppression du dossier {}"
 msgstr "Delete folder {}"
 
-#: serveur.py:615
+#: deps/controleur.py:638
 msgid "Dossier supprimé !"
 msgstr "Folder deleted !"
 
-#: serveur.py:642 serveur.py:1004
-msgid "Renommer"
-msgstr "Rename"
+#: deps/controleur.py:700 deps/controleur.py:881
+msgid "Ceci n'est pas une archive zip."
+msgstr "This isn't a zip archive."
 
-#: serveur.py:646 serveur.py:766 serveur.py:800
-msgid "Créer projet"
-msgstr "Create project"
+#: deps/controleur.py:740
+msgid "Distant-envoi"
+msgstr "Remote-push"
 
-#: serveur.py:667
-msgid "Ce projet existe déjà !"
-msgstr "A project with this name already exists !"
+#: deps/controleur.py:742
+msgid "Distant-réception"
+msgstr "Remote-pull"
 
-#: serveur.py:677 serveur.py:687
+#: deps/controleur.py:777 deps/controleur.py:808
 msgid "Il y a déjà un projet portant ce nom !"
 msgstr "There's already a project with this name !"
 
-#: serveur.py:722
+#: deps/controleur.py:788
+msgid "Ce projet existe déjà !"
+msgstr "A project with this name already exists !"
+
+#: deps/controleur.py:843
 msgid "Projet supprimé !"
 msgstr "Project deleted !"
 
-#: serveur.py:727
+#: deps/controleur.py:847
 msgid ""
 "C'est drôle, ce que vous me demandez :\n"
 "                il n'y a pas de projet ici !"
 msgstr "There isn't any such project."
 
-#: serveur.py:774
-msgid "Projets"
-msgstr "Projects"
-
-#: serveur.py:826 modeles/html/page.tpl:64
-msgid "Accès réservé"
-msgstr "Restricted"
-
-#: serveur.py:832
-msgid "Bonjour, {} !"
-msgstr "Hello, {} !"
-
-#: serveur.py:838 serveur.py:863 serveur.py:872
-msgid "Vous devez être administrateur"
-msgstr "Restricted to administrator"
-
-#: serveur.py:843
-msgid "Utilisateurs"
-msgstr "Users"
-
-#: serveur.py:909 serveur.py:922 serveur.py:937 serveur.py:950 serveur.py:963
-#: serveur.py:975 serveur.py:989 serveur.py:1012 serveur.py:1035
-#: serveur.py:1053 serveur.py:1084 serveur.py:1099 serveur.py:1115
-#: serveur.py:1131 serveur.py:1146 serveur.py:1162 serveur.py:1176
-#: serveur.py:1186 serveur.py:1250 serveur.py:1273 serveur.py:1283
-msgid "Réservé aux éditeurs"
-msgstr "Restricted to editors"
-
-#: serveur.py:917
-msgid "fichier"
-msgstr "file"
-
-#: serveur.py:945
-msgid "dossier"
-msgstr "folder"
-
-#: serveur.py:971
-msgid "projet"
-msgstr "project"
-
-#: serveur.py:997
-msgid "Nouvel emplacement"
-msgstr "New path"
-
-#: serveur.py:1003
-msgid "Nouveau nom"
-msgstr "New name"
-
-#: serveur.py:1043
-msgid "Destination"
+#: deps/controleur.py:868
+msgid ""
+"L'archive doit contenir un et un seul dossier, dans lequel doivent se "
+"trouver :\n"
+"\n"
+"- les fichiers du projet ;\n"
+"- éventuellement, le dossier `.git` contenant les données de gestion de "
+"version."
 msgstr ""
+"The archive must contain (only) one folder, that should contain :\n"
+"\n"
+"- the project's files ;\n"
+"- optionnally, the `.git` directory that contains versionning data."
 
-#: serveur.py:1094
-msgid "le fichier {}/{}"
-msgstr "the file {}/{}"
-
-#: serveur.py:1155
-msgid "le projet {} et tout son contenu ? "
-msgstr "the {} project and all its files ?"
-
-#: serveur.py:1156
-msgid "Attention : cette opération est irréversible !"
-msgstr "Think twice : this cannot be reverted !"
-
-#: serveur.py:1202 serveur.py:1380
-msgid "Pourriez-vous expliciter votre intention ?"
-msgstr "I don't understand what you want."
-
-#: serveur.py:1406
-msgid "Accès réservé !"
-msgstr "Restricted access !"
-
-#: serveur.py:1417
-msgid "Il n'y a rien ici !"
-msgstr "There's nothing here."
-
-#: deps/outils.py:159
+#: deps/outils.py:225
 msgid " n'est pas un dossier"
 msgstr " isn't a folder"
 
-#: deps/outils.py:222
-msgid "Clonage"
-msgstr "Clone"
-
-#: deps/outils.py:228
-msgid "Déplacement"
-msgstr "Move"
-
-#: deps/outils.py:288
-msgid "Effacement"
-msgstr "Erase"
-
-#: deps/ext/gabc.py:50
+#: deps/ext/gabc.py:37 deps/ext/gabc.py:41
 msgid "Tempo"
-msgstr ""
+msgstr "Tempo"
 
-#: deps/ext/gabc.py:51
+#: deps/ext/gabc.py:38 deps/ext/gabc.py:42
 msgid "Transposition"
-msgstr ""
+msgstr "Transposition"
 
-#: deps/ext/gabc.py:54
+#: deps/ext/gabc.py:46
 msgid "Couleur (R,V,B)"
 msgstr "Color (R,G,B)"
 
-#: deps/ext/gabc.py:55
-msgid "Initiale en couleur"
-msgstr "Colored initial"
+#: deps/ext/gabc.py:47 deps/ext/ly.py:32 deps/ext/md.py:31
+msgid "Document"
+msgstr "Document"
+
+#: deps/ext/gabc.py:49 deps/ext/ly.py:40
+msgid "Titre"
+msgstr "Title"
+
+#: deps/ext/gabc.py:51
+msgid "Mode"
+msgstr "Mode"
+
+#: deps/ext/gabc.py:53
+msgid "Type"
+msgstr "Type"
 
 #: deps/ext/gabc.py:56
-msgid "Lignes en couleur"
-msgstr "Colored lines"
+msgid "Taille de la page (largeur, hauteur)"
+msgstr "Page size (width, height)"
 
-#: deps/ext/gabc.py:57
-msgid "Symboles en couleur"
-msgstr "Colored symbols"
+#: deps/ext/gabc.py:61 deps/ext/ly.py:37 deps/ext/md.py:36
+msgid "Marges (haut, bas, gauche, droite)"
+msgstr "Margins (top, bottom, left, right)"
 
-#: deps/ext/gabc.py:58
-msgid "Épaisseur des lignes"
-msgstr "Lines thickness"
+#: deps/ext/gabc.py:65
+msgid "Notes"
+msgstr "Notes"
 
-#: deps/ext/gabc.py:59
-msgid "Espacement sous la portée"
-msgstr "Space below lines"
-
-#: deps/ext/gabc.py:60
-msgid "Taille de la page"
-msgstr "Page size"
-
-#: deps/ext/gabc.py:61
-msgid "Taille de l'initiale"
-msgstr "Initial size"
-
-#: deps/ext/gabc.py:62
+#: deps/ext/gabc.py:67
 msgid "Taille des notes"
 msgstr "Notes size"
 
-#: deps/ext/gabc.py:63
+#: deps/ext/gabc.py:69
+msgid "Lignes en couleur"
+msgstr "Colored lines"
+
+#: deps/ext/gabc.py:71
+msgid "Épaisseur des lignes"
+msgstr "Lines thickness"
+
+#: deps/ext/gabc.py:73
+msgid "Espace sous la portée"
+msgstr "Space below lines"
+
+#: deps/ext/gabc.py:75 modeles/html/jgabc.tpl:458
+msgid "Texte"
+msgstr "Text"
+
+#: deps/ext/gabc.py:77 deps/ext/md.py:46
 msgid "Taille de la police"
 msgstr "Font size"
 
-#: deps/ext/gabc.py:102
+#: deps/ext/gabc.py:79
+msgid "Symboles en couleur"
+msgstr "Colored symbols"
+
+#: deps/ext/gabc.py:80
+msgid "Initiale"
+msgstr "Initial"
+
+#: deps/ext/gabc.py:82 deps/ext/gabc.py:95
+msgid "Couleur"
+msgstr "Color"
+
+#: deps/ext/gabc.py:84
+msgid "Élévation"
+msgstr "Raise"
+
+#: deps/ext/gabc.py:86 deps/ext/ly.py:51
+msgid "Taille"
+msgstr "Size"
+
+#: deps/ext/gabc.py:89
+msgid "Espace (avant, après)"
+msgstr "Spacing (before, after)"
+
+#: deps/ext/gabc.py:93
+msgid "Annotations"
+msgstr "Annotations"
+
+#: deps/ext/gabc.py:97
+msgid "Espace"
+msgstr "Space"
+
+#: deps/ext/gabc.py:99
+msgid "Espace au-dessus de l'initiale"
+msgstr "Space above initial"
+
+#: deps/ext/ly.py:34 deps/ext/md.py:33
+msgid "Taille de la page"
+msgstr "Page size"
+
+#: deps/ext/ly.py:42 deps/ext/md.py:42
+msgid "Police"
+msgstr "Font"
+
+#: deps/ext/ly.py:44
+msgid "Roman"
+msgstr "Roman"
+
+#: deps/ext/ly.py:46
+msgid "Sans"
+msgstr "Sans"
+
+#: deps/ext/ly.py:48
+msgid "Mono"
+msgstr "Mono"
+
+#: deps/ext/ly.py:50
+msgid "Portées"
+msgstr "Score"
+
+#: deps/ext/ly.py:65
+msgid ""
+"\n"
+"Il est aussi possible que vous ayez saisi du code *Scheme* dans votre\n"
+"document : par souci de sécurité, `Lilypond` est lancé avec des options "
+"plus\n"
+"restrictives, qui rendent impossibles certaines opérations.\n"
+msgstr ""
+"\n"
+"Perhaps you have *Scheme* code in your\n"
+"document : for security reasons, `Lilypond` is launched with "
+"more restrictive options,\n"
+"that make some operations impossible.\n"
+
+#: deps/ext/md.py:40
+msgid "Numéros de page"
+msgstr "Page numbers"
+
+#: deps/ext/md.py:44
+msgid "Nom"
+msgstr "Name"
+
+#: deps/ext/md.py:50
+msgid "Thème"
+msgstr "Theme"
+
+#: deps/ext/txt.py:187
 msgid ""
 "Il y a eu une erreur pendant le traitement du document.\n"
 "Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument\n"
 "certain du contraire, merci de signaler le problème.\n"
+"\n"
+"{}\n"
 "\n"
 "Voici la sortie de la commande :\n"
 "\n"
@@ -339,68 +498,53 @@ msgstr ""
 "please\n"
 "report the problem.\n"
 "\n"
+"{}\n"
+"\n"
 "Here is the command output :\n"
 "\n"
 "                "
 
-#: deps/ext/ly.py:80 deps/ext/tex.py:116
+#: deps/ext/txt.py:282
 msgid "Sortie :"
 msgstr "Output :"
 
-#: deps/ext/ly.py:84 deps/ext/tex.py:120
+#: deps/ext/txt.py:286
 msgid "Erreurs :"
 msgstr "Errors :"
-
-#: deps/ext/tex.py:47
-msgid ""
-"Il y a eu une erreur pendant le traitement du document.\n"
-"Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument\n"
-"certain du contraire, merci de signaler le problème.\n"
-"\n"
-"Voici la sortie de la commande :\n"
-"\n"
-"                    "
-msgstr ""
-"There was an error processing the document.\n"
-"This probably comes from a syntax error ; if you are sure it doesn't, "
-"please\n"
-"report the problem.\n"
-"\n"
-"Here is the command output :\n"
-"\n"
-"                "
 
 #: modeles/html/creation.tpl:5
 msgid "Créer le"
 msgstr "Create the"
 
 #: modeles/html/creation.tpl:7 modeles/html/deplacement.tpl:15
-#: modeles/html/editeur.tpl:25 modeles/html/envoi.tpl:14
-#: modeles/html/inexistant.tpl:13
+#: modeles/html/depot.tpl:43 modeles/html/editeur.tpl:19
+#: modeles/html/envoi_dossier.tpl:8 modeles/html/envoi_projet.tpl:10
+#: modeles/html/envoi.tpl:14 modeles/html/inexistant.tpl:13
 msgid "Annuler"
 msgstr "Cancel"
 
 #: modeles/html/deplacement.tpl:10
 msgid "Ne pas vérifier s'il y a déjà quelque chose à cet emplacement."
-msgstr ""
+msgstr "Don't check for existing files"
 
-#: modeles/html/editeur.tpl:23 modeles/html/utilisateurs.tpl:60
+#: modeles/html/editeur.tpl:17 modeles/html/jgabc.tpl:74
+#: modeles/html/utilisateurs.tpl:60
 msgid "Enregistrer"
 msgstr "Save"
+
+#: modeles/html/envoi_dossier.tpl:2 modeles/html/envoi_projet.tpl:3
+msgid "Sélectionnez une archive zip contenant ce que vous voulez envoyer :"
+msgstr "Please select the zip archive you'd like to integrate :"
 
 #: modeles/html/envoi.tpl:10
 msgid "Écraser le fichier s'il existe."
 msgstr "Overwrite existing file."
 
-#: modeles/html/envoi.tpl:12
-msgid "Envoyer"
-msgstr "Send"
-
-#: modeles/html/export.tpl:53
+#: modeles/html/export.tpl:56
 msgid "Exporter"
 msgstr "Export"
 
-#: modeles/html/export.tpl:55
+#: modeles/html/export.tpl:58
 msgid "Retour"
 msgstr "Back"
 
@@ -451,32 +595,40 @@ msgstr "Create folder"
 msgid "Créer un document"
 msgstr "Create document"
 
-#: modeles/html/page.tpl:29
+#: modeles/html/jgabc.tpl:450
+msgid "GABC simple"
+msgstr "Simple GABC"
+
+#: modeles/html/jgabc.tpl:467
+msgid "Notes sur les élisions"
+msgstr "Use puncta for elisions"
+
+#: modeles/html/page.tpl:69
 msgid "Liens"
 msgstr "Links"
 
-#: modeles/html/page.tpl:41
+#: modeles/html/page.tpl:81
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
-#: modeles/html/page.tpl:53
+#: modeles/html/page.tpl:93
 msgid "Export"
-msgstr ""
+msgstr "Export"
 
-#: modeles/html/page.tpl:70
+#: modeles/html/page.tpl:110
 msgid "Déconnexion"
 msgstr "Disconnect"
 
-#: modeles/html/page.tpl:76 modeles/html/page.tpl:83
+#: modeles/html/page.tpl:116 modeles/html/page.tpl:123
 msgid "S'authentifier"
 msgstr "Authenticate"
 
-#: modeles/html/page.tpl:90
+#: modeles/html/page.tpl:130
 msgid "Administration"
-msgstr ""
+msgstr "Administration"
 
 #: modeles/html/suppression.tpl:2
-msgid "Êtes-vous sûr de vouloir supprimer {} ?"
+msgid "Êtes-vous sûr de vouloir supprimer {}"
 msgstr "Are you sure you want to delete {} ?"
 
 #: modeles/html/suppression.tpl:4
@@ -498,3 +650,31 @@ msgstr "Users :"
 #: modeles/html/utilisateurs.tpl:26
 msgid "supprimer"
 msgstr "delete"
+
+#~ msgid "Déplacement"
+#~ msgstr "Move"
+
+#~ msgid "Effacement"
+#~ msgstr "Erase"
+
+#~ msgid "Initiale en couleur"
+#~ msgstr "Colored initial"
+
+#~ msgid ""
+#~ "Il y a eu une erreur pendant le traitement du document.\n"
+#~ "Ceci vient probablement d'une erreur de syntaxe ; si vous êtes "
+#~ "absolument\n"
+#~ "certain du contraire, merci de signaler le problème.\n"
+#~ "\n"
+#~ "Voici la sortie de la commande :\n"
+#~ "\n"
+#~ "                    "
+#~ msgstr ""
+#~ "There was an error processing the document.\n"
+#~ "This probably comes from a syntax error ; if you are sure it doesn't, "
+#~ "please\n"
+#~ "report the problem.\n"
+#~ "\n"
+#~ "Here is the command output :\n"
+#~ "\n"
+#~ "                "

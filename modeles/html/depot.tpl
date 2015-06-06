@@ -4,7 +4,7 @@
             name="origine"
             value="{{origine}}"
             label="{{_("Adresse d'origine")}} :"
-            placeholder="{{_("https://github.com/<auteur>/<projet>")}}"
+            placeholder="{{"https://github.com/<auteur>/<projet>"}}"
             required
         >
         <br>
@@ -20,7 +20,7 @@
         <input
             name="utilisateur"
             label="{{_("Nom d'utilisateur")}} :"
-            placeholder="{{_("Utilisateur")}}"
+            placeholder="{{_('Utilisateur')}}"
             required
         >
         <br>
