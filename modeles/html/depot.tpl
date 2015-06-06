@@ -2,7 +2,10 @@
     <form method="post">
         <input
             name="origine"
+            %try:
             value="{{origine}}"
+            %except NameError: pass
+            %end
             label="{{_("Adresse d'origine")}} :"
             placeholder="{{"https://github.com/<auteur>/<projet>"}}"
             required
