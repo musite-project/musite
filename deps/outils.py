@@ -210,7 +210,7 @@ class Depot():
         """Sauvegarde d'un fichier isolé
         """
         self.sauvegarde(
-            fichier.nom,
+            fichier.chemin,
             fichier.nom,
             auteur
         )

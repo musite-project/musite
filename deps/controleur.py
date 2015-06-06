@@ -335,8 +335,8 @@ class Document:
             f.traiter_erreur(err)
             TXT.Document(self.chemin).enregistrer(self.chemin)
         self.depot.sauvegarder(
-            fichier=f.Fichier(self. fichier),
-            message=os.path.basename(self. fichier)
+            fichier=f.Fichier(self.fichier),
+            message=os.path.basename(self.fichier)
         )
         b.redirect(i18n_path('/' + self.chemin))
 
