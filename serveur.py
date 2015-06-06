@@ -261,7 +261,10 @@ def document_creer(nom, element=''):
     """
     if rq.forms.action == 'creer':
         doc = rq.forms.decode().nom.split('.')
-        element, ext = element + '/' + '.'.join((doc[:-1])), doc[-1]
+        if len(doc) > 1:
+            element, ext = element + '.'.join((doc[:-1])), doc[-1]
+        else:
+            element, ext = doc[0], ''
         return Document(nom, element, ext).creer()
     else:
         b.redirect(i18n_path('/{}/{}'.format(nom, element)))
@@ -814,7 +817,7 @@ def document_afficher(nom, element=None, ext=None):
         if not element:
             return Projet(nom).lister()
         else:
-            return Dossier(nom, element).lister()
+            return Dossier(nom, element + ('.' + ext if ext else '')).lister()
     except TypeError as err:
         f.traiter_erreur(err)
         # Cette exception est levée s'il ne s'agit pas d'un dossier.

@@ -148,6 +148,9 @@ class Document(txt.Document):
         except UnicodeDecodeError as err:
             traiter_erreur(err)
             raise FichierIllisible
+        except FileNotFoundError as err:
+            traiter_erreur(err)
+            return Gabc('')
 
     def _gabc_entete(self, entete):
         """Entête d'un document gabc
