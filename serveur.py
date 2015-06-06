@@ -215,6 +215,8 @@ def utilisateur_ajout():
         except u.UtilisateurExistant as err:
             f.traiter_erreur(err)
             utilisateur.modifier()
+        except u.NomDUtilisateurRequis as err:
+            f.traiter_erreur(err)
     b.redirect(i18n_path('/admin/utilisateurs'))
 
 

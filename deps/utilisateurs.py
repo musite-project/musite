@@ -35,6 +35,8 @@ class Utilisateur:
     def ajouter(self, fichier=False):
         if not fichier:
             fichier = self.fichier
+        if self.nom == '':
+            raise NomDUtilisateurRequis
         if self.mdp == '':
             raise MotDePasseRequis
         if self.nom not in lister(fichier).keys():
@@ -74,6 +76,10 @@ class Utilisateur:
 
 
 class UtilisateurExistant(Exception):
+    pass
+
+
+class NomDUtilisateurRequis(Exception):
     pass
 
 
