@@ -27,6 +27,7 @@ class Document(txt.Document):
             self, chemin,
             formats={
                 'pdf': (self.pdf, {
+                    'aa_perso': (_("Personnaliser la mise en page"), False),
                     'document': (_("Document"), {
                         'ba_papier':
                             (
@@ -45,7 +46,7 @@ class Document(txt.Document):
                         'police_famille':
                             (_("Nom"), 'libertine'),
                         'police_taille':
-                            (_("Taille de la police"), '12pt'),
+                            (_("Taille de la police"), '12'),
                     }),
                 }),
             },
@@ -95,19 +96,20 @@ class Document(txt.Document):
             self.dossier, self.dossiertmp, symlinks=True,
             ignore=lambda x, y: '.git'
         )
-        with open(self._fichiertmp(), 'w') as doc:
-            doc.write(re.sub(
-                'fontsize=\d*',
-                'fontsize={}'.format(self.proprietes['pdf']['police_taille']),
-                self.contenu.replace(
-                    "\\begin{document}",
-                    TEMPLATETEX(
-                        'entete',
-                        proprietes=self.proprietes['pdf']
-                    ) +
-                    "\n\\begin{document}"
-                )
-            ))
+        if self.proprietes['pdf']['aa_perso']:
+            with open(self._fichiertmp(), 'w') as doc:
+                doc.write(re.sub(
+                    'fontsize=\d*',
+                    'fontsize={}'.format(self.proprietes['pdf']['police_taille']),
+                    self.contenu.replace(
+                        "\\begin{document}",
+                        TEMPLATETEX(
+                            'entete',
+                            proprietes=self.proprietes['pdf']
+                        ) +
+                        "\n\\begin{document}"
+                    )
+                ))
         compiler_pdf(self._fichiertmp(), environnement)
         os.renames(orig, dest)
         if not cfg.DEVEL:
