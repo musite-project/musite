@@ -22,7 +22,7 @@ class Document(txt.Document):
     def __init__(self, chemin):
         txt.Document.__init__(self, chemin)
 
-    def afficher(self):
+    def afficher(self, actualiser=0):
         def documentmaitre():
             """Test pour savoir s'il s'agit d'un document maître
             """
@@ -33,9 +33,26 @@ class Document(txt.Document):
                         return True
             return False
         if documentmaitre():
-            return self.afficher_pdf()
+            return self.afficher_pdf(actualiser=actualiser)
         else:
-            return txt.Document.afficher(self)
+            return txt.Document.afficher(self, actualiser=actualiser)
+
+    def pdf(self, chemin=None, indice='', actualiser=0):
+        """Format pdf
+
+        Pour les documents latex, on désactive l'actualisation automatique,
+        pour les raisons suivantes :
+
+        - la compilation peut être longue, et l'utilisateur n'a pas forcément
+          envie de la recommencer à chaque modification de détail ;
+        - la compilation peut être rendue nécessaire par la modification d'un
+          autre document que le document maître, ce que ne détecte pas la
+          compilation automatique.
+        """
+        print(actualiser)
+        return txt.Document.pdf(
+            self, chemin=chemin, indice=indice, actualiser=actualiser
+        )
 
     def preparer_pdf(self, destination=False, environnement=None):
         """Mise en place du pdf

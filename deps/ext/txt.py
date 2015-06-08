@@ -171,12 +171,12 @@ class Document:
 
     afficher_source = afficher
 
-    def afficher_pdf(self, message_erreur=''):
+    def afficher_pdf(self, message_erreur='', actualiser=2):
         """Affichage du document pdf en html (base 64)
         """
         try:
             return h.OBJECT(
-                data="{}".format(self.pdf()),
+                data="{}".format(self.pdf(actualiser=actualiser)),
                 Type="application/pdf",
                 width="100%",
                 height="100%"
@@ -195,7 +195,7 @@ Voici la sortie de la commande :
 
                 """
             ).format(message_erreur)) +
-            traiter_erreur_compilation(self.dossiertmp))
+                traiter_erreur_compilation(self.dossiertmp))
 
     @property
     def contenu(self):
@@ -247,15 +247,26 @@ Voici la sortie de la commande :
         """
         return self.fmt[fmt][0]
 
-    def pdf(self, chemin=None, indice=''):
+    def pdf(self, chemin=None, indice='', actualiser=2):
         """Format pdf
+
+        Si un pdf existe déjà dans l'arborescence de musite, il sera
+        actualisé en fonction du paramètre *actualiser* :
+
+        - 0 : aucune actualisation ;
+        - 1 : actualisation forcée ;
+        - 2 : actualisation si le pdf est plus ancien que l'original.
         """
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichiersortie('pdf', chemin=chemin, indice=indice)
-        if (
+        print(actualiser)
+        if actualiser == 1 or (
                 not os.path.isfile(fichierpdf)
-                or os.path.getmtime(fichierpdf)
-                < os.path.getmtime(self._fichier())
+                or (
+                    actualiser
+                    and os.path.getmtime(fichierpdf)
+                    < os.path.getmtime(self._fichier())
+                )
         ):
             self.preparer_pdf(destination=fichierpdf)
         return url(fichierpdf)

@@ -831,7 +831,12 @@ def document_afficher(nom, element=None, ext=None):
         f.traiter_erreur(err)
         # Cette exception est levée s'il ne s'agit pas d'un dossier.
         try:
-            return Document(nom, element, ext).contenu
+            document = Document(nom, element, ext)
+            actualiser = rq.query.act
+            if actualiser:
+                return document.contenu(actualiser=int(actualiser))
+            else:
+                return document.contenu()
         except FileNotFoundError as err:
             f.traiter_erreur(err)
             # Cette exception est levée s'il n'y a pas de document, ce qui

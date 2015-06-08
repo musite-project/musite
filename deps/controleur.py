@@ -183,6 +183,7 @@ class Document:
         proposant une opération sur un document.
         """
         actions = {
+            _('Actualiser'): self.chemin + '/?act=1',
             _('Aperçu'): self.chemin,
             _('Historique'): '_historique/' + self.chemin,
             _('Source'): '_src/' + self.chemin
@@ -226,8 +227,7 @@ class Document:
             'midi': midi,
         }
 
-    @property
-    def contenu(self):
+    def contenu(self, actualiser=None):
         """Contenu du document
 
         Ce contenu dépend du type du document : c'est donc le module gérant
@@ -237,9 +237,14 @@ class Document:
         aux docstrings du module deps/ext/txt.py.
         """
         try:
-            return self.afficher(
-                self.document.afficher()
-            )
+            if actualiser:
+                return self.afficher(
+                    self.document.afficher(actualiser=actualiser)
+                )
+            else:
+                return self.afficher(
+                    self.document.afficher()
+                )
         except AttributeError as err:
             f.traiter_erreur(err)
             # Si le type de document est inconnu ou ne prévoit pas d'affichage,
