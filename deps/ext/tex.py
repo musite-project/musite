@@ -14,13 +14,43 @@ from etc import config as cfg
 import os
 import shutil
 import re
+from deps.outils import templateperso, _
+
+TEMPLATETEX = templateperso()
 
 
 class Document(txt.Document):
     """Document tex
     """
-    def __init__(self, chemin):
-        txt.Document.__init__(self, chemin)
+    def __init__(self, chemin, proprietes=None):
+        txt.Document.__init__(
+            self, chemin,
+            formats={
+                'pdf': (self.pdf, {
+                    'document': (_("Document"), {
+                        'ba_papier':
+                            (
+                                _("Taille de la page (largeur, hauteur)"),
+                                '210mm, 297mm'
+                            ),
+                        'marge':
+                            (
+                                _("Marges (haut, bas, gauche, droite)"),
+                                ('25mm', '35mm', '25mm', '25mm')
+                            ),
+                        'page_numero':
+                            (_("Numéros de page"), True),
+                    }),
+                    'police': (_("Police"), {
+                        'police_famille':
+                            (_("Nom"), 'libertine'),
+                        'police_taille':
+                            (_("Taille de la police"), '12pt'),
+                    }),
+                }),
+            },
+            proprietes=proprietes
+        )
 
     def afficher(self, actualiser=0):
         def documentmaitre():
@@ -49,7 +79,6 @@ class Document(txt.Document):
           autre document que le document maître, ce que ne détecte pas la
           compilation automatique.
         """
-        print(actualiser)
         return txt.Document.pdf(
             self, chemin=chemin, indice=indice, actualiser=actualiser
         )
@@ -66,6 +95,19 @@ class Document(txt.Document):
             self.dossier, self.dossiertmp, symlinks=True,
             ignore=lambda x, y: '.git'
         )
+        with open(self._fichiertmp(), 'w') as doc:
+            doc.write(re.sub(
+                'fontsize=\d*',
+                'fontsize={}'.format(self.proprietes['pdf']['police_taille']),
+                self.contenu.replace(
+                    "\\begin{document}",
+                    TEMPLATETEX(
+                        'entete',
+                        proprietes=self.proprietes['pdf']
+                    ) +
+                    "\n\\begin{document}"
+                )
+            ))
         compiler_pdf(self._fichiertmp(), environnement)
         os.renames(orig, dest)
         if not cfg.DEVEL:
