@@ -58,7 +58,9 @@
         <div id="menu">
             %try:
             %if midi:
+            <object data="{{midi}}" type="audio/x-midi" width="50px" height="25px">
             <input type="button" value="▶" id='btnmidi' onclick="doPlay(mp, this);"/>
+            </object>
             <br><br>
             %end
             %except NameError: pass
