@@ -58,9 +58,13 @@
         <div id="menu">
             %try:
             %if midi:
+            %if prefixe != 'https':
             <object data="{{prefixe + '://' + hote + i18n_path(midi)}}" type="audio/x-midi" width="50px" height="25px">
+            %end
             <input type="button" value="▶" id='btnmidi' onclick="doPlay(mp, this);"/>
+            %if prefixe != 'https':
             </object>
+            %end
             <br><br>
             %end
             %except NameError: pass
