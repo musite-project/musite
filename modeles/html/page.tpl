@@ -58,7 +58,7 @@
         <div id="menu">
             %try:
             %if midi:
-            <object data="{{i18n_path(midi)}}" type="audio/x-midi" width="50px" height="25px">
+            <object data="{{prefixe + '://' + hote + i18n_path(midi)}}" type="audio/x-midi" width="50px" height="25px">
             <input type="button" value="▶" id='btnmidi' onclick="doPlay(mp, this);"/>
             </object>
             <br><br>
