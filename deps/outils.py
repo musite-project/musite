@@ -9,6 +9,7 @@ en plusieurs points du programme.
 import os
 import re
 import shutil
+import traceback
 from time import time
 import subprocess
 from glob import glob as ls
@@ -38,6 +39,7 @@ class Depot():
     def cloner(self, depot):
         """Cloner un dépôt distant
         """
+        return commande(['clone', depot, self.dossier])
         cmd = ['git', 'clone', depot, self.dossier]
         try:
             resultat = subprocess.check_output(cmd)
@@ -55,10 +57,12 @@ class Depot():
         ligne = ['git']
         ligne.extend(arguments)
         try:
-            resultat = subprocess.check_output(ligne)
+            resultat = subprocess.check_output(ligne, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as err:
             traiter_erreur(err)
-            raise
+            if cfg.DEVEL:
+                print(err.returncode, err.output)
+            raise GitError(err)
         return resultat.decode('utf-8')
 
     def comparer(self, version, versionb=None, fichier=None):
@@ -85,6 +89,10 @@ class Depot():
             parametres.append(fichier)
         return self.commande(parametres).replace('\r', '').split('\n')
 
+    @property
+    def etat(self):
+        return self.commande(['status', '-s'])
+
     def initialiser(self):
         """Initialisation du dépôt
         """
@@ -95,7 +103,7 @@ class Depot():
 
         Méthode générale.
         """
-        ligne = ['log']
+        ligne = ['log', '--no-merges']
         ligne.extend(arguments if arguments else [])
         return self.commande(ligne)
 
@@ -143,8 +151,7 @@ class Depot():
     def pull(self, depot=None):
         """Récupérer les modifications depuis un dépôt distant
         """
-        depot = depot if depot else self.origine
-        self.commande(['pull', depot])
+        self.commande(['pull', depot if depot else self.origine])
 
     def push(self, depot=None, utilisateur=None, mdp=''):
         """Renvoyer les modifications locales vers un dépôt distant
@@ -189,17 +196,8 @@ class Depot():
         ]
         if auteur:
             arguments.append('--author="{0} <{0}>'.format(auteur))
-        try:
-            self.commande(['add', chemin])
-            self.commande(arguments)
-        except subprocess.CalledProcessError as err:
-            if err.returncode == 128:
-                try:
-                    self.initialiser()
-                except subprocess.CalledProcessError:
-                    pass
-            else:
-                print(err.__dict__)
+        self.commande(['add', chemin])
+        self.commande(arguments)
 
     def sauvegardecomplete(self, message=_("Sauvegarde complète"), auteur=None):
         """Sauvegarde de l'ensemble du dépôt
@@ -327,10 +325,29 @@ def traiter_erreur(err):
     """Méthode appelée lorsqu'une exception est levée
     """
     if cfg.DEVEL:
-        print(type(err), err)
+        print(traceback.format_exc())
 
 
 def url(fichier):
     """Url correspondant à un fichier
     """
     return fichier.replace(cfg.PWD, '').replace(os.sep, '/')
+
+
+class GitError(Exception):
+    def __init__(self, cpe):
+        """L'argument cpe doit être une CalledProcessException."""
+        self.cpe = cpe
+
+    def __getattr__(self, attribut):
+        try:
+            return getattr(self.cpe, attribut)
+        except AttributeError:
+            raise
+
+    @property
+    def status(self):
+        etat = subprocess.check_output(['git', 'status', '-s'])\
+            .decode('utf8').split('\n')
+        print(etat)
+        return {doc[3:]: (doc[0], doc[1]) for doc in etat[:-1]}

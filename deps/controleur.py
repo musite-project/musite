@@ -339,10 +339,30 @@ class Document:
         except AttributeError as err:
             f.traiter_erreur(err)
             TXT.Document(self.chemin).enregistrer(self.chemin)
-        self.depot.sauvegarder(
-            fichier=f.Fichier(self.fichier),
-            message=os.path.basename(self.fichier)
-        )
+        try:
+            self.depot.sauvegarder(
+                fichier=f.Fichier(self.fichier),
+                message=os.path.basename(self.fichier)
+            )
+        except f.GitError as err:
+            f.traiter_erreur(err)
+            print(err.status)
+            return self.afficher(markdown(_
+                (
+                    "Il y a eu une erreur pendant la sauvegarde du document "
+                    "dans l'historique. Cela vient probablement d'erreurs de "
+                    "fusion non corrigées."
+                ) + "\n- " +
+                (
+                    "\n- ".join(
+                        str(h.A(
+                            doc, href=i18n_path('/' + self.projet + '/' + doc)
+                        ))
+                        for doc in err.status.keys()
+                        if err.status[doc] == ('U', 'U')
+                    )
+                ) if len(err.status) else ""
+            ))
         b.redirect(i18n_path('/' + self.chemin))
 
     def copier(self, destination, ecraser=False):
@@ -801,7 +821,29 @@ class Projet(Dossier):
 
     def recevoir(self, depot):
         """Réception des modifications distantes"""
-        self.depot.pull(depot)
+        try:
+            self.depot.pull(depot)
+        except f.GitError as err:
+            f.traiter_erreur(err)
+            return self.afficher(markdown(
+                _(
+                    "Il y a conflit de fusion sur les fichiers suivants :\n"
+                    "\n"
+                    "- {}\n"
+                    "\n"
+                    "Veuillez régler manuellement les conflits en question ; "
+                    "pour cela, recherchez les lignes `<<<<<<< HEAD`, qui "
+                    "indiquent le début de la zone de conflit.\n"
+                    "\n"
+                    "Attention : faites cela préalablement à tout autre "
+                    "travail, car l'historique ne fonctionnera normalement "
+                    "qu'après résolution des conflits."
+                ).format(
+                    "\n- ".join(str(h.A(
+                        doc, href=i18n_path('/' + self.chemin + doc)
+                    )) for doc in err.status.keys())
+                )
+            ))
         b.redirect(self.url)
 
     def renommer(self, destination):

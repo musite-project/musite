@@ -19,6 +19,7 @@ __license__ = 'MIT'
 
 import os
 import sys
+from functools import wraps
 
 LIB = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'deps')
 sys.path.insert(0, LIB)
@@ -61,6 +62,7 @@ def page(fonction):
     affichant des pages, mais non à celles qui retournent des données
     particulières, tels les css ou les fichiers statiques.
     """
+    @wraps(fonction)
     def afficher(*arguments, **parametres):
         """Décorateur
         """
@@ -865,7 +867,11 @@ def document_enregistrer(nom, element='', ext=''):
     """Enregistrement d'un document
     """
     if rq.forms.action == 'enregistrer':
-        Document(nom, element, ext).enregistrer(rq.forms.decode().contenu)
+        return Document(
+            nom, element, ext
+        ).enregistrer(
+            rq.forms.decode().contenu
+        )
     elif rq.forms.action == 'annuler':
         b.redirect(i18n_path(
             '/' + nom
