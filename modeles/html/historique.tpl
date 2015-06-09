@@ -18,6 +18,15 @@ mettre davantage en évidence.""")}}
 
 <br>
 
+%try:
+%if a.authentifier(rq.auth[0], rq.auth[1]) and rq.auth[0] != 'anonyme':
+<form method="post" action="{{i18n_path('/_annuler/' + emplacement)}}">
+    <button type="submit" name='commit' value='{{commit}}'>{{_("Annuler ces changements")}}</button>
+</form>
+%end
+%except TypeError: pass
+%end
+
 <h2>{{_("""Changements effectués depuis cette modification :""")}}</h2>
 
 <code>

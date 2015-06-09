@@ -36,6 +36,20 @@ class Depot():
     def __init__(self, dossier):
         self.dossier = dossier
 
+    def annuler(self, version, auteur=None):
+        """Revenir sur un commit donné
+        """
+        self.commande([
+            'revert',
+            '-n',
+            version
+        ])
+        self.sauvegardecomplete(
+            'Annulation des changements de la version '
+            + version,
+            auteur
+        )
+
     def cloner(self, depot):
         """Cloner un dépôt distant
         """

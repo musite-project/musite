@@ -750,6 +750,15 @@ def projet_historique(nom):
         return Projet(nom).historique
 
 
+@APP.post('/_annuler/<nom>')
+@b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
+@page
+def projet_annuler_commit(nom):
+    """Annulation des changements d'une version antérieure
+    """
+    return Projet(nom).annuler(rq.forms.commit)
+
+
 @APP.post('/_retablir/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page

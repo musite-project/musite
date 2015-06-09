@@ -787,11 +787,41 @@ class Projet(Dossier):
             'liens': liens,
         }
 
+    def annuler(self, commit):
+        """Annulation d'un commit malheureux
+        """
+        try:
+            self.depot.annuler(commit)
+            b.redirect(self.url)
+        except f.GitError as err:
+            return self.afficher(self.conflit(err))
+
     def cloner(self, depot):
         """Clonage d'un projet distant
         """
         self.depot.cloner(depot)
         b.redirect(self.url)
+
+    def conflit(self, err):
+        return markdown(
+                _(
+                    "Il y a conflit de fusion sur les fichiers suivants :\n"
+                    "\n"
+                    "- {}\n"
+                    "\n"
+                    "Veuillez régler manuellement les conflits en question ; "
+                    "pour cela, recherchez les lignes `<<<<<<< HEAD`, qui "
+                    "indiquent le début de la zone de conflit.\n"
+                    "\n"
+                    "Attention : faites cela préalablement à tout autre "
+                    "travail, car l'historique ne fonctionnera normalement "
+                    "qu'après résolution des conflits."
+                ).format(
+                    "\n- ".join(str(h.A(
+                        doc, href=i18n_path('/' + self.chemin + doc)
+                    )) for doc in err.status.keys())
+                )
+            )
 
     def copier(self, destination, ecraser=False):
         """Copie d'un projet
@@ -825,25 +855,7 @@ class Projet(Dossier):
             self.depot.pull(depot)
         except f.GitError as err:
             f.traiter_erreur(err)
-            return self.afficher(markdown(
-                _(
-                    "Il y a conflit de fusion sur les fichiers suivants :\n"
-                    "\n"
-                    "- {}\n"
-                    "\n"
-                    "Veuillez régler manuellement les conflits en question ; "
-                    "pour cela, recherchez les lignes `<<<<<<< HEAD`, qui "
-                    "indiquent le début de la zone de conflit.\n"
-                    "\n"
-                    "Attention : faites cela préalablement à tout autre "
-                    "travail, car l'historique ne fonctionnera normalement "
-                    "qu'après résolution des conflits."
-                ).format(
-                    "\n- ".join(str(h.A(
-                        doc, href=i18n_path('/' + self.chemin + doc)
-                    )) for doc in err.status.keys())
-                )
-            ))
+            return self.afficher(self.conflit(err))
         b.redirect(self.url)
 
     def renommer(self, destination):
