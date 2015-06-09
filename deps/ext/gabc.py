@@ -179,8 +179,8 @@ class Document(txt.Document):
         """
         return self._gabc.partition(transposition=transposition)
 
-    def afficher(self):
-        return self.afficher_pdf()
+    def afficher(self, actualiser=2):
+        return self.afficher_pdf(actualiser=actualiser)
 
     def gabc(self, fmt, chemin=None, indice=''):
         """Format gabc
@@ -190,6 +190,10 @@ class Document(txt.Document):
                 not os.path.isfile(fichier)
                 or os.path.getmtime(fichier)
                 < os.path.getmtime(self._fichier())
+                or os.path.getmtime(fichier)
+                < os.path.getmtime(
+                    self._fichiersortie('pdf', chemin=chemin, indice=indice)
+                )
         ):
             try:
                 self.preparer_gabc(fmt, fichier)
