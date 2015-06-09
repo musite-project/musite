@@ -17,7 +17,7 @@
     <script type="text/javascript">
     var mp;
     function init() {
-        mp = new MidiPlayer("{{midi}}", 'btnmidi');
+        mp = new MidiPlayer("{{i18n_path(midi)}}", 'btnmidi');
     }
     function doPlay(m, btnmidi) {
         if (btnmidi.value == '▶') {
@@ -58,7 +58,7 @@
         <div id="menu">
             %try:
             %if midi:
-            <object data="{{midi}}" type="audio/x-midi" width="50px" height="25px">
+            <object data="{{i18n_path(midi)}}" type="audio/x-midi" width="50px" height="25px">
             <input type="button" value="▶" id='btnmidi' onclick="doPlay(mp, this);"/>
             </object>
             <br><br>
