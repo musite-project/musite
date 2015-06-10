@@ -52,8 +52,10 @@ class Depot():
 
     def cloner(self, depot):
         """Cloner un dépôt distant
+
+        On n'utilise pas la méthode commande, car le dossier n'existe pas
+        encore !
         """
-        return commande(['clone', depot, self.dossier])
         cmd = ['git', 'clone', depot, self.dossier]
         try:
             resultat = subprocess.check_output(cmd)
