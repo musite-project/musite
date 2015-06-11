@@ -51,7 +51,7 @@ background-color: white;
 margin: 0px;
 margin-left: 10px;
 font-size: 93%;
-width: 120px;
+width: 130px;
 padding: 0px;
 float:left;
 overflow:auto;
@@ -87,7 +87,7 @@ height: auto;
 overflow:auto;
 padding: 4px;
 font-size: 108%;
-margin-left:130px;
+margin-left:140px;
 margin-right:auto;
 }
 
@@ -210,7 +210,7 @@ color: red;
 }
 
 #expr {
-    width: 110px;
+    width: 120px;
 }
 
 {{ext}}
