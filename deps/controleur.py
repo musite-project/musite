@@ -656,11 +656,13 @@ class Dossier:
             readme=readme,
         ))
 
-    def rechercher(self, expression):
+    def rechercher(self, expression, nom=True, contenu=True):
         try:
             liens = (
                 url(dossier).replace('/data', '')
-                for dossier in f.Dossier(self.dossier).rechercher(expression)
+                for dossier in f.Dossier(self.dossier).rechercher(
+                    expression, nom, contenu
+                )
             )
             return self.afficher(markdown(_(
                 "# Documents du dossier *{d}* "

@@ -209,4 +209,8 @@ color: red;
     bottom:10px;
 }
 
+#expr {
+    width: 110px;
+}
+
 {{ext}}

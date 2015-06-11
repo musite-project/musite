@@ -309,11 +309,16 @@ def dossier_creer(nom, element=''):
 @APP.post('/_rechercher/<nom>/<element:path>')
 @page
 def dossier_rechercher(nom, element=''):
-    expression = \
-        rq.forms.decode().expr if 'expr' in rq.forms \
-        else rq.query.expr if 'expr' in rq.query \
-        else '.*'
-    return Dossier(nom, element).rechercher(expression)
+    if 'expr' in rq.forms:
+        expression = rq.forms.decode().expr
+        recherchenom = rq.forms.nom
+        contenu = rq.forms.contenu
+    else:
+        expression = rq.query.expr if 'expr' in rq.query else '.*'
+        recherchenom = contenu = True
+    return Dossier(nom, element).rechercher(
+        expression, nom=recherchenom, contenu=contenu
+    )
 
 
 @APP.get('/_telechargerdossier/<nom>')
