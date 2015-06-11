@@ -84,7 +84,7 @@
 
             %try:
             <b>{{_("Recherche")}}</b><br>
-            <form method="post" action="{{i18n_path('/_rechercher/' + recherche)}}">
+            <form method="post" action="{{i18n_path('/_rechercher/' + recherche).replace('//', '/')}}">
             <input name="expr" id="expr" label='{{_("Expression")}}' placeholder='{{_("Expression")}}'>
             <input type="checkbox" name="nom" label='{{_("nom")}}' value="1" checked> {{_("nom")}} <br>
             <input type="checkbox" name="contenu" label='{{_("contenu")}}' value="1" checked> {{_("contenu")}}

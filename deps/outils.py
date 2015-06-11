@@ -268,6 +268,8 @@ class Dossier():
     def rechercher(self, expression, nom=True, contenu=True):
         for dossier, sousdossiers, fichiers in os.walk(self.dossier):
             if dossier[-4:] != '.git/':
+                if nom and re.match(expression, dossier.split('/')[-1]):
+                    yield dossier
                 for fichier in fichiers:
                     document = os.path.join(dossier, fichier)
                     if nom and re.match(expression, fichier):

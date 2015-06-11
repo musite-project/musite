@@ -464,7 +464,9 @@ class Dossier:
         self.projet = projet
         self.nom = element
         self.chemin = '/'.join((projet, element))
-        self.dossier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
+        self.dossier = \
+            os.path.join(cfg.DATA, self.chemin.replace('/', os.sep)) \
+            if len(self.chemin) > 1 else cfg.DATA
         self.depot = Depot(self.projet)
 
     def afficher(self, contenu, suppression=False):

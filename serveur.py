@@ -103,7 +103,8 @@ def accueil():
     return {
         'corps': corps,
         'actions': actions,
-        'liens': liens
+        'liens': liens,
+        'recherche': '',
     }
 
 
@@ -303,12 +304,15 @@ def dossier_creer(nom, element=''):
         b.redirect(i18n_path('/{}/{}'.format(nom, element).replace('//', '/')))
 
 
+
+@APP.get('/_rechercher')
 @APP.get('/_rechercher/<nom>')
 @APP.get('/_rechercher/<nom>/<element:path>')
+@APP.post('/_rechercher')
 @APP.post('/_rechercher/<nom>')
 @APP.post('/_rechercher/<nom>/<element:path>')
 @page
-def dossier_rechercher(nom, element=''):
+def dossier_rechercher(nom='', element=''):
     if 'expr' in rq.forms:
         expression = rq.forms.decode().expr
         recherchenom = rq.forms.nom
