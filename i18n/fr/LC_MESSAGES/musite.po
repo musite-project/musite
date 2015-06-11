@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-06 10:32+0200\n"
+"POT-Creation-Date: 2015-06-11 17:46+0200\n"
 "PO-Revision-Date: 2015-04-24 16:23+0200\n"
 "Last-Translator: Abbé Jacques Peron <cataclop@hotmail.com>\n"
 "Language-Team: French\n"
@@ -18,124 +18,124 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: serveur.py:82 serveur.py:115 deps/controleur.py:753
+#: serveur.py:84 serveur.py:117 deps/controleur.py:803
 msgid "Créer projet"
 msgstr ""
 
-#: serveur.py:89
+#: serveur.py:91
 msgid "Projets"
 msgstr ""
 
-#: serveur.py:116
+#: serveur.py:118
 msgid "Cloner projet"
 msgstr ""
 
-#: serveur.py:117
+#: serveur.py:119
 msgid "Envoyer projet"
 msgstr ""
 
-#: serveur.py:143 modeles/html/page.tpl:104
+#: serveur.py:145 modeles/html/page.tpl:119
 msgid "Accès réservé"
 msgstr ""
 
-#: serveur.py:150
+#: serveur.py:152
 msgid "Bonjour, {} !"
 msgstr ""
 
-#: serveur.py:153
+#: serveur.py:155
 msgid "Retour à la page précédente"
 msgstr ""
 
-#: serveur.py:161 serveur.py:187 serveur.py:197 serveur.py:206
+#: serveur.py:163 serveur.py:189 serveur.py:199 serveur.py:208
 msgid "Vous devez être administrateur"
 msgstr ""
 
-#: serveur.py:166
+#: serveur.py:168
 msgid "Utilisateurs"
 msgstr ""
 
-#: serveur.py:244 serveur.py:257 serveur.py:275 serveur.py:288 serveur.py:310
-#: serveur.py:320 serveur.py:334 serveur.py:346 serveur.py:360 serveur.py:370
-#: serveur.py:386 serveur.py:398 serveur.py:412 serveur.py:435 serveur.py:459
-#: serveur.py:477 serveur.py:507 serveur.py:522 serveur.py:538 serveur.py:559
-#: serveur.py:574 serveur.py:590 serveur.py:602 serveur.py:622 serveur.py:641
-#: serveur.py:651 serveur.py:720 serveur.py:743 serveur.py:754 serveur.py:765
-#: serveur.py:848
+#: serveur.py:253 serveur.py:266 serveur.py:285 serveur.py:295 serveur.py:330
+#: serveur.py:340 serveur.py:354 serveur.py:366 serveur.py:380 serveur.py:390
+#: serveur.py:406 serveur.py:418 serveur.py:432 serveur.py:455 serveur.py:479
+#: serveur.py:497 serveur.py:527 serveur.py:542 serveur.py:560 serveur.py:581
+#: serveur.py:598 serveur.py:614 serveur.py:626 serveur.py:646 serveur.py:665
+#: serveur.py:675 serveur.py:744 serveur.py:767 serveur.py:776 serveur.py:787
+#: serveur.py:798 serveur.py:886
 msgid "Réservé aux éditeurs"
 msgstr ""
 
-#: serveur.py:252
+#: serveur.py:261
 msgid "fichier"
 msgstr ""
 
-#: serveur.py:283
+#: serveur.py:290
 msgid "dossier"
 msgstr ""
 
-#: serveur.py:340
+#: serveur.py:360
 msgid "Cloner"
 msgstr ""
 
-#: serveur.py:341 serveur.py:394 serveur.py:614
+#: serveur.py:361 serveur.py:414 serveur.py:638
 msgid "projet"
 msgstr ""
 
-#: serveur.py:420
+#: serveur.py:440
 msgid "Nouvel emplacement"
 msgstr ""
 
-#: serveur.py:421 deps/controleur.py:193 deps/controleur.py:462
+#: serveur.py:441 deps/controleur.py:194 deps/controleur.py:488
 #: modeles/html/deplacement.tpl:5
 msgid "Déplacer"
 msgstr ""
 
-#: serveur.py:426
+#: serveur.py:446
 msgid "Nouveau nom"
 msgstr ""
 
-#: serveur.py:427 deps/controleur.py:748
+#: serveur.py:447 deps/controleur.py:798
 msgid "Renommer"
 msgstr ""
 
-#: serveur.py:467
+#: serveur.py:487
 msgid "Destination"
 msgstr ""
 
-#: serveur.py:468 deps/controleur.py:192 deps/controleur.py:460
-#: deps/controleur.py:738
+#: serveur.py:488 deps/controleur.py:193 deps/controleur.py:486
+#: deps/controleur.py:788
 msgid "Copier"
 msgstr ""
 
-#: serveur.py:517
+#: serveur.py:537
 msgid "le fichier {}/{} ?"
 msgstr ""
 
-#: serveur.py:583
+#: serveur.py:607
 msgid "le projet {} et tout son contenu ? "
 msgstr ""
 
-#: serveur.py:584
+#: serveur.py:608
 msgid "Attention : cette opération est irréversible !"
 msgstr ""
 
-#: serveur.py:611
+#: serveur.py:635
 msgid "Recevoir"
 msgstr ""
 
-#: serveur.py:611 modeles/html/envoi_dossier.tpl:6
+#: serveur.py:635 modeles/html/envoi_dossier.tpl:6
 #: modeles/html/envoi_projet.tpl:8 modeles/html/envoi.tpl:12
 msgid "Envoyer"
 msgstr ""
 
-#: serveur.py:667 serveur.py:864
+#: serveur.py:691 serveur.py:906
 msgid "Pourriez-vous expliciter votre intention ?"
 msgstr ""
 
-#: serveur.py:894
+#: serveur.py:936
 msgid "Accès réservé !"
 msgstr ""
 
-#: serveur.py:907
+#: serveur.py:949
 msgid "Il n'y a rien ici !"
 msgstr ""
 
@@ -147,71 +147,81 @@ msgstr ""
 msgid "Il n'y a pas encore de modifications à signaler."
 msgstr ""
 
-#: deps/controleur.py:147 deps/outils.py:204
+#: deps/controleur.py:147 deps/outils.py:219
 msgid "Sauvegarde complète"
 msgstr ""
 
 #: deps/controleur.py:186
+msgid "Actualiser"
+msgstr ""
+
+#: deps/controleur.py:187
 msgid "Aperçu"
 msgstr ""
 
-#: deps/controleur.py:187 deps/controleur.py:728
+#: deps/controleur.py:188 deps/controleur.py:778
 msgid "Historique"
 msgstr ""
 
-#: deps/controleur.py:188
+#: deps/controleur.py:189
 msgid "Source"
 msgstr ""
 
-#: deps/controleur.py:194
+#: deps/controleur.py:195
 msgid "Éditer"
 msgstr ""
 
-#: deps/controleur.py:195 deps/controleur.py:468 deps/controleur.py:750
+#: deps/controleur.py:196 deps/controleur.py:494 deps/controleur.py:800
 msgid "Supprimer"
 msgstr ""
 
-#: deps/controleur.py:197
+#: deps/controleur.py:198
 msgid "Éditer gabc"
 msgstr ""
 
-#: deps/controleur.py:201 deps/controleur.py:473 deps/controleur.py:756
+#: deps/controleur.py:202 deps/controleur.py:499 deps/controleur.py:806
 msgid "Projet"
 msgstr ""
 
-#: deps/controleur.py:202
+#: deps/controleur.py:203
 msgid "Dossier"
 msgstr ""
 
-#: deps/controleur.py:252 deps/controleur.py:280
+#: deps/controleur.py:257 deps/controleur.py:285
 msgid "Extension inconnue : {}."
 msgstr ""
 
-#: deps/controleur.py:258 deps/controleur.py:296
+#: deps/controleur.py:263 deps/controleur.py:301
 msgid "Ce fichier est illisible."
 msgstr ""
 
-#: deps/controleur.py:282
+#: deps/controleur.py:287
 msgid "Voici les données de la requète :"
 msgstr ""
 
-#: deps/controleur.py:312
+#: deps/controleur.py:318
 msgid "Suppression du document {}"
 msgstr ""
 
-#: deps/controleur.py:314
+#: deps/controleur.py:320
 msgid "Document supprimé !"
 msgstr ""
 
-#: deps/controleur.py:326
+#: deps/controleur.py:332
 msgid "Ce type de document n'est pas éditable."
 msgstr ""
 
-#: deps/controleur.py:351 deps/controleur.py:510
+#: deps/controleur.py:352
+msgid ""
+"Il y a eu une erreur pendant la sauvegarde du document dans l'historique. "
+"Cela vient probablement d'erreurs de fusion non corrigées."
+msgstr ""
+
+#: deps/controleur.py:377 deps/controleur.py:538
 msgid "copie"
 msgstr ""
 
-#: deps/controleur.py:359 deps/controleur.py:518
+#: deps/controleur.py:385 deps/controleur.py:546
 msgid ""
 "Il y a déjà quelque chose à cet emplacement.\n"
 "\n"
@@ -220,7 +230,7 @@ msgid ""
 "- Si vous désirez remplacer un fichier existant, supprimez-le auparavant."
 msgstr ""
 
-#: deps/controleur.py:384
+#: deps/controleur.py:410
 msgid ""
 "Il y a eu une erreur pendant le traitement du document.\n"
 "Ceci vient probablement d'une erreur de syntaxe ou d'une erreur dans vos\n"
@@ -229,79 +239,98 @@ msgid ""
 "                    "
 msgstr ""
 
-#: deps/controleur.py:452 deps/controleur.py:729
+#: deps/controleur.py:478 deps/controleur.py:779
 msgid "Télécharger"
 msgstr ""
 
-#: deps/controleur.py:456 deps/controleur.py:734
+#: deps/controleur.py:482 deps/controleur.py:784
 msgid "Créer document"
 msgstr ""
 
-#: deps/controleur.py:458 deps/controleur.py:736
+#: deps/controleur.py:484 deps/controleur.py:786
 msgid "Créer dossier"
 msgstr ""
 
-#: deps/controleur.py:464 deps/controleur.py:744
+#: deps/controleur.py:490 deps/controleur.py:794
 msgid "Envoyer fichier"
 msgstr ""
 
-#: deps/controleur.py:466 deps/controleur.py:746
+#: deps/controleur.py:492 deps/controleur.py:796
 msgid "Envoyer dossier"
 msgstr ""
 
-#: deps/controleur.py:474
+#: deps/controleur.py:500
 msgid "Parent"
 msgstr ""
 
-#: deps/controleur.py:533
+#: deps/controleur.py:561
 msgid "Envoi du fichier {}"
 msgstr ""
 
-#: deps/controleur.py:540
+#: deps/controleur.py:568
 msgid ""
 "Le fichier existe déjà. Si vous voulez l'écraser, merci de cocher la case "
 "correspondante."
 msgstr ""
 
-#: deps/controleur.py:636
+#: deps/controleur.py:666
+#, python-brace-format
+msgid "# Documents du dossier *{d}* contenant l'expression _{e}_"
+msgstr ""
+
+#: deps/controleur.py:686
 msgid "Suppression du dossier {}"
 msgstr ""
 
-#: deps/controleur.py:638
+#: deps/controleur.py:688
 msgid "Dossier supprimé !"
 msgstr ""
 
-#: deps/controleur.py:700 deps/controleur.py:881
+#: deps/controleur.py:750 deps/controleur.py:966
 msgid "Ceci n'est pas une archive zip."
 msgstr ""
 
-#: deps/controleur.py:740
+#: deps/controleur.py:790
 msgid "Distant-envoi"
 msgstr ""
 
-#: deps/controleur.py:742
+#: deps/controleur.py:792
 msgid "Distant-réception"
 msgstr ""
 
-#: deps/controleur.py:777 deps/controleur.py:808
+#: deps/controleur.py:832
+msgid ""
+"Il y a conflit de fusion sur les fichiers suivants :\n"
+"\n"
+"- {}\n"
+"\n"
+"Veuillez régler manuellement les conflits en question ; pour cela, "
+"recherchez les lignes `<<<<<<< HEAD`, qui indiquent le début de la zone de "
+"conflit.\n"
+"\n"
+"Attention : faites cela préalablement à tout autre travail, car l'historique "
+"ne fonctionnera normalement qu'après résolution des conflits."
+msgstr ""
+
+#: deps/controleur.py:858 deps/controleur.py:893
 msgid "Il y a déjà un projet portant ce nom !"
 msgstr ""
 
-#: deps/controleur.py:788
+#: deps/controleur.py:869
 msgid "Ce projet existe déjà !"
 msgstr ""
 
-#: deps/controleur.py:843
+#: deps/controleur.py:928
 msgid "Projet supprimé !"
 msgstr ""
 
-#: deps/controleur.py:847
+#: deps/controleur.py:932
 msgid ""
 "C'est drôle, ce que vous me demandez :\n"
 "                il n'y a pas de projet ici !"
 msgstr ""
 
-#: deps/controleur.py:868
+#: deps/controleur.py:953
 msgid ""
 "L'archive doit contenir un et un seul dossier, dans lequel doivent se "
 "trouver :\n"
@@ -311,7 +340,7 @@ msgid ""
 "version."
 msgstr ""
 
-#: deps/outils.py:225
+#: deps/outils.py:240
 msgid " n'est pas un dossier"
 msgstr ""
 
@@ -327,7 +356,7 @@ msgstr ""
 msgid "Couleur (R,V,B)"
 msgstr ""
 
-#: deps/ext/gabc.py:47 deps/ext/ly.py:32 deps/ext/md.py:31
+#: deps/ext/gabc.py:47 deps/ext/ly.py:32 deps/ext/md.py:31 deps/ext/tex.py:31
 msgid "Document"
 msgstr ""
 
@@ -343,11 +372,11 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: deps/ext/gabc.py:56
+#: deps/ext/gabc.py:56 deps/ext/tex.py:34
 msgid "Taille de la page (largeur, hauteur)"
 msgstr ""
 
-#: deps/ext/gabc.py:61 deps/ext/ly.py:37 deps/ext/md.py:36
+#: deps/ext/gabc.py:61 deps/ext/ly.py:37 deps/ext/md.py:36 deps/ext/tex.py:39
 msgid "Marges (haut, bas, gauche, droite)"
 msgstr ""
 
@@ -375,7 +404,7 @@ msgstr ""
 msgid "Texte"
 msgstr ""
 
-#: deps/ext/gabc.py:77 deps/ext/md.py:46
+#: deps/ext/gabc.py:77 deps/ext/md.py:46 deps/ext/tex.py:49
 msgid "Taille de la police"
 msgstr ""
 
@@ -419,7 +448,7 @@ msgstr ""
 msgid "Taille de la page"
 msgstr ""
 
-#: deps/ext/ly.py:42 deps/ext/md.py:42
+#: deps/ext/ly.py:42 deps/ext/md.py:42 deps/ext/tex.py:45
 msgid "Police"
 msgstr ""
 
@@ -448,16 +477,20 @@ msgid ""
 "restrictives, qui rendent impossibles certaines opérations.\n"
 msgstr ""
 
-#: deps/ext/md.py:40
+#: deps/ext/md.py:40 deps/ext/tex.py:43
 msgid "Numéros de page"
 msgstr ""
 
-#: deps/ext/md.py:44
+#: deps/ext/md.py:44 deps/ext/tex.py:47
 msgid "Nom"
 msgstr ""
 
 #: deps/ext/md.py:50
 msgid "Thème"
+msgstr ""
+
+#: deps/ext/tex.py:30
+msgid "Personnaliser la mise en page"
 msgstr ""
 
 #: deps/ext/txt.py:187
@@ -473,11 +506,11 @@ msgid ""
 "                "
 msgstr ""
 
-#: deps/ext/txt.py:282
+#: deps/ext/txt.py:292
 msgid "Sortie :"
 msgstr ""
 
-#: deps/ext/txt.py:286
+#: deps/ext/txt.py:296
 msgid "Erreurs :"
 msgstr ""
 
@@ -486,7 +519,7 @@ msgid "Créer le"
 msgstr ""
 
 #: modeles/html/creation.tpl:7 modeles/html/deplacement.tpl:15
-#: modeles/html/depot.tpl:43 modeles/html/editeur.tpl:19
+#: modeles/html/depot.tpl:44 modeles/html/editeur.tpl:19
 #: modeles/html/envoi_dossier.tpl:8 modeles/html/envoi_projet.tpl:10
 #: modeles/html/envoi.tpl:14 modeles/html/inexistant.tpl:13
 msgid "Annuler"
@@ -535,11 +568,15 @@ msgstr ""
 msgid "Changements apportés par la modification {} :"
 msgstr ""
 
-#: modeles/html/historique.tpl:21
+#: modeles/html/historique.tpl:24
+msgid "Annuler ces changements"
+msgstr ""
+
+#: modeles/html/historique.tpl:30
 msgid "Changements effectués depuis cette modification :"
 msgstr ""
 
-#: modeles/html/historique.tpl:32
+#: modeles/html/historique.tpl:41
 msgid "Revenir à cette version"
 msgstr ""
 
@@ -567,27 +604,31 @@ msgstr ""
 msgid "Notes sur les élisions"
 msgstr ""
 
-#: modeles/html/page.tpl:69
+#: modeles/html/page.tpl:75
 msgid "Liens"
 msgstr ""
 
-#: modeles/html/page.tpl:81
+#: modeles/html/page.tpl:86
+msgid "Recherche"
+msgstr ""
+
+#: modeles/html/page.tpl:96
 msgid "Actions"
 msgstr ""
 
-#: modeles/html/page.tpl:93
+#: modeles/html/page.tpl:108
 msgid "Export"
 msgstr ""
 
-#: modeles/html/page.tpl:110
+#: modeles/html/page.tpl:125
 msgid "Déconnexion"
 msgstr ""
 
-#: modeles/html/page.tpl:116 modeles/html/page.tpl:123
+#: modeles/html/page.tpl:131 modeles/html/page.tpl:138
 msgid "S'authentifier"
 msgstr ""
 
-#: modeles/html/page.tpl:130
+#: modeles/html/page.tpl:145
 msgid "Administration"
 msgstr ""
 
