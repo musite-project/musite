@@ -115,13 +115,14 @@ text-align:justify;
 
 h1
 {
+text-align: left;
 font-size: 140%;
 padding-left: 10px;
 }
 
 h2
 {
-text-align:left;
+text-align: left;
 font-size: 120%;
 }
 

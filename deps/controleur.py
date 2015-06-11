@@ -503,6 +503,7 @@ class Dossier:
             'corps': contenu,
             'actions': actions,
             'liens': liens,
+            'recherche': self.chemin,
         }
 
     def creer(self):
@@ -655,6 +656,28 @@ class Dossier:
             readme=readme,
         ))
 
+    def rechercher(self, expression):
+        try:
+            liens = (
+                url(dossier).replace('/data', '')
+                for dossier in f.Dossier(self.dossier).rechercher(expression)
+            )
+            return self.afficher(markdown(_(
+                "# Documents du dossier *{d}* "
+                "contenant l'expression _{e}_"
+            ).format(
+                    d = self.dossier, e = expression
+                ) + '\n\n- ' +
+                '\n- '.join(str(
+                    h.A(lien.replace('/' + self.projet + '/', ''), href=lien)
+                ) for lien in liens)
+            ))
+        except f.ErreurExpression:
+            return self.afficher(markdown(
+                "Votre expression a généré une erreur : veuillez respecter "
+                "la syntaxe des expressions régulières de Python."
+            ))
+
     def supprimer(self):
         """Suppression d'un dossier et de son contenu
         """
@@ -785,6 +808,7 @@ class Projet(Dossier):
             'corps': contenu,
             'actions': actions,
             'liens': liens,
+            'recherche': self.chemin,
         }
 
     def annuler(self, commit):

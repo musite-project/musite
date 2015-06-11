@@ -83,6 +83,14 @@
             %end
 
             %try:
+            <b>{{_("Recherche")}}</b><br>
+            <form method="post" action="{{i18n_path('/_rechercher/' + recherche)}}">
+            <input name="expr" label="{{_('Expression')}}" placeholder="{{_('Expression')}}">
+            </form>
+            %except NameError: pass
+            %end
+
+            %try:
             %if len(actions) > 0:  # Même chose pour les actions sur les documents.
             <b>{{_("Actions")}}</b><br>
             <ul>

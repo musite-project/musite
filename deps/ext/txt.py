@@ -162,7 +162,7 @@ class Document:
             )
         return listeproprietes
 
-    def afficher(self):
+    def afficher(self, actualiser=2):
         """Affichage du contenu du document
 
         Il doit s'agir ou bien d'un simple texte, ou bien de code html.
@@ -259,7 +259,6 @@ Voici la sortie de la commande :
         """
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichiersortie('pdf', chemin=chemin, indice=indice)
-        print(actualiser)
         if actualiser == 1 or (
                 not os.path.isfile(fichierpdf)
                 or (

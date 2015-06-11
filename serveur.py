@@ -303,6 +303,19 @@ def dossier_creer(nom, element=''):
         b.redirect(i18n_path('/{}/{}'.format(nom, element).replace('//', '/')))
 
 
+@APP.get('/_rechercher/<nom>')
+@APP.get('/_rechercher/<nom>/<element:path>')
+@APP.post('/_rechercher/<nom>')
+@APP.post('/_rechercher/<nom>/<element:path>')
+@page
+def dossier_rechercher(nom, element=''):
+    expression = \
+        rq.forms.decode().expr if 'expr' in rq.forms \
+        else rq.query.expr if 'expr' in rq.query \
+        else '.*'
+    return Dossier(nom, element).rechercher(expression)
+
+
 @APP.get('/_telechargerdossier/<nom>')
 @APP.get('/_telechargerdossier/<nom>/<element:path>')
 @page

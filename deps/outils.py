@@ -8,6 +8,7 @@ en plusieurs points du programme.
 """
 import os
 import re
+from sre_constants import error as ReError
 import shutil
 import traceback
 from time import time
@@ -264,6 +265,26 @@ class Dossier():
                     pass
         return liste
 
+    def rechercher(self, expression, nom=True, contenu=True):
+        for dossier, sousdossiers, fichiers in os.walk(self.dossier):
+            if dossier[-4:] != '.git/':
+                for fichier in fichiers:
+                    document = os.path.join(dossier, fichier)
+                    if nom and re.match(expression, fichier):
+                        yield document
+                    elif contenu:
+                        with open(document, 'r') as doc:
+                            try:
+                                if re.search(expression, doc.read()):
+                                    yield document
+                            except UnicodeDecodeError as err:
+                                traiter_erreur(err)
+                            except ReError as err:
+                                traiter_erreur(err)
+                                raise ErreurExpression
+                if '.git' in sousdossiers:
+                    sousdossiers.remove('.git')
+
 
 class Fichier():
     """Gestion des fichiers
@@ -348,6 +369,10 @@ def url(fichier):
     """Url correspondant à un fichier
     """
     return fichier.replace(cfg.PWD, '').replace(os.sep, '/')
+
+
+class ErreurExpression(Exception):
+    pass
 
 
 class GitError(Exception):
