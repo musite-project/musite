@@ -670,7 +670,7 @@ class Dossier:
                 "# Documents du dossier *{d}* "
                 "contenant l'expression _{e}_"
             ).format(
-                    d = self.dossier, e = expression
+                    d = self.chemin, e = expression
                 ) + '\n\n- ' +
                 '\n- '.join(str(
                     h.A(lien.replace('/' + self.projet + '/', ''), href=lien)
