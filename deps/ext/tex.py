@@ -100,7 +100,9 @@ class Document(txt.Document):
             with open(self._fichiertmp(), 'w') as doc:
                 doc.write(re.sub(
                     'fontsize=\d*',
-                    'fontsize={}'.format(self.proprietes['pdf']['police_taille']),
+                    'fontsize={}'.format(
+                        self.proprietes['pdf']['police_taille']
+                    ),
                     self.contenu.replace(
                         "\\begin{document}",
                         TEMPLATETEX(

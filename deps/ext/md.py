@@ -19,6 +19,25 @@ class Document(txt.Document):
     """Document markdown
     """
     def __init__(self, chemin, proprietes=None):
+        proprietes_tex = {
+            'document': (_("Document"), {
+                'ba_papier':
+                    (_("Taille de la page"), 'a4'),
+                'marge':
+                    (
+                        _("Marges (haut, bas, gauche, droite)"),
+                        ('25mm', '35mm', '25mm', '25mm')
+                    ),
+                'page_numero':
+                    (_("Numéros de page"), True),
+            }),
+            'police': (_("Police"), {
+                'police_famille':
+                    (_("Nom"), 'libertine'),
+                'police_taille':
+                    (_("Taille de la police"), '12pt'),
+            })
+        }
         txt.Document.__init__(
             self, chemin,
             # Liste des formats, avec :
@@ -27,28 +46,9 @@ class Document(txt.Document):
             # - l'intitulé correspondant à ces propriétés ;
             # - la valeur par défaut de ces propriétés.
             formats={
-                'pdf': (self.pdf, {
-                    'document': (_("Document"), {
-                        'ba_papier':
-                            (_("Taille de la page"), 'a4'),
-                        'marge':
-                            (
-                                _("Marges (haut, bas, gauche, droite)"),
-                                ('25mm', '35mm', '25mm', '25mm')
-                            ),
-                        'page_numero':
-                            (_("Numéros de page"), True),
-                    }),
-                    'police': (_("Police"), {
-                        'police_famille':
-                            (_("Nom"), 'libertine'),
-                        'police_taille':
-                            (_("Taille de la police"), '12pt'),
-                    })
-                }),
-                'reveal.js': (self.revealjs, {
-                    'theme':            (_("Thème"), 'black')
-                }),
+                'pdf': (self.pdf, proprietes_tex),
+                'tex': (self.tex, proprietes_tex),
+                'reveal.js': (self.revealjs, {'theme': (_("Thème"), 'black')}),
                 'beamer': (self.beamer, {}),
             },
             proprietes=proprietes
@@ -68,6 +68,18 @@ class Document(txt.Document):
         ):
             self.preparer('pdf', fichierpdf, fmt)
         return url(fichierpdf)
+
+    def tex(self, chemin='tex', indice='', fmt=None):  # pylint: disable=W0221
+        """Format tex
+        """
+        fichiertex = self._fichiersortie('tex', chemin=chemin, indice=indice)
+        if (
+                not os.path.isfile(fichiertex)
+                or os.path.getmtime(fichiertex)
+                < os.path.getmtime(self._fichier())
+        ):
+            self.preparer('tex', fichiertex, fmt)
+        return url(fichiertex)
 
     def beamer(self, chemin=False, indice=''):
         """Format beamer
@@ -105,28 +117,32 @@ class Document(txt.Document):
             ignore=lambda x, y: '.git'
         )
         arguments = []
-        if ext == 'pdf':
-            arguments = [
+        if ext in ('tex', 'pdf'):
+            arguments += [
                 '--latex-engine=lualatex',
+                '--filter=' +
+                os.path.join(cfg.PWD, 'deps', 'pandoc', 'gabc.py'),
+                '--filter=' +
+                os.path.join(cfg.PWD, 'deps', 'pandoc', 'lilypond.py'),
                 '--variable=fontfamily:' +
-                self.proprietes['pdf']['police_famille'],
+                self.proprietes[ext]['police_famille'],
                 '--variable=fontsize:' +
-                self.proprietes['pdf']['police_taille'],
+                self.proprietes[ext]['police_taille'],
                 '--variable=papersize:' +
-                self.proprietes['pdf']['ba_papier'] +
+                self.proprietes[ext]['ba_papier'] +
                 'paper',
                 "--variable=geometry:top=" +
-                self.proprietes['pdf']['marge'][0],
+                self.proprietes[ext]['marge'][0],
                 "--variable=geometry:bottom=" +
-                self.proprietes['pdf']['marge'][1],
+                self.proprietes[ext]['marge'][1],
                 "--variable=geometry:left=" +
-                self.proprietes['pdf']['marge'][2],
+                self.proprietes[ext]['marge'][2],
                 "--variable=geometry:right=" +
-                self.proprietes['pdf']['marge'][3],
+                self.proprietes[ext]['marge'][3],
                 '--variable=include-before:' +
                 '\\widowpenalty=10000\\clubpenalty=10000',
             ]
-            if not self.proprietes['pdf']['page_numero']:
+            if not self.proprietes[ext]['page_numero']:
                 arguments.append(
                     '--variable=header-includes:' +
                     "\\pagestyle{empty}"
@@ -140,7 +156,7 @@ class Document(txt.Document):
         if ext == 'html':
             arguments = []
             if fmt == 'revealjs':
-                arguments = [
+                arguments += [
                     '-i',
                     '-c',
                     os.path.join(
@@ -184,8 +200,14 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
     if arguments:
         commande = commande + arguments
     commande.append(fichier)
+    environnement = os.environ.copy()
+    environnement['shell_escape_commands'] = (
+        "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
+        "gregorio,lilypond"
+    )
+    environnement['TEXINPUTS'] = ("lib:")
     try:
-        compiler(commande, fichier, os.environ)
+        compiler(commande, fichier, environnement)
     except ErreurCompilation as err:
         traiter_erreur(err)
         raise
