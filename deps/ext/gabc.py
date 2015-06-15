@@ -96,7 +96,7 @@ class Document(txt.Document):
                             'annotations_espace':
                                 (_("Espace"), '0.5mm'),
                             'annotations_elevation':
-                                (_("Espace au-dessus de l'initiale"), '1.5mm'),
+                                (_("Élévation"), '0mm'),
                         }),
                     }),
                 })

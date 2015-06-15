@@ -24,10 +24,11 @@
 
 \pagestyle{empty}
 
-\setgrefactor{<<<proprietes['notes_taille']>>>}
-\setstafflinethickness{<<<proprietes['notes_epaisseur_lignes']>>>}
+\grechangestaffsize{<<<proprietes['notes_taille']>>>}
+\grechangestafflinethickness{<<<proprietes['notes_epaisseur_lignes']>>>}
 \grechangedim{spacelinestext}{<<<proprietes['notes_espace_lignes_texte']>>>}{0}
-\setaboveinitialseparation{<<<proprietes['annotations_espace']>>>}{0}
+\grechangedim{annotationseparation}{<<<proprietes['annotations_espace']>>>}{0}
+\grechangedim{annotationraise}{<<<proprietes['annotations_elevation']>>>}{0}
 \grechangedim{beforeinitialshift}{<<<proprietes['initiale_espace'][0]>>>}{0}
 \grechangedim{afterinitialshift}{<<<proprietes['initiale_espace'][1]>>>}{0}
 
@@ -42,7 +43,7 @@
 \def\rubrinit{}
 %end
 %if proprietes['notes_couleur_lignes']:
-\grecoloredlines{gregoriocolor}
+\gresetlinecolor{gregoriocolor}
 %end
 %if proprietes['texte_symboles_couleur']:
 \let\rubrsym\rubrum
@@ -71,15 +72,18 @@
         {\rubrsym \Rbar\hspace{-.25ex}#1}
 }
 \catcode`\†=\active \def †{%
-    {\rubrsym \gredagger}%
+    {\rubrsym \GreDagger}%
 }
 \catcode`\✠=\active \def ✠{%
     {\rubrsym \grecross}%
 }
-\renewcommand{\grestar}{%
-    {\rubrsym \gresixstar}%
+\let\oldGreStar\GreStar
+\renewcommand{\GreStar}{%
+    {\rubrsym \oldGreStar}%
 }
-\renewcommand{\greheightstar}{\grestar}
+\renewcommand{\greheightstar}{%
+    {\GreStar}%
+}
 
 
 \begin{document}
@@ -89,16 +93,16 @@
 \bigskip}
 %end
 
-\setfirstannotation{%
-    \raisebox{<<<proprietes['annotations_elevation']>>>}[1.2\height][1ex]{%
-    \rubrannot \hspace*{.2ex}\footnotesize <<<proprietes['ab_type']>>>%
-    }%
+%if proprietes['ab_type']:
+\greannotation{%
+    {\rubrannot\footnotesize <<<proprietes['ab_type']>>>}%
 }
-\setsecondannotation{%
-    \raisebox{<<<proprietes['annotations_elevation']>>>}[1.2\height][1ex]{%
-    \rubrannot \hspace*{.2ex}\footnotesize <<<proprietes['ab_mode']>>>%
-    }%
+%end
+%if proprietes['ab_mode']:
+\greannotation{%
+    {\rubrannot\footnotesize <<<proprietes['ab_mode']>>>}%
 }
-\includescore{<<<partition>>>}
+%end
+\gregorioscore{<<<partition>>>}
 
 \end{document}
