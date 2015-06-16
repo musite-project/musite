@@ -142,11 +142,30 @@ $endif$
 $for(header-includes)$
 $header-includes$
 $endfor$
-$if(gregorio)$
+$if(music.gregorio)$
 \usepackage[autocompile]{gregoriotex}
+\catcode`\℣=\active \def ℣#1{%
+        {\rubrsym \Vbar\hspace{-.25ex}#1}
+}
+\catcode`\℟=\active \def ℟#1{%
+        {\rubrsym \Rbar\hspace{-.25ex}#1}
+}
+\catcode`\†=\active \def †{%
+    {\rubrsym \GreDagger}%
+}
+\catcode`\✠=\active \def ✠{%
+    {\rubrsym \grecross}%
+}
+\let\oldGreStar\GreStar
+\renewcommand{\GreStar}{%
+    {\rubrsym \oldGreStar}%
+}
+$endif$
+$if(music.lilypond)$
+\usepackage{lyluatex}
 $endif$
 $for(packages)$
-\usepackage{$packages$}
+\usepackage$if(packages.options)$[$packages.options$]$endif${$packages.name$}
 $endfor$
 
 \begin{document}

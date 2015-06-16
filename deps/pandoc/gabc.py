@@ -8,7 +8,7 @@ and a reasonable selection of LaTeX packages are installed.
 
 import os
 from sys import getfilesystemencoding, stderr
-from subprocess import Popen, call, PIPE, DEVNULL
+from subprocess import Popen, call, PIPE
 from hashlib import sha1
 from pandocfilters import toJSONFilter, RawBlock, RawInline, Para, Image
 
@@ -17,6 +17,12 @@ IMAGEDIR = "tmp_gabc"
 LATEX_DOC = """\\documentclass{article}
 \\usepackage{libertine}
 \\usepackage[autocompile]{gregoriotex}
+\\catcode`\\℣=\\active \\def ℣#1{{\\Vbar\\hspace{-.25ex}#1}}
+\\catcode`\\℟=\\active \\def ℟#1{{\\Rbar\\hspace{-.25ex}#1}}
+\\catcode`\\†=\\active \\def †{{\\GreDagger}}
+\\catcode`\\✠=\\active \\def ✠{{\\grecross}}
+\\let\\oldGreStar\\GreStar
+\\renewcommand{\\GreStar}{{\\oldGreStar}}
 \\pagestyle{empty}
 \\begin{document}
 %s
@@ -44,11 +50,12 @@ def htmlblock(code):
     return RawBlock('html', code)
 
 
-def latexsnippet(code, kvs):
+def latexsnippet(code, kvs, staffsize=17):
     """Take in account key/values"""
     snippet = ''
-    staffsize = int(kvs['staffsize']) if 'staffsize' in kvs else 17
-    annotationsize = .56 * staffsize
+    staffsize = int(kvs['staffsize']) if 'staffsize' in kvs \
+        else staffsize
+    annotationsize = .5 * staffsize
     if 'mode' in kvs:
         snippet = (
             "\\greannotation{{\\fontsize{%s}{%s}\\selectfont{}%s}}\n" %
@@ -58,12 +65,12 @@ def latexsnippet(code, kvs):
         snippet = (
             "\\grechangedim{annotationseparation}{%s mm}{0}\n"
             "\\greannotation{{\\fontsize{%s}{%s}\\selectfont{}%s}}\n" %
-            (staffsize / 34, annotationsize, annotationsize, kvs['annotation'])
+            (staffsize / 60, annotationsize, annotationsize, kvs['annotation'])
         ) + snippet
     snippet = (
         "\\grechangestaffsize{%s}\n" % staffsize +
         "\\def\\greinitialformat#1{{\\fontsize{%s}{%s}\\selectfont{}#1}}" %
-        (2.75 * staffsize, 2.75 * staffsize)
+        (2.5 * staffsize, 2.5 * staffsize)
     ) + snippet
     snippet = "\\setlength{\\parskip}{0pt}\n" + snippet + code
     return snippet
@@ -79,7 +86,7 @@ def latex2png(snippet, outfile):
     proc = Popen(
         ["lualatex", '-output-directory=' + IMAGEDIR],
         stdin=PIPE,
-        stdout=DEVNULL,
+        stdout=stderr,
         env=environment
     )
     proc.stdin.write(
@@ -89,7 +96,7 @@ def latex2png(snippet, outfile):
     )
     proc.communicate()
     proc.stdin.close()
-    call(["pdfcrop", os.path.join(IMAGEDIR, "texput.pdf")], stdout=DEVNULL)
+    call(["pdfcrop", os.path.join(IMAGEDIR, "texput.pdf")], stdout=stderr)
     call(
         [
             "gs",
@@ -98,7 +105,7 @@ def latex2png(snippet, outfile):
             "-sOutputFile=" + pngimage,
             os.path.join(IMAGEDIR, "texput-crop.pdf"),
         ],
-        stdout=DEVNULL,
+        stdout=stderr,
     )
 
 
@@ -123,6 +130,12 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
         [[ident, classes, kvs], contents] = value  # pylint:disable=I0011,W0612
         kvs = {key: value for key, value in kvs}
         if "gabc" in classes:
+            try:
+                staffsize = int(
+                    meta['music']['c']['gregorio']['c']['staffsize']['c']
+                )
+            except TypeError:
+                staffsize = 17
             if fmt == "latex":
                 if ident == "":
                     label = ""
@@ -130,7 +143,9 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
                     label = '\\label{' + ident + '}'
                 return latex(
                     "\n\\smallskip\n{%\n" +
-                    latexsnippet('\\gregorioscore{' + contents + '}', kvs) +
+                    latexsnippet(
+                        '\\gregorioscore{' + contents + '}', kvs, staffsize
+                    ) +
                     "%\n}" +
                     label
                 )
@@ -143,7 +158,7 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
                 return [Image([], [
                     png(
                         contents,
-                        latexsnippet('\\gregorioscore', kvs)
+                        latexsnippet('\\gregorioscore', kvs, staffsize)
                     ),
                     ""
                 ])]
@@ -151,6 +166,12 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
         [[ident, classes, kvs], contents] = value
         kvs = {key: value for key, value in kvs}
         if "gabc" in classes:
+            try:
+                staffsize = int(
+                    meta['music']['c']['gregorio']['c']['staffsize']['c']
+                )
+            except TypeError:
+                staffsize = 17
             if fmt == "latex":
                 if ident == "":
                     label = ""
@@ -158,7 +179,9 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
                     label = '\\label{' + ident + '}'
                 return [latexblock(
                     "\n\\smallskip\n{%\n" +
-                    latexsnippet('\\gabcsnippet{' + contents + '}', kvs) +
+                    latexsnippet(
+                        '\\gabcsnippet{' + contents + '}', kvs, staffsize
+                    ) +
                     "%\n}" +
                     label
                     )]
@@ -166,7 +189,7 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
                 return Para([Image([], [
                     png(
                         contents,
-                        latexsnippet('\\gabcsnippet', kvs)
+                        latexsnippet('\\gabcsnippet', kvs, staffsize)
                     ),
                     ""
                 ])])

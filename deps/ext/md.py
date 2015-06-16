@@ -9,6 +9,7 @@ http://fr.wikipedia.org/wiki/Markdown
 """
 import os
 import shutil
+from sys import stderr
 from deps.mistune import markdown
 from . import txt
 from etc import config as cfg
@@ -54,8 +55,24 @@ class Document(txt.Document):
             proprietes=proprietes
         )
 
-    def afficher(self):
-        return markdown(self.contenu)
+    def afficher(self, actualiser=2):
+        return self.html(actualiser=actualiser)
+
+    def html(self, chemin='html', indice='', fmt=None, actualiser=2):
+        """Format html
+        """
+        fichierhtml = self._fichiersortie('html', chemin=chemin, indice=indice)
+        if actualiser == 1 or (
+                not os.path.isfile(fichierhtml)
+                or (
+                    actualiser
+                    and os.path.getmtime(fichierhtml)
+                    < os.path.getmtime(self._fichier())
+                )
+        ):
+            self.preparer('html', fichierhtml, fmt)
+        with open(fichierhtml, 'r') as doc:
+            return doc.read()
 
     def pdf(self, chemin='pdf', indice='', fmt=None):  # pylint: disable=W0221
         """Format pdf
@@ -116,14 +133,15 @@ class Document(txt.Document):
             self.dossier, self.dossiertmp, symlinks=True,
             ignore=lambda x, y: '.git'
         )
-        arguments = []
+        arguments = [
+            '--filter=' +
+            os.path.join(cfg.PWD, 'deps', 'pandoc', 'gabc.py'),
+            '--filter=' +
+            os.path.join(cfg.PWD, 'deps', 'pandoc', 'lilypond.py'),
+        ]
         if ext in ('tex', 'pdf'):
             arguments += [
                 '--latex-engine=lualatex',
-                '--filter=' +
-                os.path.join(cfg.PWD, 'deps', 'pandoc', 'gabc.py'),
-                '--filter=' +
-                os.path.join(cfg.PWD, 'deps', 'pandoc', 'lilypond.py'),
                 '--variable=fontfamily:' +
                 self.proprietes[ext]['police_famille'],
                 '--variable=fontsize:' +
@@ -154,7 +172,6 @@ class Document(txt.Document):
             if fmt != 'beamer':
                 arguments.append('--variable=documentclass:scrartcl')
         if ext == 'html':
-            arguments = []
             if fmt == 'revealjs':
                 arguments += [
                     '-i',
@@ -200,6 +217,8 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
     if arguments:
         commande = commande + arguments
     commande.append(fichier)
+    if cfg.DEVEL:
+        stderr.write(str(commande) + '\n\n')
     environnement = os.environ.copy()
     environnement['shell_escape_commands'] = (
         "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"

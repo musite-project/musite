@@ -300,6 +300,7 @@ def compiler(commande, fichier, environnement):
         except UnicodeDecodeError:
             raise FichierIllisible
         if compilation.returncode:
+            print(sortie, erreurs)
             raise ErreurCompilation
     finally:
         os.chdir(cfg.PWD)
