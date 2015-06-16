@@ -145,20 +145,20 @@ $endfor$
 $if(music.gregorio)$
 \usepackage[autocompile]{gregoriotex}
 \catcode`\℣=\active \def ℣#1{%
-        {\rubrsym \Vbar\hspace{-.25ex}#1}
+        {\Vbar\hspace{-.25ex}#1}
 }
 \catcode`\℟=\active \def ℟#1{%
-        {\rubrsym \Rbar\hspace{-.25ex}#1}
+        {\Rbar\hspace{-.25ex}#1}
 }
 \catcode`\†=\active \def †{%
-    {\rubrsym \GreDagger}%
+    {\GreDagger}%
 }
 \catcode`\✠=\active \def ✠{%
-    {\rubrsym \grecross}%
+    {\grecross}%
 }
 \let\oldGreStar\GreStar
 \renewcommand{\GreStar}{%
-    {\rubrsym \oldGreStar}%
+    {\oldGreStar}%
 }
 $endif$
 $if(music.lilypond)$
