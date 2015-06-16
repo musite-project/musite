@@ -213,4 +213,10 @@ color: red;
     width: 120px;
 }
 
+.important A {
+    color: red;
+    font-weight: bold;
+    font-style: italic;
+}
+
 {{ext}}

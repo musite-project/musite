@@ -71,6 +71,17 @@
             %end
 
             %try:
+            %if actualiser[1]:
+            <span class="important">
+            %end
+            <a href={{i18n_path('/' + actualiser[0])}}>{{_("Actualiser")}}</a>
+            %if actualiser[1]:
+            </span>
+            %end
+            %except NameError: pass
+            %end
+            <br>
+            %try:
             %if len(liens) > 0:  # S'il y a des liens à afficher, on en fait la liste.
             <b>{{_("Liens")}}</b><br>
             <ul>

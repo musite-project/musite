@@ -48,6 +48,18 @@ class Document:
                         fmt, proprietes[fmt], self.proprietes_liste[fmt]
                     )
 
+    def doit_etre_actualise(self, fichier, actualiser):
+        return actualiser == 1 or (
+            not os.path.isfile(fichier)
+            or (
+                actualiser
+                and self.est_obsolete(fichier)
+            )
+        )
+
+    def est_obsolete(self, fichier):
+        return os.path.getmtime(fichier) < os.path.getmtime(self._fichier())
+
     def _fichierrelatif(self, ext=None):
         """Chemin vers un fichier portant ce nom avec une autre extension
         """
@@ -144,6 +156,10 @@ class Document:
         """Dossier temporaire
         """
         return os.path.dirname(self._fichiertmp())
+
+    @property
+    def obsolete(self):
+        return False
 
     @property
     def proprietes_detail(self):
@@ -263,8 +279,7 @@ Voici la sortie de la commande :
                 not os.path.isfile(fichierpdf)
                 or (
                     actualiser
-                    and os.path.getmtime(fichierpdf)
-                    < os.path.getmtime(self._fichier())
+                    and self.est_obsolete(fichierpdf)
                 )
         ):
             self.preparer_pdf(destination=fichierpdf)

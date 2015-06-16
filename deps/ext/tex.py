@@ -53,6 +53,10 @@ class Document(txt.Document):
             proprietes=proprietes
         )
 
+    @property
+    def obsolete(self):
+        return self.est_obsolete(self._fichiersortie('pdf'))
+
     def afficher(self, actualiser=0):
         def documentmaitre():
             """Test pour savoir s'il s'agit d'un document maître

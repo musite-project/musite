@@ -60,6 +60,10 @@ class Document(txt.Document):
                 'pdf', self.proprietes_detail['pdf'], {'aa_titre': self.titre}
             )
 
+    @property
+    def obsolete(self):
+        return self.est_obsolete(self._fichiersortie('pdf'))
+
     def afficher(self):
         return self.afficher_pdf(
             message_erreur=_("""

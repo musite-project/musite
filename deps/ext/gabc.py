@@ -139,6 +139,10 @@ class Document(txt.Document):
             )
 
     @property
+    def obsolete(self):
+        return self.est_obsolete(self._fichiersortie('pdf'))
+
+    @property
     def _gabc(self):
         """Contenu gabc du document
         """

@@ -183,7 +183,6 @@ class Document:
         proposant une opération sur un document.
         """
         actions = {
-            _('Actualiser'): self.chemin + '/?act=1',
             _('Aperçu'): self.chemin,
             _('Historique'): '_historique/' + self.chemin,
             _('Source'): '_src/' + self.chemin
@@ -221,6 +220,7 @@ class Document:
             midi = None
         return {
             'corps': contenu,
+            'actualiser': (self.chemin + '/?act=1', self.document.obsolete),
             'actions': actions,
             'exports': exports,
             'liens': liens,

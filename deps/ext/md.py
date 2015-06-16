@@ -55,46 +55,35 @@ class Document(txt.Document):
             proprietes=proprietes
         )
 
-    def afficher(self, actualiser=2):
+    @property
+    def obsolete(self):
+        return self.est_obsolete(self._fichiersortie('html'))
+
+    def afficher(self, actualiser=0):
         return self.html(actualiser=actualiser)
 
     def html(self, chemin='html', indice='', fmt=None, actualiser=2):
         """Format html
         """
         fichierhtml = self._fichiersortie('html', chemin=chemin, indice=indice)
-        if actualiser == 1 or (
-                not os.path.isfile(fichierhtml)
-                or (
-                    actualiser
-                    and os.path.getmtime(fichierhtml)
-                    < os.path.getmtime(self._fichier())
-                )
-        ):
+        if self.doit_etre_actualise(fichierhtml, actualiser):
             self.preparer('html', fichierhtml, fmt)
         with open(fichierhtml, 'r') as doc:
             return doc.read()
 
-    def pdf(self, chemin='pdf', indice='', fmt=None):  # pylint: disable=W0221
+    def pdf(self, chemin='pdf', indice='', fmt=None, actualiser=2):
         """Format pdf
         """
         fichierpdf = self._fichiersortie('pdf', chemin=chemin, indice=indice)
-        if (
-                not os.path.isfile(fichierpdf)
-                or os.path.getmtime(fichierpdf)
-                < os.path.getmtime(self._fichier())
-        ):
+        if self.doit_etre_actualise(fichierpdf, actualiser):
             self.preparer('pdf', fichierpdf, fmt)
         return url(fichierpdf)
 
-    def tex(self, chemin='tex', indice='', fmt=None):  # pylint: disable=W0221
+    def tex(self, chemin='tex', indice='', fmt=None, actualiser=2):
         """Format tex
         """
         fichiertex = self._fichiersortie('tex', chemin=chemin, indice=indice)
-        if (
-                not os.path.isfile(fichiertex)
-                or os.path.getmtime(fichiertex)
-                < os.path.getmtime(self._fichier())
-        ):
+        if self.doit_etre_actualise(fichiertex, actualiser):
             self.preparer('tex', fichiertex, fmt)
         return url(fichiertex)
 
@@ -112,11 +101,7 @@ class Document(txt.Document):
         """
         chemin = chemin if chemin else 'rj'
         fichierhtml = self._fichiersortie('html', chemin=chemin, indice=indice)
-        if (
-                not os.path.isfile(fichierhtml)
-                or os.path.getmtime(fichierhtml)
-                < os.path.getmtime(self._fichier())
-        ):
+        if self.doit_etre_actualise(fichierhtml, actualiser):
             self.preparer('html', fichierhtml, fmt='revealjs')
         return url(fichierhtml)
 
