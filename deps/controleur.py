@@ -218,9 +218,14 @@ class Document:
             # Cette exception est levée quand le module concerné ne définit pas
             # de fichier midi.
             midi = None
+        actualiser = (
+            (self.chemin + '/?act=1', self.document.obsolete)
+            if hasattr(self.document, 'obsolete')
+            else None
+        )
         return {
             'corps': contenu,
-            'actualiser': (self.chemin + '/?act=1', self.document.obsolete),
+            'actualiser': actualiser,
             'actions': actions,
             'exports': exports,
             'liens': liens,

@@ -78,7 +78,7 @@
             %if actualiser[1]:
             </span>
             %end
-            %except NameError: pass
+            %except (NameError, TypeError): pass
             %end
             <br>
             %try:
