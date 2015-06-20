@@ -49,6 +49,8 @@ class Document:
                     )
 
     def doit_etre_actualise(self, fichier, actualiser):
+        """Teste s'il est nécessaire de rafraîchir le document
+        """
         return actualiser == 1 or (
             not os.path.isfile(fichier)
             or (
@@ -58,6 +60,8 @@ class Document:
         )
 
     def est_obsolete(self, fichier):
+        """Teste l'obsolescence d'un fichier
+        """
         return os.path.getmtime(fichier) < os.path.getmtime(self._fichier())
 
     def _fichierrelatif(self, ext=None):
@@ -158,7 +162,9 @@ class Document:
         return os.path.dirname(self._fichiertmp())
 
     @property
-    def obsolete(self):
+    def obsolete(self):  # pylint: disable=R0201
+        """Par défaut, on considère qu'un aperçu est à jour
+        """
         return False
 
     @property
@@ -178,7 +184,7 @@ class Document:
             )
         return listeproprietes
 
-    def afficher(self, actualiser=2):
+    def afficher(self, actualiser=2):  # pylint: disable=W0613
         """Affichage du contenu du document
 
         Il doit s'agir ou bien d'un simple texte, ou bien de code html.
@@ -199,8 +205,9 @@ class Document:
             )
         except ErreurCompilation as err:
             traiter_erreur(err)
-            return (markdown(_(
-                """\
+            return (markdown(
+                _(
+                    """\
 Il y a eu une erreur pendant le traitement du document.
 Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
 certain du contraire, merci de signaler le problème.
@@ -209,9 +216,9 @@ certain du contraire, merci de signaler le problème.
 
 Voici la sortie de la commande :
 
-                """
-            ).format(message_erreur)) +
-                traiter_erreur_compilation(self.dossiertmp))
+                    """
+                ).format(message_erreur)
+            ) + traiter_erreur_compilation(self.dossiertmp))
 
     @property
     def contenu(self):

@@ -103,7 +103,7 @@ class Document(txt.Document):
         if self.proprietes['pdf']['aa_perso']:
             with open(self._fichiertmp(), 'w') as doc:
                 doc.write(re.sub(
-                    'fontsize=\d*',
+                    r'fontsize=\d*',
                     'fontsize={}'.format(
                         self.proprietes['pdf']['police_taille']
                     ),

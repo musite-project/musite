@@ -285,7 +285,7 @@ def document_creer(nom, element=''):
 @APP.get('/_creerdossier/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def dossier_creer_infos(nom, element=None):
+def dossier_creer_infos(nom, element=None):  # pylint: disable=W0613
     """ Page de création d'un dossier
     """
     return {'corps': b.template('creation', {'quoi': _('dossier')})}
@@ -313,6 +313,8 @@ def dossier_creer(nom, element=''):
 @APP.post('/_rechercher/<nom>/<element:path>')
 @page
 def dossier_rechercher(nom='', element=''):
+    """Recherche d'une expression dans le nom ou le contenu des documents
+    """
     if 'expr' in rq.forms:
         expression = rq.forms.decode().expr
         recherchenom = rq.forms.nom

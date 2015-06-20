@@ -64,8 +64,9 @@ class Document(txt.Document):
     def obsolete(self):
         return self.est_obsolete(self._fichiersortie('pdf'))
 
-    def afficher(self):
+    def afficher(self, actualiser=2):
         return self.afficher_pdf(
+            actualiser=actualiser,
             message_erreur=_("""
 Il est aussi possible que vous ayez saisi du code *Scheme* dans votre
 document : par souci de sécurité, `Lilypond` est lancé avec des options plus
@@ -110,9 +111,9 @@ restrictives, qui rendent impossibles certaines opérations.
         )
         with open(self._fichiertmp(), 'w') as tmp:
             contenu = self.contenu
-            entetes = re.findall('\\\header{[^}]*}', contenu)
+            entetes = re.findall(r'\\\header{[^}]*}', contenu)
             entetes = entetes[0] if len(entetes) else ''
-            papier = re.findall('\\\paper{[^}]*}', contenu)
+            papier = re.findall(r'\\\paper{[^}]*}', contenu)
             papier = papier[0] if len(papier) else ''
             entetes = (
                 entete for entete in entetes.split('\n')[1:-1]
@@ -139,6 +140,8 @@ restrictives, qui rendent impossibles certaines opérations.
 
     @property
     def titre(self):
+        """Retourne le titre de la partition
+        """
         contenu = self.contenu
         entete = re.findall('header{[^}]*}', contenu)
         entete = entete[0] if len(entete) else ''

@@ -4,7 +4,6 @@
 import os
 import shutil
 from deps import HTMLTags as h
-from bottle import static_file
 from base64 import b64encode
 from etc import config as cfg
 from deps.outils import url
@@ -61,6 +60,8 @@ class Document:
             .replace('/', os.path.sep)
 
     def preparer(self):
+        """Copie le pdf dans le dossier static
+        """
         if not os.path.isfile(self._fichier()) \
         or os.path.getmtime(self._fichier()) < os.path.getmtime(self.fichier):
             os.makedirs(os.path.dirname(self._fichier()))

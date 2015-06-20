@@ -19,7 +19,6 @@ from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
 from etc import config as cfg
-from bottle import request as rq
 
 
 # Import des modules qui vont traiter chaque extension ########################
@@ -352,8 +351,8 @@ class Document:
         except f.GitError as err:
             f.traiter_erreur(err)
             print(err.status)
-            return self.afficher(markdown(_
-                (
+            return self.afficher(markdown(
+                _(
                     "Il y a eu une erreur pendant la sauvegarde du document "
                     "dans l'historique. Cela vient probablement d'erreurs de "
                     "fusion non corrigées."
@@ -643,12 +642,13 @@ class Dossier:
             for fichier in listefichiers
         ]
         for fichier in (
-            'README-{}.md'.format(rq.locale.upper()),
-            'README-{}.MD'.format(rq.locale.upper()),
-            'Readme-{}.md'.format(rq.locale), 'readme-{}.md'.format(rq.locale),
-            'README.md', 'README.MD', 'Readme.md', 'readme.md',
-            'README', 'Readme', 'readme',
-            'README.txt', 'README.TXT', 'Readme.txt', 'readme.txt',
+                'README-{}.md'.format(rq.locale.upper()),
+                'README-{}.MD'.format(rq.locale.upper()),
+                'Readme-{}.md'.format(rq.locale),
+                'readme-{}.md'.format(rq.locale),
+                'README.md', 'README.MD', 'Readme.md', 'readme.md',
+                'README', 'Readme', 'readme',
+                'README.txt', 'README.TXT', 'Readme.txt', 'readme.txt',
         ):
             try:
                 with open(os.path.join(self.dossier, fichier), 'r') as readme:
@@ -664,6 +664,8 @@ class Dossier:
         ))
 
     def rechercher(self, expression, nom=True, contenu=True):
+        """Recherche dans le nom ou le contenu des documents
+        """
         try:
             liens = (
                 url(dossier).replace('/data', '')
@@ -671,11 +673,12 @@ class Dossier:
                     expression, nom, contenu
                 )
             )
-            return self.afficher(markdown(_(
-                "# Documents du dossier *{d}* "
-                "contenant l'expression _{e}_"
-            ).format(
-                    d = self.chemin, e = expression
+            return self.afficher(markdown(
+                _(
+                    "# Documents du dossier *{d}* "
+                    "contenant l'expression _{e}_"
+                ).format(
+                    d=self.chemin, e=expression
                 ) + '\n\n- ' +
                 '\n- '.join(str(
                     h.A(lien.replace('/' + self.projet + '/', ''), href=lien)
@@ -827,7 +830,7 @@ class Projet(Dossier):
             self.depot.annuler(commit)
             b.redirect(self.url)
         except f.GitError as err:
-            return self.afficher(self.conflit(err))
+            return self.afficher(self._conflit(err))
 
     def cloner(self, depot):
         """Clonage d'un projet distant
@@ -835,26 +838,28 @@ class Projet(Dossier):
         self.depot.cloner(depot)
         b.redirect(self.url)
 
-    def conflit(self, err):
+    def _conflit(self, err):
+        """Message en cas de conflit de fusion
+        """
         return markdown(
-                _(
-                    "Il y a conflit de fusion sur les fichiers suivants :\n"
-                    "\n"
-                    "- {}\n"
-                    "\n"
-                    "Veuillez régler manuellement les conflits en question ; "
-                    "pour cela, recherchez les lignes `<<<<<<< HEAD`, qui "
-                    "indiquent le début de la zone de conflit.\n"
-                    "\n"
-                    "Attention : faites cela préalablement à tout autre "
-                    "travail, car l'historique ne fonctionnera normalement "
-                    "qu'après résolution des conflits."
-                ).format(
-                    "\n- ".join(str(h.A(
-                        doc, href=i18n_path('/' + self.chemin + doc)
-                    )) for doc in err.status.keys())
-                )
+            _(
+                "Il y a conflit de fusion sur les fichiers suivants :\n"
+                "\n"
+                "- {}\n"
+                "\n"
+                "Veuillez régler manuellement les conflits en question ; "
+                "pour cela, recherchez les lignes `<<<<<<< HEAD`, qui "
+                "indiquent le début de la zone de conflit.\n"
+                "\n"
+                "Attention : faites cela préalablement à tout autre "
+                "travail, car l'historique ne fonctionnera normalement "
+                "qu'après résolution des conflits."
+            ).format(
+                "\n- ".join(str(h.A(
+                    doc, href=i18n_path('/' + self.chemin + doc)
+                )) for doc in err.status.keys())
             )
+        )
 
     def copier(self, destination, ecraser=False):
         """Copie d'un projet
@@ -888,7 +893,7 @@ class Projet(Dossier):
             self.depot.pull(depot)
         except f.GitError as err:
             f.traiter_erreur(err)
-            return self.afficher(self.conflit(err))
+            return self.afficher(self._conflit(err))
         b.redirect(self.url)
 
     def renommer(self, destination):
@@ -941,7 +946,7 @@ class Projet(Dossier):
             return self.afficher(_('''C'est drôle, ce que vous me demandez :
                 il n'y a pas de projet ici !'''), suppression=True)
 
-    def telecharger_envoi(self, archive, nom):
+    def telecharger_envoi(self, archive):
         """Intégration d'une archive au sein d'un dossier
         """
         tmp = os.path.join(cfg.TMP, motaleatoire(6))

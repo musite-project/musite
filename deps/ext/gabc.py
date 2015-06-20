@@ -21,7 +21,7 @@ import shutil
 TEMPLATETEX = templateperso()
 
 
-class Document(txt.Document):
+class Document(txt.Document):  # pylint: disable=R0904
     """Document gabc
     """
     def __init__(self, chemin, proprietes=None):

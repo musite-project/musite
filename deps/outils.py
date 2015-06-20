@@ -108,6 +108,8 @@ class Depot():
 
     @property
     def etat(self):
+        """Retourne l'état du dépôt
+        """
         return self.commande(['status', '-s'])
 
     def initialiser(self):
@@ -266,6 +268,8 @@ class Dossier():
         return liste
 
     def rechercher(self, expression, nom=True, contenu=True):
+        """Recherche d'une expression dans le nom ou le contenu des documents
+        """
         for dossier, sousdossiers, fichiers in os.walk(self.dossier):
             if dossier[-4:] != '.git/':
                 if nom and re.match(expression, dossier.split('/')[-1]):
@@ -360,7 +364,7 @@ def templateperso(syntaxe='<% %> % <<< >>>'):
     return functools.partial(template, template_adapter=Adaptateur)
 
 
-def traiter_erreur(err):
+def traiter_erreur(err):  # pylint: disable=W0613
     """Méthode appelée lorsqu'une exception est levée
     """
     if cfg.DEVEL:
@@ -374,23 +378,27 @@ def url(fichier):
 
 
 class ErreurExpression(Exception):
+    """Exception levée quand une expression régulière n'est pas reconnue
+    """
     pass
 
 
 class GitError(Exception):
+    """Exception levée quand git renvoie une erreur
+    """
     def __init__(self, cpe):
         """L'argument cpe doit être une CalledProcessException."""
+        Exception.__init__(self)
         self.cpe = cpe
+        self.status = {
+            doc[3:]: (doc[0], doc[1])
+            for doc in
+            subprocess.check_output(['git', 'status', '-s'])
+            .decode('utf8').split('\n')[:-1]
+        }
 
     def __getattr__(self, attribut):
         try:
             return getattr(self.cpe, attribut)
         except AttributeError:
             raise
-
-    @property
-    def status(self):
-        etat = subprocess.check_output(['git', 'status', '-s'])\
-            .decode('utf8').split('\n')
-        print(etat)
-        return {doc[3:]: (doc[0], doc[1]) for doc in etat[:-1]}

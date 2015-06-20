@@ -10,7 +10,6 @@ http://fr.wikipedia.org/wiki/Markdown
 import os
 import shutil
 from sys import stderr
-from deps.mistune import markdown
 from . import txt
 from etc import config as cfg
 from deps.outils import url, traiter_erreur, _
@@ -71,12 +70,13 @@ class Document(txt.Document):
         with open(fichierhtml, 'r') as doc:
             return doc.read()
 
+    # pylint: disable=W0221
     def pdf(self, chemin='pdf', indice='', fmt=None, actualiser=2):
         """Format pdf
         """
         fichierpdf = self._fichiersortie('pdf', chemin=chemin, indice=indice)
         if self.doit_etre_actualise(fichierpdf, actualiser):
-            self.preparer('pdf', fichierpdf, fmt)
+            self.preparer('pdf', fichierpdf, fmt=fmt)
         return url(fichierpdf)
 
     def tex(self, chemin='tex', indice='', fmt=None, actualiser=2):
@@ -87,14 +87,16 @@ class Document(txt.Document):
             self.preparer('tex', fichiertex, fmt)
         return url(fichiertex)
 
-    def beamer(self, chemin=False, indice=''):
+    def beamer(self, chemin=False, indice='', actualiser=2):
         """Format beamer
 
         Format pdf pour les présentations.
         """
-        return self.pdf(chemin=chemin, indice=indice, fmt='beamer')
+        return self.pdf(
+            chemin=chemin, indice=indice, fmt='beamer', actualiser=actualiser
+        )
 
-    def revealjs(self, chemin=False, indice=''):
+    def revealjs(self, chemin=False, indice='', actualiser=2):
         """Format reveal.js
 
         Format html5 pour les présentations.
