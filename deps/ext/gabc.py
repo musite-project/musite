@@ -147,7 +147,7 @@ class Document(txt.Document):  # pylint: disable=R0904
         """Contenu gabc du document
         """
         try:
-            with open(self._fichier(), 'r') as fch:
+            with self._fichier().open() as fch:
                 return Gabc(fch.read(-1))
         except UnicodeDecodeError as err:
             traiter_erreur(err)
@@ -191,13 +191,11 @@ class Document(txt.Document):  # pylint: disable=R0904
         """
         fichier = self._fichiersortie(fmt, chemin=chemin, indice=indice)
         if (
-                not os.path.isfile(fichier)
-                or os.path.getmtime(fichier)
-                < os.path.getmtime(self._fichier())
-                or os.path.getmtime(fichier)
-                < os.path.getmtime(
-                    self._fichiersortie('pdf', chemin=chemin, indice=indice)
-                )
+                not fichier.is_file()
+                or fichier.stat().st_mtime < self._fichier().stat().st_mtime
+                or fichier.stat().st_mtime < self._fichiersortie(
+                    'pdf', chemin=chemin, indice=indice
+                ).stat().st_mtime
         ):
             try:
                 self.preparer_gabc(fmt, fichier)
@@ -223,13 +221,16 @@ class Document(txt.Document):  # pylint: disable=R0904
         """Mise en place du pdf
         """
         fichiertmp = 'main'
-        textmp = os.path.join(self.dossiertmp, fichiertmp + '.tex')
-        orig = os.path.join(self.dossiertmp, fichiertmp + '.pdf')
+        textmp = self.dossiertmp / (fichiertmp + '.tex')
+        orig = self.dossiertmp / (fichiertmp + '.pdf')
         dest = destination if destination else self._fichier('pdf')
-        shutil.rmtree(self.rnd, ignore_errors=True)
-        os.makedirs(self.dossiertmp, exist_ok=True)
-        shutil.copy2(self._fichier(), self._fichiertmp())
-        with open(textmp, 'w') as tmp:
+        shutil.rmtree(str(self.rnd), ignore_errors=True)
+        try:
+            self.dossiertmp.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
+        shutil.copy(str(self._fichier()), str(self._fichiertmp()))
+        with textmp.open('w') as tmp:
             tmp.write(TEMPLATETEX(
                 'partgreg',
                 {
@@ -238,15 +239,22 @@ class Document(txt.Document):  # pylint: disable=R0904
                 },
             ))
         compiler_pdf(textmp, environnement)
-        os.renames(orig, dest)
+        try:
+            dest.parent.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
+        orig.replace(dest)
         if not cfg.DEVEL:
-            shutil.rmtree(self.rnd, ignore_errors=True)
+            shutil.rmtree(str(self.rnd), ignore_errors=True)
 
     def preparer_gabc(self, fmt, destination=None):
         """Mise en place du gabc
         """
         dest = destination if destination else self._fichier(fmt)
-        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        try:
+            dest.parent.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
         fichier = {
             'midi': Midi,
             'ly':   Lily
@@ -257,7 +265,7 @@ class Document(txt.Document):  # pylint: disable=R0904
             ),
             tempo=self.proprietes[fmt]['tempo']
         )
-        fichier.ecrire(dest)
+        fichier.ecrire(str(dest))
 
 
 def compiler_pdf(fichier, environnement=None):

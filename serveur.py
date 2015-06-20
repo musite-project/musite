@@ -856,7 +856,7 @@ def document_afficher(nom, element=None, ext=None):
             return Projet(nom).lister()
         else:
             return Dossier(nom, element + ('.' + ext if ext else '')).lister()
-    except TypeError as err:
+    except NotADirectoryError as err:
         f.traiter_erreur(err)
         # Cette exception est levée s'il ne s'agit pas d'un dossier.
         try:
@@ -867,6 +867,7 @@ def document_afficher(nom, element=None, ext=None):
             else:
                 return document.contenu()
         except FileNotFoundError as err:
+            raise
             f.traiter_erreur(err)
             # Cette exception est levée s'il n'y a pas de document, ce qui
             # arrive notamment lorsque l'on renonce à créer un nouveau

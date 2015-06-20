@@ -14,7 +14,7 @@ from etc import config as cfg
 import os
 import shutil
 import re
-from deps.outils import templateperso, _
+from deps.outils import traiter_erreur, templateperso, _
 
 TEMPLATETEX = templateperso()
 
@@ -62,7 +62,7 @@ class Document(txt.Document):
             """Test pour savoir s'il s'agit d'un document maître
             """
             entete = re.compile('\\\\documentclass')
-            with open(self._fichier()) as doc:
+            with self._fichier().open() as doc:
                 for ligne in doc:
                     if entete.match(ligne):
                         return True
@@ -95,13 +95,13 @@ class Document(txt.Document):
             environnement if environnement else {'TEXINPUTS': 'lib:'}
         orig = self._fichiertmp('pdf')
         dest = destination if destination else self._fichier('pdf')
-        shutil.rmtree(self.rnd, ignore_errors=True)
+        shutil.rmtree(str(self.rnd), ignore_errors=True)
         shutil.copytree(
-            self.dossier, self.dossiertmp, symlinks=True,
+            str(self.dossier), str(self.dossiertmp), symlinks=True,
             ignore=lambda x, y: '.git'
         )
         if self.proprietes['pdf']['aa_perso']:
-            with open(self._fichiertmp(), 'w') as doc:
+            with self._fichiertmp().open('w') as doc:
                 doc.write(re.sub(
                     r'fontsize=\d*',
                     'fontsize={}'.format(
@@ -117,9 +117,13 @@ class Document(txt.Document):
                     )
                 ))
         compiler_pdf(self._fichiertmp(), environnement)
-        os.renames(orig, dest)
+        try:
+            dest.parent.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
+        orig.replace(dest)
         if not cfg.DEVEL:
-            shutil.rmtree(self.rnd, ignore_errors=True)
+            shutil.rmtree(str(self.rnd), ignore_errors=True)
 
 
 def compiler_pdf(fichier, environnement=None):
@@ -130,7 +134,7 @@ def compiler_pdf(fichier, environnement=None):
         'lualatex',
         '-interaction=nonstopmode',
         '-shell-restricted',
-        fichier
+        str(fichier)
     ]
     environnement = dict(os.environ, **environnement)
     environnement['shell_escape_commands'] = (
@@ -138,7 +142,7 @@ def compiler_pdf(fichier, environnement=None):
         "gregorio,lilypond"
     )
     compiler(commande, fichier, environnement)
-    if os.path.exists(os.path.splitext(fichier)[0] + '.toc'):
+    if fichier.with_suffix('.toc').exists():
         if cfg.DEVEL:
             print('Table des matières : 2e compilation')
         compiler(commande, fichier, environnement)

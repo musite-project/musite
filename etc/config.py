@@ -21,7 +21,7 @@ TMP = PWD / 'tmp'
 DATA = PWD / 'data'
 I18N = PWD / 'i18n'
 PAGES = PWD / 'pages'
-PANDOC = PWD / 'modeles', 'pandoc'
+PANDOC = PWD / 'modeles' / 'pandoc'
 STATIC = PWD / 'static'
 
 LANGUES = [

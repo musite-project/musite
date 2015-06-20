@@ -67,7 +67,7 @@ class Document(txt.Document):
         fichierhtml = self._fichiersortie('html', chemin=chemin, indice=indice)
         if self.doit_etre_actualise(fichierhtml, actualiser):
             self.preparer('html', fichierhtml, fmt)
-        with open(fichierhtml, 'r') as doc:
+        with fichierhtml.open() as doc:
             return doc.read()
 
     # pylint: disable=W0221
@@ -115,16 +115,16 @@ class Document(txt.Document):
         """
         orig = self._fichiertmp(ext)
         dest = destination if destination else self._fichier(ext)
-        shutil.rmtree(self.rnd, ignore_errors=True)
+        shutil.rmtree(str(self.rnd), ignore_errors=True)
         shutil.copytree(
-            self.dossier, self.dossiertmp, symlinks=True,
+            str(self.dossier), str(self.dossiertmp), symlinks=True,
             ignore=lambda x, y: '.git'
         )
         arguments = [
             '--filter=' +
-            os.path.join(cfg.PWD, 'deps', 'pandoc', 'gabc.py'),
+            str(cfg.PWD / 'deps' / 'pandoc' / 'gabc.py'),
             '--filter=' +
-            os.path.join(cfg.PWD, 'deps', 'pandoc', 'lilypond.py'),
+            str(cfg.PWD / 'deps' / 'pandoc' / 'lilypond.py'),
         ]
         if ext in ('tex', 'pdf'):
             arguments += [
@@ -163,17 +163,11 @@ class Document(txt.Document):
                 arguments += [
                     '-i',
                     '-c',
-                    os.path.join(
-                        cfg.PANDOC,
-                        'reveal.js',
-                        'css',
-                        'theme',
-                        self.proprietes['reveal.js']['theme'] + '.css'
+                    str(
+                        cfg.PANDOC / 'reveal.js' / 'css' / 'theme' /
+                        (self.proprietes['reveal.js']['theme'] + '.css')
                     ),
-                    '--variable=revealjs-url:' + os.path.join(
-                        cfg.PANDOC,
-                        'reveal.js'
-                    ),
+                    '--variable=revealjs-url:' + str(cfg.PANDOC /  'reveal.js'),
                 ]
         pandoc(
             self._fichiertmp(),
@@ -181,7 +175,11 @@ class Document(txt.Document):
             fmt=fmt,
             arguments=arguments
         )
-        os.renames(orig, dest)
+        try:
+            dest.parent.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
+        orig.replace(dest)
         if not cfg.DEVEL:
             shutil.rmtree(self.rnd, ignore_errors=True)
 
@@ -189,34 +187,37 @@ class Document(txt.Document):
 def pandoc(fichier, destination, fmt=None, arguments=None):
     """Méthode appelant la commande pandoc
     """
-    os.chdir(os.path.dirname(fichier))
-    commande = [
-        'pandoc',
-        '-S',
-        '-s',
-        '--data-dir', cfg.PANDOC,
-        '--self-contained',
-        '--variable=lang:' + {'fr': 'french', 'en': 'english'}[cfg.LANGUE],
-        '-o', destination
-    ]
-    if fmt:
-        commande = commande + ['-t', fmt]
-    if arguments:
-        commande = commande + arguments
-    commande.append(fichier)
-    if cfg.DEVEL:
-        stderr.write(str(commande) + '\n\n')
-    environnement = os.environ.copy()
-    environnement['shell_escape_commands'] = (
-        "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
-        "gregorio,lilypond"
-    )
-    environnement['TEXINPUTS'] = ("lib:")
     try:
-        compiler(commande, fichier, environnement)
-    except ErreurCompilation as err:
-        traiter_erreur(err)
-        raise
+        os.chdir(str(fichier.parent))
+        commande = [
+            'pandoc',
+            '-S',
+            '-s',
+            '--data-dir', str(cfg.PANDOC),
+            '--self-contained',
+            '--variable=lang:' + {'fr': 'french', 'en': 'english'}[cfg.LANGUE],
+            '-o', str(destination)
+        ]
+        if fmt:
+            commande = commande + ['-t', fmt]
+        if arguments:
+            commande = commande + arguments
+        commande.append(str(fichier))
+        if cfg.DEVEL:
+            stderr.write(str(commande) + '\n\n')
+        environnement = os.environ.copy()
+        environnement['shell_escape_commands'] = (
+            "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
+            "gregorio,lilypond"
+        )
+        environnement['TEXINPUTS'] = ("lib:")
+        try:
+            compiler(commande, fichier, environnement)
+        except ErreurCompilation as err:
+            traiter_erreur(err)
+            raise
+    finally:
+        os.chdir(str(cfg.PWD))
 
 compiler = txt.compiler  # pylint: disable=C0103
 

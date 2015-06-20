@@ -9,7 +9,7 @@ http://www.lilypond.org
 import os
 import shutil
 import re
-from deps.outils import templateperso, traiter_erreur, url, _
+from deps.outils import Path, templateperso, traiter_erreur, url, _
 from etc import config as cfg
 from . import txt
 
@@ -90,7 +90,7 @@ restrictives, qui rendent impossibles certaines opérations.
             assert self.pdf(chemin=chemin, indice=indice)
         except ErreurCompilation as err:
             traiter_erreur(err)
-        if os.path.isfile(fichiermidi):
+        if fichiermidi.is_file():
             return url(fichiermidi)
 
     def preparer_pdf(self, destination=None, environnement=None):
@@ -99,17 +99,19 @@ restrictives, qui rendent impossibles certaines opérations.
         orig = self._fichiertmp('pdf')
         origmidi = self._fichiertmp('midi')
         dest = destination if destination else self._fichier('pdf')
-        destmidi = destination\
-            .replace('/pdf/', '/midi/')\
-            .replace('.pdf', '.midi')\
-            if destination else self._fichier('midi')
-        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        destmidi = Path(
+            destination.as_posix().replace('/pdf/', '/midi/')
+        ).with_suffix('.midi') if destination else self._fichier('midi')
+        try:
+            dest.parent.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
         shutil.rmtree(self.rnd, ignore_errors=True)
         shutil.copytree(
-            self.dossier, self.dossiertmp, symlinks=True,
+            str(self.dossier), str(self.dossiertmp), symlinks=True,
             ignore=lambda x, y: '.git'
         )
-        with open(self._fichiertmp(), 'w') as tmp:
+        with self._fichiertmp().open('w') as tmp:
             contenu = self.contenu
             entetes = re.findall(r'\\\header{[^}]*}', contenu)
             entetes = entetes[0] if len(entetes) else ''
@@ -133,10 +135,10 @@ restrictives, qui rendent impossibles certaines opérations.
                 },
             ))
         compiler_pdf(self._fichiertmp(), environnement)
-        os.renames(orig, dest)
-        os.renames(origmidi, destmidi)
+        orig.replace(dest)
+        origmidi.replace(destmidi)
         if not cfg.DEVEL:
-            shutil.rmtree(self.rnd, ignore_errors=True)
+            shutil.rmtree(str(self.rnd), ignore_errors=True)
 
     @property
     def titre(self):
@@ -155,7 +157,7 @@ def compiler_pdf(fichier, environnement=None):
     """
     commande = [
         'lilypond',
-        fichier
+        str(fichier)
     ]
     environnement = dict(
         os.environ,
@@ -170,7 +172,7 @@ compiler = txt.compiler  # pylint: disable=C0103
 def traiter_erreur_compilation(dossier):
     """Réaction en cas d'erreur de compilation
     """
-    return txt.Document(dossier.replace(os.path.sep, '/') + '/log').afficher()
+    return txt.Document(str(dossier) + '/log').afficher()
 
 
 FichierIllisible = txt.FichierIllisible

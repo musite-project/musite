@@ -13,11 +13,11 @@ import os.path
 import subprocess as sp
 from deps import HTMLTags as h
 from deps import bottle as b
-from deps.outils import motaleatoire, traiter_erreur, url, _
+from deps.outils import Path, motaleatoire, traiter_erreur, url, _
 from deps.mistune import markdown
 from deps import jrnl as l
 from etc import config as cfg
-b.TEMPLATE_PATH += cfg.MODELES
+b.TEMPLATE_PATH += [str(modele) for modele in cfg.MODELES]
 
 
 class Document:
@@ -33,7 +33,7 @@ class Document:
         self.nom, self.ext = os.path.splitext(chemin.split('/')[-1])
         self.ext = self.ext[1:]
         # Chemin absolu des fichiers temporaires
-        self.rnd = os.path.join(cfg.TMP, motaleatoire(6))
+        self.rnd = cfg.TMP / motaleatoire(6)
         if formats:
             self.fmt = formats
             self.proprietes = {}
@@ -52,7 +52,7 @@ class Document:
         """Teste s'il est nécessaire de rafraîchir le document
         """
         return actualiser == 1 or (
-            not os.path.isfile(fichier)
+            not fichier.is_file()
             or (
                 actualiser
                 and self.est_obsolete(fichier)
@@ -62,43 +62,40 @@ class Document:
     def est_obsolete(self, fichier):
         """Teste l'obsolescence d'un fichier
         """
-        return os.path.getmtime(fichier) < os.path.getmtime(self._fichier())
+        try:
+            return fichier.stat().st_mtime < self._fichier().stat().st_mtime
+        except FileNotFoundError:
+            return True
 
     def _fichierrelatif(self, ext=None):
         """Chemin vers un fichier portant ce nom avec une autre extension
         """
-        return os.path.splitext(self.chemin)[0] \
-            + ('.' + ext if ext else '.' + self.ext if self.ext else '')\
-            .replace('/', os.path.sep)
+        return Path(self.chemin).with_suffix(
+            '.' + ext if ext else '.' + self.ext if self.ext else ''
+        )
 
     def _fichier(self, ext=None):
         """Chemin absolu
         """
         if ext:
-            return os.path.join(
-                cfg.PWD, cfg.STATIC, 'docs', ext,
-                self._fichierrelatif(ext)
+            return (
+                cfg.PWD / cfg.STATIC / 'docs' / ext / self._fichierrelatif(ext)
             )
         else:
-            return os.path.join(cfg.DATA, self._fichierrelatif())
+            return cfg.DATA / self._fichierrelatif()
 
     def _fichiertmp(self, ext=None):
         """Fichier temporaire
         """
-        return os.path.join(
-            self.rnd,
-            self._fichierrelatif(
-                ext if ext else self.ext
-            )
-        )
+        return self.rnd / self._fichierrelatif(ext if ext else self.ext)
 
     def _fichiersortie(self, ext=None, chemin=None, indice=''):
         """Fichier de destination pour un export
         """
         chemin = chemin if chemin else ext
-        return self._fichier(ext).replace(
-            '/' + ext + '/',
-            '/{}/{}/'.format(chemin, indice).replace('//', '/')
+        return (
+            cfg.PWD / cfg.STATIC / 'docs' /
+            chemin / indice / self._fichierrelatif(ext)
         )
 
     def _traiter_options(self, fmt, options, props):
@@ -153,13 +150,13 @@ class Document:
     def dossier(self):
         """Dossier contenant le document
         """
-        return os.path.dirname(self._fichier())
+        return self._fichier().parent
 
     @property
     def dossiertmp(self):
         """Dossier temporaire
         """
-        return os.path.dirname(self._fichiertmp())
+        return self._fichiertmp().parent
 
     @property
     def obsolete(self):  # pylint: disable=R0201
@@ -225,7 +222,7 @@ Voici la sortie de la commande :
         """Contenu du document
         """
         try:
-            with open(self._fichier()) as doc:
+            with self._fichier().open() as doc:
                 return doc.read(-1)
         except UnicodeDecodeError:
             raise FichierIllisible(self._fichier())
@@ -257,7 +254,7 @@ Voici la sortie de la commande :
     def enregistrer(self, contenu):
         """Enregistrement du document
         """
-        with open(self._fichier(), 'w') as doc:
+        with self._fichier().open('w') as doc:
             doc.write(contenu)
 
     def supprimer(self):
@@ -282,8 +279,9 @@ Voici la sortie de la commande :
         """
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichiersortie('pdf', chemin=chemin, indice=indice)
+        print(fichierpdf.is_file())
         if actualiser == 1 or (
-                not os.path.isfile(fichierpdf)
+                not fichierpdf.is_file
                 or (
                     actualiser
                     and self.est_obsolete(fichierpdf)
@@ -299,7 +297,7 @@ def compiler(commande, fichier, environnement):
     Cette méthode est surtout appelée dans les modules dépendant de celui-ci.
     """
     try:
-        os.chdir(os.path.dirname(fichier))
+        os.chdir(str(fichier.parent))
         if cfg.DEVEL:
             print(environnement)
         compilation = sp.Popen(
@@ -325,13 +323,13 @@ def compiler(commande, fichier, environnement):
             print(sortie, erreurs)
             raise ErreurCompilation
     finally:
-        os.chdir(cfg.PWD)
+        os.chdir(str(cfg.PWD))
 
 
 def traiter_erreur_compilation(dossier):
     """Réaction en cas d'erreur de compilation
     """
-    return Document(dossier.replace(os.path.sep, '/') + '/log').afficher()
+    return Document(dossier.as_posix() + '/log').afficher()
 
 
 class FichierIllisible(Exception):

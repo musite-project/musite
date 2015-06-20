@@ -3,6 +3,7 @@
 """
 import os
 import shutil
+from pathlib import Path
 from deps import HTMLTags as h
 from base64 import b64encode
 from etc import config as cfg
@@ -17,14 +18,11 @@ class Document:
         self.chemin = chemin
         self.nom = os.path.splitext(chemin.split('/')[-1])[0]
         # Chemin relatif du fichier
-        self.fichierrelatif = chemin.replace('/', os.path.sep)
-        self.dossierrelatif = os.path.dirname(self.fichierrelatif)
+        self.fichierrelatif = Path(chemin)
+        self.dossierrelatif = self.fichierrelatif.parent
         # Chemin absolu du fichier
-        self.fichier = os.path.join(
-            cfg.DATA,
-            self.fichierrelatif
-        )
-        self.dossier = os.path.dirname(self.fichier)
+        self.fichier = cfg.DATA / self.fichierrelatif
+        self.dossier = self.fichier.parent
 
     def afficher(self):
         """Contenu du pdf embarqué dans un code html
@@ -41,33 +39,30 @@ class Document:
     def contenu(self):
         """Contenu du pdf en base 64
         """
-        with open(self.fichier, "rb") as doc:
+        with self.fichier.open("rb") as doc:
             return b64encode(doc.read()).decode('ascii')
 
     def _fichier(self, ext='pdf'):
         """Chemin absolu
         """
-        return os.path.join(
-            cfg.PWD, cfg.STATIC, 'docs', ext,
-            self._fichierrelatif(ext)
-        )
+        return cfg.STATIC / 'docs' / ext / self._fichierrelatif(ext)
 
     def _fichierrelatif(self, ext=None):
         """Chemin vers un fichier portant ce nom avec une autre extension
         """
-        return os.path.splitext(self.chemin)[0] \
-            + ('.' + ext if ext else '.' + self.ext if self.ext else '')\
-            .replace('/', os.path.sep)
+        return Path(self.chemin).with_suffix(
+            '.' + ext if ext else '.' + self.ext if self.ext else ''
+        )
 
     def preparer(self):
         """Copie le pdf dans le dossier static
         """
-        if not os.path.isfile(self._fichier()) \
-        or os.path.getmtime(self._fichier()) < os.path.getmtime(self.fichier):
-            os.makedirs(os.path.dirname(self._fichier()))
-            shutil.copy(self.fichier, self._fichier())
+        if not self._fichier().is_file() \
+        or self._fichier().stat().st_mtime < self.fichier.stat().st_mtime:
+            os.makedirs(str(self._fichier().parent))
+            shutil.copy(str(self.fichier), str(self._fichier()))
 
     def supprimer(self):
         """Suppression du document
         """
-        os.remove(self.fichier)
+        self.fichier.unlink()

@@ -607,7 +607,7 @@ class Dossier:
         # Liste des dossiers, puis des fichiers
         listedossiers = sorted(
             [
-                str(fichier.relative_to(self.dossier)) + '/'
+                str(fichier.relative_to(self.dossier).as_posix()) + '/'
                 for fichier in fichiers
                 if (self.dossier / fichier).is_dir()
             ],
@@ -615,7 +615,7 @@ class Dossier:
         )
         listefichiers = sorted(
             [
-                str(fichier.relative_to(self.dossier))
+                str(fichier.relative_to(self.dossier).as_posix())
                 for fichier in fichiers
                 if not (self.dossier / fichier).is_dir()
             ],
@@ -708,7 +708,7 @@ class Dossier:
         dossier = self.dossier.parent
         os.makedirs(str(rnd), exist_ok=True)
         try:
-            os.chdir(rnd)
+            os.chdir(str(rnd))
             shutil.make_archive(
                 archive,
                 'zip',
@@ -716,7 +716,7 @@ class Dossier:
                 base_dir=str(archive)
             )
         finally:
-            os.chdir(cfg.PWD)
+            os.chdir(str(cfg.PWD))
         b.redirect(
             i18n_path(
                 '/{}/{}.zip?action=telecharger'.format(url(rnd), archive)
@@ -732,7 +732,7 @@ class Dossier:
         tmp_archive = tmp / archive.filename
         archive.save(str(tmp_archive))
         try:
-            os.chdir(tmp)
+            os.chdir(str(tmp))
             shutil.unpack_archive(
                 str(tmp_archive),
                 extract_dir=str(tmp),
@@ -954,7 +954,7 @@ class Projet(Dossier):
         tmp_archive = tmp / archive.filename
         archive.save(str(tmp_archive))
         try:
-            os.chdir(tmp)
+            os.chdir(str(tmp))
             shutil.unpack_archive(
                 str(tmp_archive),
                 extract_dir=str(tmp),
@@ -979,7 +979,7 @@ class Projet(Dossier):
             f.traiter_erreur(err)
             return self.afficher(_("Ceci n'est pas une archive zip."))
         finally:
-            os.chdir(cfg.PWD)
+            os.chdir(str(cfg.PWD))
             shutil.rmtree(str(tmp))
 
     def telecharger_envoi_infos(self):

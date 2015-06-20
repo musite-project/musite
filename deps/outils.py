@@ -324,7 +324,7 @@ def traiter_erreur(err):  # pylint: disable=W0613
 def url(fichier):
     """Url correspondant à un fichier
     """
-    return fichier.replace(str(cfg.PWD), '').replace(os.sep, '/')
+    return '/' + fichier.relative_to(cfg.PWD).as_posix()
 
 
 class ErreurExpression(Exception):
