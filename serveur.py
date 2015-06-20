@@ -19,10 +19,11 @@ __license__ = 'MIT'
 
 import os
 import sys
+from pathlib import Path
 from functools import wraps
 
-LIB = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'deps')
-sys.path.insert(0, LIB)
+LIB = Path(os.path.realpath(__file__)).parent / 'deps'
+sys.path.insert(0, str(LIB))
 import bottle as b
 from bottle import request as rq
 from deps.i18n import I18NPlugin as Traduction
@@ -39,7 +40,7 @@ from etc import config as cfg
 
 # Paramètres bottle ###########################################################
 
-b.TEMPLATE_PATH += cfg.MODELES
+b.TEMPLATE_PATH += [str(modele) for modele in cfg.MODELES]
 APP = b.Bottle()
 
 
@@ -90,15 +91,11 @@ def accueil():
         actions = {}
     liens = {_('Projets'): '_projets'}
     try:
-        with open(os.path.join(
-            cfg.PAGES,
-            'md',
-            'Accueil.{}.md'.format(rq.locale)
-        ), 'r') as acc:
+        with (cfg.PAGES / 'md' / ('Accueil.' + rq.locale + '.md')).open() as acc:
             corps = markdown(acc.read(-1))
     except FileNotFoundError as err:
         f.traiter_erreur(err)
-        with open(os.path.join(cfg.PAGES, 'md', 'Accueil.fr.md'), 'r') as acc:
+        with cfg.PAGES / 'md' / 'Accueil.fr.md'.open() as acc:
             corps = markdown(acc.read(-1))
     return {
         'corps': corps,
@@ -125,14 +122,15 @@ def lister_projets():
         f.traiter_erreur(err)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
-    listefichiers = f.Dossier(cfg.DATA).lister(profondeur=1)
+    listefichiers = [fichier.relative_to(cfg.DATA) for fichier in cfg.DATA.iterdir()]
+    print(listefichiers)
     # Formatage de la liste des fichiers.
     liste = [
         h.A(
             projet, href=i18n_path('/{}'.format(projet))
         )
-        for projet in sorted(listefichiers[cfg.DATA])
-        if os.path.isdir(os.path.join(cfg.DATA, projet))
+        for projet in sorted(listefichiers)
+        if (cfg.DATA / projet).is_dir()
     ]
     return {
         'corps': b.template('liste', liste=liste),
@@ -171,17 +169,13 @@ def admin(action=''):
         retour['corps'] = b.template('utilisateurs')
     else:
         try:
-            with open(os.path.join(
-                cfg.PAGES,
-                'md',
-                'Admin.{}.md'.format(rq.locale)
-            ), 'r') as adm:
+            with cfg.PAGES / 'md' / ('Admin.' + rq.locale + '.md').open() \
+            as adm:
                 retour['corps'] = markdown(adm.read(-1))
         except FileNotFoundError as err:
             f.traiter_erreur(err)
-            with open(os.path.join(
-                cfg.PAGES, 'md', 'Admin.fr.md'
-            ), 'r') as adm:
+            with cfg.PAGES / 'md' / 'Admin.fr.md'.open() \
+            as adm:
                 retour['corps'] = markdown(adm.read(-1))
     return retour
 
@@ -191,7 +185,7 @@ def admin(action=''):
 def groupes():
     """Enregistrement des groupes
     """
-    with open(os.path.join(cfg.ETC, 'groupes'), 'w') as grp:
+    with cfg.ETC / 'groupes'.open('w') as grp:
         grp.write(rq.forms.decode().groupes)
     b.redirect(i18n_path('/admin/utilisateurs'))
 
@@ -232,7 +226,7 @@ def static(chemin='/'):
     telecharger = True if rq.query.action == 'telecharger' else False
     return b.static_file(
         chemin.replace('/', os.sep),
-        root=os.path.join(cfg.PWD, cfg.STATIC),
+        root=str(cfg.STATIC),
         download=telecharger
     )
 
@@ -966,7 +960,7 @@ WEBAPP = Traduction(
     APP,
     langs=cfg.LANGUES,
     default_locale=cfg.LANGUE,
-    locale_dir=cfg.I18N,
+    locale_dir=str(cfg.I18N),
     domain='musite'
 )
 

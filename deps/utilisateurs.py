@@ -5,6 +5,7 @@
 import sys as s
 import os
 import hashlib as h
+from etc import config as cfg
 
 
 def encoder(mdp):
@@ -13,9 +14,8 @@ def encoder(mdp):
 
 # Gestion des utilisateurs #
 
-
 def lister(fichier):
-    with open(fichier, 'r') as f:
+    with fichier.open() as f:
         return {
             u[0]: u[1].replace('\n', '')
             for u in [
@@ -30,9 +30,9 @@ class Utilisateur:
     def __init__(self, nom, mdp=''):
         self.nom = nom
         self.mdp = encoder(mdp)
-        self.fichier = os.path.join('etc', 'utilisateurs')
+        self.fichier = cfg.ETC / 'utilisateurs'
 
-    def ajouter(self, fichier=False):
+    def ajouter(self, fichier=None):
         if not fichier:
             fichier = self.fichier
         if self.nom == '':
@@ -40,31 +40,31 @@ class Utilisateur:
         if self.mdp == '':
             raise MotDePasseRequis
         if self.nom not in lister(fichier).keys():
-            with open(fichier, 'a') as f:
+            with fichier.open('a') as f:
                 f.write('{0}\t{1}\n'.format(self.nom, self.mdp))
         else:
             raise UtilisateurExistant(self.nom)
 
-    def supprimer(self, fichier=False):
+    def supprimer(self, fichier=None):
         if not fichier:
             fichier = self.fichier
         utilisateurs = lister(fichier)
         try:
             del utilisateurs[self.nom]
-            with open(fichier, 'w') as f:
+            with fichier.open('w') as f:
                 for nom in utilisateurs.keys():
                     f.write('{0}\t{1}\n'.format(nom, utilisateurs[nom]))
         except KeyError:
             pass
 
-    def modifier(self, fichier=False):
+    def modifier(self, fichier=None):
         if not fichier:
             fichier = self.fichier
         if self.mdp == '':
             raise MotDePasseRequis
         utilisateurs = lister(fichier)
         utilisateurs[self.nom] = self.mdp
-        with open(fichier, 'w') as f:
+        with fichier.open('w') as f:
             for nom in utilisateurs.keys():
                 f.write('{0}\t{1}\n'.format(nom, utilisateurs[nom]))
 
@@ -90,7 +90,7 @@ class MotDePasseRequis(Exception):
 
 
 def listergroupes(fichier):
-    with open(fichier, 'r') as f:
+    with fichier.open() as f:
         return {
             groupes[0]: [
                 utilisateur
@@ -110,7 +110,7 @@ class Groupe:
 
     def creer(self, fichier):
         if self.nom not in lister(fichier).keys():
-            with open(fichier, 'a') as f:
+            with fichier.open('a') as f:
                 f.write('{0}\t\n'.format(self.nom))
         else:
             raise GroupeExistant(self.nom)
@@ -119,7 +119,7 @@ class Groupe:
         groupes = lister(fichier)
         try:
             del groupes[self.nom]
-            with open(fichier, 'w') as f:
+            with fichier.open('w') as f:
                 f.write(
                     '\n'.join(
                         ['\t'.join((
@@ -134,7 +134,7 @@ class Groupe:
         groupes = lister(fichier)
         if utilisateur not in groupes[self.nom]:
             groupes[self.nom].append(utilisateur)
-            with open(fichier, 'w') as f:
+            with fichier.open('w') as f:
                 f.write(
                     '\n'.join(
                         ['\t'.join((
@@ -148,7 +148,7 @@ class Groupe:
     def retirer(self, utilisateur, fichier):
         groupes = lister(fichier)
         groupes[self.nom] = [u for u in groupes[self.nom] if u != utilisateur]
-        with open(fichier, 'w') as f:
+        with fichier.open('w') as f:
             f.write(
                 '\n'.join(
                     ['\t'.join((

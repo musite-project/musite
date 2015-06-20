@@ -8,6 +8,7 @@ en plusieurs points du programme.
 """
 import os
 import re
+from pathlib import Path
 from sre_constants import error as ReError
 import shutil
 import traceback
@@ -26,6 +27,7 @@ from .i18n import lazy_gettext as _, i18n_path
 # en effet, les autres modules l'importent depuis celui-ci, afin de centraliser
 # tout cela et de permettre le cas échéant de redéfinir cette méthode.
 assert i18n_path
+assert Path
 
 
 class Depot():
@@ -159,7 +161,7 @@ class Depot():
     def origine(self):
         """Adresse du dépôt depuis lequel celui-ci a été clôné
         """
-        with open(os.path.join(self.dossier, '.git', 'config')) as gitconfig:
+        with Path(self.dossier / '.git' / 'config').open() as gitconfig:
             adresse = False
             for ligne in gitconfig:
                 if adresse:
@@ -237,35 +239,9 @@ class Dossier():
     """Gestion des dossiers
     """
     def __init__(self, dossier):
-        self.dossier = dossier
-        if not os.path.isdir(dossier):
+        self.dossier = Path(dossier)
+        if not self.dossier.is_dir():
             raise TypeError(dossier + _(" n'est pas un dossier"))
-
-    def lister(self, expression='*', profondeur=1):
-        """Liste du contenu d'un dossier
-
-        Sous la forme d'un dictionnaire, chaque sous-dossier étant une clé
-        de ce dictionnaire.
-        """
-        liste = {
-            self.dossier: [
-                os.path.split(fichier)[-1]
-                for fichier in ls(self.dossier + '/' + expression)
-            ]
-        }
-        if profondeur > 1:
-            for sousdossier in liste[self.dossier]:
-                try:
-                    contenu = Dossier(
-                        os.path.join(self.dossier, sousdossier)
-                    ).lister(profondeur=profondeur - 1)
-                    if contenu[os.path.join(self.dossier, sousdossier)] != []:
-                        liste = dict(
-                            liste, **contenu
-                        )
-                except TypeError:
-                    pass
-        return liste
 
     def rechercher(self, expression, nom=True, contenu=True):
         """Recherche d'une expression dans le nom ou le contenu des documents
@@ -275,7 +251,7 @@ class Dossier():
                 if nom and re.match(expression, dossier.split('/')[-1]):
                     yield dossier
                 for fichier in fichiers:
-                    document = os.path.join(dossier, fichier)
+                    document = str(dossier / fichier)
                     if nom and re.match(expression, fichier):
                         yield document
                     elif contenu:
@@ -292,52 +268,26 @@ class Dossier():
                     sousdossiers.remove('.git')
 
 
-class Fichier():
-    """Gestion des fichiers
-    """
-    def __init__(self, chemin):
-        self.chemin = chemin
-        self.dossier = os.path.dirname(chemin)
-        self.nom = os.path.basename(chemin)
-
-    def lire(self):
-        """Retourne le contenu d'un fichier texte
-        """
-        fichier = open(self.chemin, 'r')
-        try:
-            contenu = fichier.read(-1)
-        except UnicodeDecodeError:
-            contenu = ''
-        fichier.close()
-        return contenu
-
-    def ouvrir(self):
-        """Utile ?
-        """
-        fichier = open(self.chemin, 'rb')
-        contenu = fichier.read(-1)
-        fichier.close()
-        return contenu
-
-
 def nettoyertmp():
     """Nettoyage des fichiers temporaires"""
-    for ancien in (
-            fichier for fichier in ls(os.path.join(cfg.TMP, '*'))
-            if (time() - os.path.getmtime(fichier))/3600 > 3
-    ):
-        if os.path.isdir(ancien):
-            shutil.rmtree(ancien)
-        else:
-            os.remove(ancien)
-    for ancien in (
-            fichier for fichier in ls(os.path.join(cfg.STATIC, 'tmp', '*'))
-            if (time() - os.path.getmtime(fichier))/3600 > 3
-    ):
-        if os.path.isdir(ancien):
-            shutil.rmtree(ancien)
-        else:
-            os.remove(ancien)
+    if cfg.TMP.is_dir():
+        for ancien in (
+                fichier for fichier in cfg.TMP.iterdir()
+                if (time() - fichier.stat().st_mtime)/3600 > 3
+        ):
+            if ancien.is_dir():
+                shutil.rmtree(str(ancien))
+            else:
+                ancien.unlink()
+    if (cfg.STATIC / 'tmp').is_dir():
+        for ancien in (
+                fichier for fichier in (cfg.STATIC / 'tmp').iterdir()
+                if (time() - fichier.stat().st_mtime)/3600 > 3
+        ):
+            if ancien.is_dir():
+                shutil.rmtree(str(ancien))
+            else:
+                ancien.unlink()
 
 
 def sansaccents(entree):
@@ -374,7 +324,7 @@ def traiter_erreur(err):  # pylint: disable=W0613
 def url(fichier):
     """Url correspondant à un fichier
     """
-    return fichier.replace(cfg.PWD, '').replace(os.sep, '/')
+    return fichier.replace(str(cfg.PWD), '').replace(os.sep, '/')
 
 
 class ErreurExpression(Exception):

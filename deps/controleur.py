@@ -14,7 +14,7 @@ from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 from . import outils as f
-from .outils import i18n_path, ls, url, motaleatoire, _
+from .outils import Path, i18n_path, ls, url, motaleatoire, _
 from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
@@ -26,7 +26,7 @@ from etc import config as cfg
 EXT = {
     e[1]: import_module('ext.' + e[1])
     for e in iter_modules(
-        path=[os.path.join(os.path.dirname(os.path.realpath(__file__)), 'ext')]
+        path=[str(cfg.PWD / 'deps' / 'ext')]
     )
 }
 TXT = EXT['txt']
@@ -41,7 +41,7 @@ class Depot:
     """
     def __init__(self, projet):
         self.projet = projet
-        self.depot = f.Depot(os.path.join(cfg.DATA, projet))
+        self.depot = f.Depot(cfg.DATA / projet)
 
     def annuler(self, commit):
         """Annulation des modifications d'un seul commit
@@ -162,8 +162,8 @@ class Document:
         self.projet = projet
         self.ext = ext.lower() if ext else None
         self.chemin = projet + '/' + element + ('.' + ext if ext else '')
-        self.fichier = os.path.join(cfg.DATA, self.chemin.replace('/', os.sep))
-        self.dossier = os.path.join(cfg.DATA, os.path.dirname(self.chemin))
+        self.fichier = cfg.DATA / self.chemin
+        self.dossier = self.fichier.parent
         try:
             self.document = EXT[self.ext].Document(self.chemin)
         except KeyError as err:
@@ -372,10 +372,10 @@ class Document:
     def copier(self, destination, ecraser=False):
         """Copie d'un dossier
         """
-        dest = os.path.join(cfg.DATA, destination)
-        if not os.path.exists(dest) or ecraser:
-            os.makedirs(os.path.dirname(dest), exist_ok=True)
-            shutil.copy2(self.fichier, dest)
+        dest = cfg.DATA / destination
+        if not dest.exists() or ecraser:
+            os.makedirs(str(dest.parent), exist_ok=True)
+            shutil.copy2(str(self.fichier), str(dest))
             self.depot.sauvegarder(
                 message=(
                     _('copie')
@@ -468,9 +468,7 @@ class Dossier:
         self.projet = projet
         self.nom = element
         self.chemin = '/'.join((projet, element))
-        self.dossier = \
-            os.path.join(cfg.DATA, self.chemin.replace('/', os.sep)) \
-            if len(self.chemin) > 1 else cfg.DATA
+        self.dossier = cfg.DATA / self.chemin
         self.depot = Depot(self.projet)
 
     def afficher(self, contenu, suppression=False):
@@ -522,9 +520,9 @@ class Dossier:
     def deplacer(self, destination, ecraser=False):
         """Déplacement/renommage d'un dossier (ou document)
         """
-        dest = os.path.join(cfg.DATA, destination)
-        if not os.path.exists(dest) or ecraser:
-            shutil.move(self.dossier, dest)
+        dest = cfg.DATA / destination
+        if not dest.exists() or ecraser:
+            self.dossier.replace(dest)
             self.depot.sauvegarder(
                 message=(
                     self.nom
@@ -536,9 +534,9 @@ class Dossier:
     def copier(self, destination, ecraser=False):
         """Copie d'un dossier
         """
-        dest = os.path.join(cfg.DATA, destination)
-        if not os.path.exists(dest) or ecraser:
-            shutil.copytree(self.dossier, dest)
+        dest = cfg.DATA / destination
+        if not dest.exists() or ecraser:
+            shutil.copytree(str(self.dossier), str(dest))
             self.depot.sauvegarder(
                 message=(
                     _('copie')
@@ -584,7 +582,10 @@ class Dossier:
         """Affichage des fichiers présents dans un dossier
         """
         f.nettoyertmp()
-        fichiers = f.Dossier(self.dossier).lister(profondeur=1)[self.dossier]
+        fichiers = tuple(
+            fichier for fichier in Path(self.dossier).iterdir()
+            if fichier.name[0] != '.'
+        )
         # Si l'on n'est pas à la racine, on affiche un lien vers le parent.
         try:
             if self.chemin[:-1] != self.projet:
@@ -606,17 +607,17 @@ class Dossier:
         # Liste des dossiers, puis des fichiers
         listedossiers = sorted(
             [
-                fichier + '/'
+                str(fichier.relative_to(self.dossier)) + '/'
                 for fichier in fichiers
-                if os.path.isdir(os.path.join(self.dossier, fichier))
+                if (self.dossier / fichier).is_dir()
             ],
             key=lambda s: s.lower()
         )
         listefichiers = sorted(
             [
-                fichier
+                str(fichier.relative_to(self.dossier))
                 for fichier in fichiers
-                if not os.path.isdir(os.path.join(self.dossier, fichier))
+                if not (self.dossier / fichier).is_dir()
             ],
             key=lambda s: s.lower()
         )
@@ -651,7 +652,7 @@ class Dossier:
                 'README.txt', 'README.TXT', 'Readme.txt', 'readme.txt',
         ):
             try:
-                with open(os.path.join(self.dossier, fichier), 'r') as readme:
+                with (self.dossier / fichier).open() as readme:
                     readme = markdown(readme.read(-1))
                     break
             except FileNotFoundError as err:
@@ -702,18 +703,17 @@ class Dossier:
     def telecharger(self):
         """Téléchargement d'un dossier sous forme d'archive
         """
-        rnd = os.path.join(cfg.STATIC, 'tmp', motaleatoire(6))
-        dossier = re.sub('/$', '', self.dossier)
-        archive = os.path.basename(dossier)
-        dossier = os.path.dirname(dossier)
-        os.makedirs(rnd, exist_ok=True)
+        rnd = cfg.STATIC / 'tmp' / motaleatoire(6)
+        archive = self.dossier.name
+        dossier = self.dossier.parent
+        os.makedirs(str(rnd), exist_ok=True)
         try:
             os.chdir(rnd)
             shutil.make_archive(
                 archive,
                 'zip',
-                root_dir=dossier,
-                base_dir=archive
+                root_dir=str(dossier),
+                base_dir=str(archive)
             )
         finally:
             os.chdir(cfg.PWD)
@@ -727,15 +727,15 @@ class Dossier:
     def telecharger_envoi(self, archive):
         """Intégration d'une archive au sein d'un dossier
         """
-        tmp = os.path.join(cfg.TMP, motaleatoire(6))
-        os.mkdir(tmp)
-        tmp_archive = os.path.join(tmp, archive.filename)
-        archive.save(tmp_archive)
+        tmp = cfg.TMP / motaleatoire(6)
+        tmp.mkdir()
+        tmp_archive = tmp / archive.filename
+        archive.save(str(tmp_archive))
         try:
             os.chdir(tmp)
             shutil.unpack_archive(
-                tmp_archive,
-                extract_dir=tmp,
+                str(tmp_archive),
+                extract_dir=str(tmp),
                 format='zip',
             )
             os.remove(tmp_archive)
@@ -864,9 +864,9 @@ class Projet(Dossier):
     def copier(self, destination, ecraser=False):
         """Copie d'un projet
         """
-        dest = os.path.join(cfg.DATA, destination)
-        if not os.path.exists(dest):
-            shutil.copytree(self.dossier, dest)
+        dest = cfg.DATA / destination
+        if not dest.exists():
+            shutil.copytree(str(self.dossier), str(dest))
             b.redirect(i18n_path('/' + destination))
         else:
             return self.afficher(_('Il y a déjà un projet portant ce nom !'))
@@ -899,9 +899,9 @@ class Projet(Dossier):
     def renommer(self, destination):
         """Renommage d'un projet
         """
-        dest = os.path.join(cfg.DATA, destination)
-        if not os.path.exists(dest):
-            shutil.move(self.dossier, dest)
+        dest = cfg.DATA / destination
+        if not dest.exists():
+            self.dossier.replace(dest)
             b.redirect(i18n_path('/' + destination))
         else:
             return self.afficher(_('Il y a déjà un projet portant ce nom !'))
@@ -949,19 +949,19 @@ class Projet(Dossier):
     def telecharger_envoi(self, archive):
         """Intégration d'une archive au sein d'un dossier
         """
-        tmp = os.path.join(cfg.TMP, motaleatoire(6))
-        os.mkdir(tmp)
-        tmp_archive = os.path.join(tmp, archive.filename)
-        archive.save(tmp_archive)
+        tmp = cfg.TMP / motaleatoire(6)
+        tmp.mkdir()
+        tmp_archive = tmp / archive.filename
+        archive.save(str(tmp_archive))
         try:
             os.chdir(tmp)
             shutil.unpack_archive(
-                tmp_archive,
-                extract_dir=tmp,
+                str(tmp_archive),
+                extract_dir=str(tmp),
                 format='zip',
             )
-            os.remove(tmp_archive)
-            dossier = ls(tmp + '/*')
+            tmp_archive.unlink()
+            dossier = [dss for dss in tmp.iterdir()]
             if len(dossier) != 1:
                 return self.afficher(markdown(_(
                     "L'archive doit contenir un et un seul dossier, "
@@ -971,8 +971,8 @@ class Projet(Dossier):
                     "les données de gestion de version."
                 )))
             dossier = dossier[0]
-            shutil.copytree(dossier, self.dossier)
-            if not os.path.isdir(os.path.join(self.dossier, '.git')):
+            shutil.copytree(str(dossier), str(self.dossier))
+            if not self.dossier / '.git'.is_dir():
                 self.depot.initialiser()
             b.redirect(i18n_path('/' + self.chemin))
         except shutil.ReadError as err:
@@ -980,7 +980,7 @@ class Projet(Dossier):
             return self.afficher(_("Ceci n'est pas une archive zip."))
         finally:
             os.chdir(cfg.PWD)
-            shutil.rmtree(tmp)
+            shutil.rmtree(str(tmp))
 
     def telecharger_envoi_infos(self):
         """Informations pour l'envoi d'un fichier

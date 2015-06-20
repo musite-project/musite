@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Gestion de l'authentification des utilisateurs
 """
+
 import os
 import hashlib
 import random as r
@@ -8,8 +9,6 @@ import utilisateurs as u
 import jrnl as l
 from etc import config as cfg
 from bottle import request as rq
-
-PWD = cfg.PWD
 
 
 def crypter(mdp):
@@ -22,13 +21,13 @@ def crypter(mdp):
 def utilisateurs():
     """Liste des utilisateurs
     """
-    return u.lister(os.path.join(PWD, 'etc', 'utilisateurs'))
+    return u.lister(cfg.ETC / 'utilisateurs')
 
 
 def groupes():
     """Liste des groupes.
     """
-    return u.listergroupes(os.path.join(PWD, 'etc', 'groupes'))
+    return u.listergroupes(cfg.ETC / 'groupes')
 
 
 def authentifier(nom, mdp):

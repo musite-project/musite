@@ -6,6 +6,7 @@ emplacements des dossiers.
 Vous pouvez aussi définir si vous êtes ou non en mode développement.
 """
 import os
+from pathlib import Path
 
 
 TITRE = 'Musite'
@@ -13,17 +14,15 @@ TITRE = 'Musite'
 HOTE = '0.0.0.0'
 PORT = 8080
 
-PWD = os.sep + os.path.join(
-        *os.path.dirname(os.path.realpath(__file__)).split(os.sep)[:-1]
-)
-ETC = os.path.join(PWD, 'etc')
-TMP = os.path.join(PWD, 'tmp')
-DATA = os.path.join(PWD, 'data')
-I18N = os.path.join(PWD, 'i18n')
-PAGES = os.path.join(PWD, 'pages')
-PANDOC = os.path.join(PWD, 'modeles', 'pandoc')
-
-STATIC = 'static'
+PWD = Path(os.path.realpath(__file__)).parents[1]
+ETC = PWD / 'etc'
+EXT = PWD / 'ext'
+TMP = PWD / 'tmp'
+DATA = PWD / 'data'
+I18N = PWD / 'i18n'
+PAGES = PWD / 'pages'
+PANDOC = PWD / 'modeles', 'pandoc'
+STATIC = PWD / 'static'
 
 LANGUES = [
     ('fr', 'french'),
@@ -32,10 +31,10 @@ LANGUES = [
 LANGUE = 'fr'
 
 MODELES = [
-    os.path.join(PWD, 'modeles', 'css'),
-    os.path.join(PWD, 'modeles', 'html'),
-    os.path.join(PWD, 'modeles', 'ly'),
-    os.path.join(PWD, 'modeles', 'tex'),
+    PWD / 'modeles' / 'css',
+    PWD / 'modeles' / 'html',
+    PWD / 'modeles' / 'ly',
+    PWD / 'modeles' / 'tex',
 ]
 
 # Mettez le paramètre suivant à False en production.
