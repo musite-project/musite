@@ -8,7 +8,7 @@ en plusieurs points du programme.
 """
 import os
 import re
-from pathlib import Path
+from pathlib import Path as PathlibPath
 from sre_constants import error as ReError
 import shutil
 import traceback
@@ -27,7 +27,18 @@ from .i18n import lazy_gettext as _, i18n_path
 # en effet, les autres modules l'importent depuis celui-ci, afin de centraliser
 # tout cela et de permettre le cas échéant de redéfinir cette méthode.
 assert i18n_path
-assert Path
+
+
+class Path():
+    def __init__(self, *args, **params):
+        self.path = PathlibPath(*args, **params)
+
+    def __getattr__(self, attr):
+        return getattr(self.path, attr)
+
+    def copytree(self, dest):
+        for orig in self.rglob('*'):
+            print(orig)
 
 
 class Depot():

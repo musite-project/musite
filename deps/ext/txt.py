@@ -83,7 +83,7 @@ class Document:
     def _fichiertmp(self, ext=None):
         """Fichier temporaire
         """
-        return self.rnd / self._fichierrelatif(ext if ext else self.ext)
+        return cfg.TMP / self._fichierrelatif(ext if ext else self.ext)
 
     def _fichiersortie(self, ext=None, chemin=None, indice=''):
         """Fichier de destination pour un export

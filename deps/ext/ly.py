@@ -135,10 +135,12 @@ restrictives, qui rendent impossibles certaines opérations.
                 },
             ))
         compiler_pdf(self._fichiertmp(), environnement)
+        dest.parent.mkdir(parents=True)
+        destmidi.parent.mkdir(parents=True)
         orig.replace(dest)
         origmidi.replace(destmidi)
-        if not cfg.DEVEL:
-            shutil.rmtree(str(self.rnd), ignore_errors=True)
+        #~ if not cfg.DEVEL:
+            #~ shutil.rmtree(str(self.rnd), ignore_errors=True)
 
     @property
     def titre(self):
