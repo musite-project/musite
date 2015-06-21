@@ -307,7 +307,6 @@ class Document:
     def creer(self):
         """Création d'un nouveau document
         """
-        print('\t', self.chemin)
         return self.editer(creation=True)
 
     def supprimer(self):
@@ -346,7 +345,8 @@ class Document:
             )
         except f.GitError as err:
             f.traiter_erreur(err)
-            print(err.status)
+            if cfg.DEVEL:
+                print(err.status)
             return self.afficher(markdown(
                 _(
                     "Il y a eu une erreur pendant la sauvegarde du document "
@@ -467,7 +467,8 @@ class Dossier:
         self.projet = projet
         self.nom = element
         self.chemin = '/'.join((projet, element))
-        self.dossier = cfg.DATA / self.chemin
+        self.dossier = \
+            cfg.DATA / self.chemin if self.chemin != '/' else cfg.DATA
         self.depot = Depot(self.projet)
 
     def afficher(self, contenu, suppression=False):
@@ -516,7 +517,6 @@ class Dossier:
             self.dossier.mkdir(parents=True)
         except FileExistsError as err:
             traiter_erreur(err)
-        print(self.chemin)
         b.redirect(i18n_path('/' + self.chemin))
 
     def deplacer(self, destination, ecraser=False):
@@ -671,7 +671,7 @@ class Dossier:
         """
         try:
             liens = (
-                url(dossier).replace('/data', '')
+                url(Path(dossier)).replace('/data', '')
                 for dossier in f.Dossier(self.dossier).rechercher(
                     expression, nom, contenu
                 )

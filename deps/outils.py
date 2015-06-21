@@ -251,7 +251,7 @@ class Dossier():
                 if nom and re.match(expression, dossier.split('/')[-1]):
                     yield dossier
                 for fichier in fichiers:
-                    document = str(dossier / fichier)
+                    document = os.path.join(dossier, fichier)
                     if nom and re.match(expression, fichier):
                         yield document
                     elif contenu:
@@ -261,6 +261,8 @@ class Dossier():
                                     yield document
                             except UnicodeDecodeError as err:
                                 traiter_erreur(err)
+                                if cfg.DEVEL:
+                                    print(document)
                             except ReError as err:
                                 traiter_erreur(err)
                                 raise ErreurExpression

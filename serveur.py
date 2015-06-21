@@ -123,7 +123,6 @@ def lister_projets():
         # Cette exception est levée en l'absence d'authentification
         actions = {}
     listefichiers = [fichier.relative_to(cfg.DATA) for fichier in cfg.DATA.iterdir()]
-    print(listefichiers)
     # Formatage de la liste des fichiers.
     liste = [
         h.A(
