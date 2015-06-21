@@ -89,7 +89,7 @@ class Depot:
                 '(@@.*@@)', '\n{}\n'.format(h.B(h.I('\\1'))), modification
             )
             return h.CODE(modification)
-        except CalledProcessError as err:
+        except f.GitError as err:
             f.traiter_erreur(err)
             return _("Il n'y a rien avant la création !")
 
@@ -338,15 +338,11 @@ class Document:
     def enregistrer(self, contenu):
         """Enregistrement du document
         """
-        try:
-            self.document.enregistrer(contenu)
-        except AttributeError as err:
-            f.traiter_erreur(err)
-            TXT.Document(self.chemin).enregistrer(self.chemin)
+        self.document.enregistrer(contenu)
         try:
             self.depot.sauvegarder(
-                fichier=f.Fichier(self.fichier),
-                message=os.path.basename(self.fichier)
+                fichier=self.fichier,
+                message=self.fichier.name
             )
         except f.GitError as err:
             f.traiter_erreur(err)
@@ -457,7 +453,7 @@ merci de signaler le problème.
     def retablir(self, commit):
         """Retour en arrière jusqu'à une version donnée
         """
-        self.depot.retablir(commit, f.Fichier(self.fichier), rq.auth[0])
+        self.depot.retablir(commit, self.fichier, rq.auth[0])
         b.redirect(i18n_path('/_historique/' + self.chemin))
 
 

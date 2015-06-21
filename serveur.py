@@ -17,7 +17,7 @@ __license__ = 'MIT'
 
 # Import de librairies externes ###############################################
 
-import os
+import os.path
 import sys
 from pathlib import Path
 from functools import wraps
@@ -225,7 +225,7 @@ def static(chemin='/'):
     """
     telecharger = True if rq.query.action == 'telecharger' else False
     return b.static_file(
-        chemin.replace('/', os.sep),
+        str(Path(chemin)),
         root=str(cfg.STATIC),
         download=telecharger
     )
@@ -265,7 +265,6 @@ def document_creer(nom, element=''):
     """
     if rq.forms.action == 'creer':
         doc = rq.forms.decode().nom.split('.')
-        print(doc)
         if len(doc) > 1:
             element, ext = element + '/' + '.'.join((doc[:-1])), doc[-1]
         else:

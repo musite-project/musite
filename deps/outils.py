@@ -72,7 +72,7 @@ class Depot():
     def commande(self, arguments):
         """Commande sur un dépôt existant
         """
-        os.chdir(self.dossier)
+        os.chdir(str(self.dossier))
         ligne = ['git']
         ligne.extend(arguments)
         try:
@@ -105,7 +105,7 @@ class Depot():
                 version
             ]
         if fichier:
-            parametres.append(fichier)
+            parametres.append(str(fichier))
         return self.commande(parametres).replace('\r', '').split('\n')
 
     @property
@@ -150,7 +150,7 @@ class Depot():
         historique = [
             re.sub('Author: |Date: | {2,4}', '', entree).split('\n')[0:5]
             for entree
-            in self.journal(['--follow', fichier]).split('commit ')
+            in self.journal(['--follow', str(fichier)]).split('commit ')
         ][1:]
         for element in historique:
             element[0] = element[0][:7]
@@ -189,7 +189,7 @@ class Depot():
             self.commande([
                 'checkout',
                 version,
-                fichier.chemin
+                str(fichier)
             ])
         else:
             self.commande([
@@ -199,7 +199,7 @@ class Depot():
             ])
         self.sauvegardecomplete(
             'Retour '
-            + ('du fichier {} '.format(fichier.nom) if fichier else '')
+            + ('du fichier {} '.format(fichier.name) if fichier else '')
             + 'à la version '
             + version,
             auteur
@@ -229,8 +229,8 @@ class Depot():
         """Sauvegarde d'un fichier isolé
         """
         self.sauvegarde(
-            fichier.chemin,
-            fichier.nom,
+            str(fichier),
+            fichier.name,
             auteur
         )
 
@@ -246,7 +246,7 @@ class Dossier():
     def rechercher(self, expression, nom=True, contenu=True):
         """Recherche d'une expression dans le nom ou le contenu des documents
         """
-        for dossier, sousdossiers, fichiers in os.walk(self.dossier):
+        for dossier, sousdossiers, fichiers in os.walk(str(self.dossier)):
             if dossier[-4:] != '.git/':
                 if nom and re.match(expression, dossier.split('/')[-1]):
                     yield dossier

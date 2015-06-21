@@ -51,12 +51,8 @@ class Document:
     def doit_etre_actualise(self, fichier, actualiser):
         """Teste s'il est nécessaire de rafraîchir le document
         """
-        return actualiser == 1 or (
-            not fichier.is_file()
-            or (
-                actualiser
-                and self.est_obsolete(fichier)
-            )
+        return actualiser == 1 or not fichier.is_file() or (
+            actualiser and self.est_obsolete(fichier)
         )
 
     def est_obsolete(self, fichier):
@@ -279,9 +275,8 @@ Voici la sortie de la commande :
         """
         chemin = chemin if chemin else 'pdf'
         fichierpdf = self._fichiersortie('pdf', chemin=chemin, indice=indice)
-        print(fichierpdf.is_file())
         if actualiser == 1 or (
-                not fichierpdf.is_file
+                not fichierpdf.is_file()
                 or (
                     actualiser
                     and self.est_obsolete(fichierpdf)

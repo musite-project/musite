@@ -54,20 +54,22 @@ class Document(txt.Document):
         )
 
     @property
+    def _documentmaitre(self):
+        """Test pour savoir s'il s'agit d'un document maître
+        """
+        entete = re.compile('\\\\documentclass')
+        with self._fichier().open() as doc:
+            for ligne in doc:
+                if entete.match(ligne):
+                    return True
+        return False
+
+    @property
     def obsolete(self):
         return self.est_obsolete(self._fichiersortie('pdf'))
 
     def afficher(self, actualiser=0):
-        def documentmaitre():
-            """Test pour savoir s'il s'agit d'un document maître
-            """
-            entete = re.compile('\\\\documentclass')
-            with self._fichier().open() as doc:
-                for ligne in doc:
-                    if entete.match(ligne):
-                        return True
-            return False
-        if documentmaitre():
+        if self._documentmaitre:
             return self.afficher_pdf(actualiser=actualiser)
         else:
             return txt.Document.afficher(self, actualiser=actualiser)
