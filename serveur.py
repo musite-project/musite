@@ -278,7 +278,7 @@ def document_creer(nom, element=''):
 @APP.get('/_creerdossier/<nom>/<element:path>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def dossier_creer_infos(nom, element=None):  # pylint: disable=W0613
+def dossier_creer_infos(nom, element=None, **args):  # pylint: disable=W0613
     """ Page de création d'un dossier
     """
     return {'corps': b.template('creation', {'quoi': _('dossier')})}
@@ -398,9 +398,7 @@ def projet_telecharger_envoi(nom=None):
     """
     nom = nom if nom else rq.forms.decode().nom
     if rq.forms.action == 'envoi':
-        return Projet(nom).telecharger_envoi(
-            archive=rq.files.get('fichier'), nom=nom
-        )
+        return Projet(nom).telecharger_envoi(archive=rq.files.get('fichier'))
     else:
         b.redirect(i18n_path('/_projets'))
 
@@ -409,7 +407,7 @@ def projet_telecharger_envoi(nom=None):
 @APP.get('/_creerprojet/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def projet_creer_infos(nom=None):
+def projet_creer_infos(nom=None, **args):
     """ Page de création d'un projet
     """
     if nom:
@@ -724,7 +722,7 @@ def inexistant_creer(nom, element=None, ext=None):
             'dossier':  dossier_creer_infos,
             'document': document_creer_infos,
             'projet':   projet_creer_infos
-        }[rq.forms.action](nom, element, ext)
+        }[rq.forms.action](nom=nom, element=element, ext=ext)
     except KeyError as err:
         f.traiter_erreur(err)
         b.redirect(i18n_path('/'))
@@ -855,7 +853,7 @@ def document_afficher(nom, element=None, ext=None):
             return Projet(nom).lister()
         else:
             return Dossier(nom, element + ('.' + ext if ext else '')).lister()
-    except NotADirectoryError as err:
+    except (FileNotFoundError, NotADirectoryError) as err:
         f.traiter_erreur(err)
         # Cette exception est levée s'il ne s'agit pas d'un dossier.
         try:

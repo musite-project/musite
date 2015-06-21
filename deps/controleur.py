@@ -370,7 +370,10 @@ class Document:
         """
         dest = cfg.DATA / destination
         if not dest.exists() or ecraser:
-            os.makedirs(str(dest.parent), exist_ok=True)
+            try:
+                dest.parent.mkdir(parents=True)
+            except FileExistsError as err:
+                traiter_erreur(err)
             shutil.copy2(str(self.fichier), str(dest))
             self.depot.sauvegarder(
                 message=(
@@ -509,7 +512,10 @@ class Dossier:
     def creer(self):
         """Création d'un nouveau dossier
         """
-        os.makedirs(self.dossier, exist_ok=True)
+        try:
+            self.dossier.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
         print(self.chemin)
         b.redirect(i18n_path('/' + self.chemin))
 
@@ -555,7 +561,7 @@ class Dossier:
         """Envoi d'un fichier vers le dossier
         """
         try:
-            fichier.save(self.dossier, int(ecraser))
+            fichier.save(str(self.dossier), int(ecraser))
             self.depot.sauvegarder(
                 message=str(_(
                     "Envoi du fichier {}".format(fichier.filename)
@@ -702,7 +708,10 @@ class Dossier:
         rnd = cfg.STATIC / 'tmp' / motaleatoire(6)
         archive = self.dossier.name
         dossier = self.dossier.parent
-        os.makedirs(str(rnd), exist_ok=True)
+        try:
+            rnd.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
         try:
             os.chdir(str(rnd))
             shutil.make_archive(
@@ -734,20 +743,20 @@ class Dossier:
                 extract_dir=str(tmp),
                 format='zip',
             )
-            os.remove(tmp_archive)
+            tmp_archive.unlink()
             for racine, dossiers, fichiers in os.walk('.'):
                 if '.git' not in racine:
                     for fichier in fichiers:
                         os.renames(
                             os.path.join(racine, fichier),
-                            os.path.join(self.dossier, racine, fichier)
+                            os.path.join(str(self.dossier), racine, fichier)
                         )
                     if '.git' in dossiers:
                         dossiers.remove('.git')
                     for dossier in dossiers:
                         os.renames(
                             os.path.join(racine, dossier),
-                            os.path.join(self.dossier, racine, dossier)
+                            os.path.join(str(self.dossier), racine, dossier)
                         )
             self.depot.sauvegarder(
                 message="Intégration de l'archive " + archive.filename
@@ -757,8 +766,8 @@ class Dossier:
             f.traiter_erreur(err)
             return self.afficher(_("Ceci n'est pas une archive zip."))
         finally:
-            os.chdir(cfg.PWD)
-            shutil.rmtree(tmp)
+            os.chdir(str(cfg.PWD))
+            shutil.rmtree(str(tmp))
 
     def telecharger_envoi_infos(self):
         """Informations pour l'envoi d'un fichier
@@ -871,7 +880,7 @@ class Projet(Dossier):
         """Création d'un nouveau projet
         """
         try:
-            os.makedirs(self.dossier, exist_ok=False)
+            self.dossier.mkdir(parents=True)
             self.depot.initialiser()
             b.redirect(self.url)
         except FileExistsError as err:
@@ -934,7 +943,7 @@ class Projet(Dossier):
         """Suppression du projet
         """
         try:
-            shutil.rmtree(self.dossier, ignore_errors=False)
+            shutil.rmtree(str(self.dossier), ignore_errors=False)
             return self.afficher(_('Projet supprimé !'), suppression=True)
         except FileNotFoundError as err:
             f.traiter_erreur(err)
@@ -968,7 +977,7 @@ class Projet(Dossier):
                 )))
             dossier = dossier[0]
             shutil.copytree(str(dossier), str(self.dossier))
-            if not self.dossier / '.git'.is_dir():
+            if not (self.dossier / '.git').is_dir():
                 self.depot.initialiser()
             b.redirect(i18n_path('/' + self.chemin))
         except shutil.ReadError as err:
