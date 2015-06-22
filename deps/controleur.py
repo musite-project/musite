@@ -14,7 +14,7 @@ from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 from . import outils as f
-from .outils import Path, i18n_path, ls, url, motaleatoire, _
+from .outils import Path, GitError, i18n_path, ls, url, motaleatoire, _
 from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
@@ -317,10 +317,13 @@ class Document:
         except KeyError as err:
             f.traiter_erreur(err)
             self.document.supprimer()
-        self.depot.sauvegarder(
-            message=_('Suppression du document {}').format(self.chemin)
-        )
-        return self.afficher(_('Document supprimé !'))
+        try:
+            self.depot.sauvegarder(
+                message=_('Suppression du document {}').format(self.chemin)
+            )
+        except GitError as err:
+            f.traiter_erreur(err)
+        b.redirect(url(Path(self.dossier)).replace('/data', ''))
 
     def editer(self, creation=False):
         """Édition du document
@@ -363,7 +366,7 @@ class Document:
                     )
                 ) if len(err.status) else ""
             ))
-        b.redirect(i18n_path('/' + self.chemin))
+        b.redirect(i18n_path(('/' + self.chemin).replace('//', '/')))
 
     def copier(self, destination, ecraser=False):
         """Copie d'un dossier
@@ -659,7 +662,7 @@ class Dossier:
                     break
             except FileNotFoundError as err:
                 f.traiter_erreur(err)
-                readme = None
+                readme = ''
         return self.afficher(b.template(
             'liste',
             liste=liste,

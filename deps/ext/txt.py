@@ -11,6 +11,7 @@ user des mécanismes d'héritage de Python en vous basant sur ce module.
 """
 import os.path
 import subprocess as sp
+import shutil
 from deps import HTMLTags as h
 from deps import bottle as b
 from deps.outils import Path, motaleatoire, traiter_erreur, url, _
@@ -75,7 +76,7 @@ class Document:
         """
         if ext:
             return (
-                cfg.PWD / cfg.STATIC / 'docs' / ext / self._fichierrelatif(ext)
+                cfg.DOCS / ext / self._fichierrelatif(ext)
             )
         else:
             return cfg.DATA / self._fichierrelatif()
@@ -256,7 +257,13 @@ Voici la sortie de la commande :
     def supprimer(self):
         """Suppression du document
         """
-        os.remove(self._fichier())
+        try:
+            self._fichier().unlink()
+        except FileNotFoundError as err:
+            traiter_erreur(err)
+        for doc in cfg.DOCS.glob('*/' + str(self._fichierrelatif().with_suffix('')) + '.*'):
+            print(doc)
+            doc.unlink()
 
     def exporter(self, fmt):
         """Export dans les différents formats

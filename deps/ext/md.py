@@ -12,7 +12,7 @@ import shutil
 from sys import stderr
 from . import txt
 from etc import config as cfg
-from deps.outils import url, traiter_erreur, _
+from deps.outils import copytree, url, traiter_erreur, _
 
 
 class Document(txt.Document):
@@ -115,11 +115,7 @@ class Document(txt.Document):
         """
         orig = self._fichiertmp(ext)
         dest = destination if destination else self._fichier(ext)
-        shutil.rmtree(str(self.rnd), ignore_errors=True)
-        shutil.copytree(
-            str(self.dossier), str(self.dossiertmp), symlinks=True,
-            ignore=lambda x, y: '.git'
-        )
+        copytree(self.dossier, self.dossiertmp, ignore=('.git',))
         arguments = [
             '--filter=' +
             str(cfg.PWD / 'deps' / 'pandoc' / 'gabc.py'),
@@ -167,7 +163,7 @@ class Document(txt.Document):
                         cfg.PANDOC / 'reveal.js' / 'css' / 'theme' /
                         (self.proprietes['reveal.js']['theme'] + '.css')
                     ),
-                    '--variable=revealjs-url:' + str(cfg.PANDOC /  'reveal.js'),
+                    '--variable=revealjs-url:' + str(cfg.PANDOC / 'reveal.js'),
                 ]
         pandoc(
             self._fichiertmp(),
@@ -180,8 +176,6 @@ class Document(txt.Document):
         except FileExistsError as err:
             traiter_erreur(err)
         orig.replace(dest)
-        if not cfg.DEVEL:
-            shutil.rmtree(self.rnd, ignore_errors=True)
 
 
 def pandoc(fichier, destination, fmt=None, arguments=None):

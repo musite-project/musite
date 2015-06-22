@@ -23,6 +23,7 @@ I18N = PWD / 'i18n'
 PAGES = PWD / 'pages'
 PANDOC = PWD / 'modeles' / 'pandoc'
 STATIC = PWD / 'static'
+DOCS = STATIC / 'docs'
 
 LANGUES = [
     ('fr', 'french'),

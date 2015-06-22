@@ -8,7 +8,7 @@ en plusieurs points du programme.
 """
 import os
 import re
-from pathlib import Path as PathlibPath
+from pathlib import Path
 from sre_constants import error as ReError
 import shutil
 import traceback
@@ -29,16 +29,44 @@ from .i18n import lazy_gettext as _, i18n_path
 assert i18n_path
 
 
-class Path():
-    def __init__(self, *args, **params):
-        self.path = PathlibPath(*args, **params)
+def copytree(orig, dest, overwrite='u', ignore=None):
+    """Copie récursive d'un dossier vers un emplacement donné
 
-    def __getattr__(self, attr):
-        return getattr(self.path, attr)
+    overwrite peut prendre les valeurs :
 
-    def copytree(self, dest):
-        for orig in self.rglob('*'):
-            print(orig)
+    - False : aucun écrasement de fichiers ;
+    - 'u' : écrasement si l'origine est plus récente que la destination ;
+    - 'c' : écrasement systématique.
+    """
+    orig = Path(orig)
+    dest = Path(dest)
+    ignore = ignore if ignore else tuple()
+    for dossier, sousdossiers, fichiers in os.walk(str(orig)):
+        print(dossier, sousdossiers, fichiers)
+        pdir = Path(dossier)
+        if pdir.name not in ignore:
+            dirpath = pdir.relative_to(orig)
+            try:
+                (dest / dirpath).mkdir(parents=True)
+            except FileExistsError as err:
+                traiter_erreur(err)
+                if not overwrite:
+                    raise
+            for fichier in fichiers:
+                path = dirpath / fichier
+                if (
+                        not (dest / path).exists()
+                        or overwrite == 'c'
+                        or (
+                            overwrite == 'u' and
+                            (dest / path).stat().st_mtime <
+                            (orig / path).stat().st_mtime
+                        )
+                ):
+                    shutil.copy(str(orig / path), str(dest / path))
+            for ign in ignore:
+                if ign in sousdossiers:
+                    sousdossiers.remove(ign)
 
 
 class Depot():
@@ -296,6 +324,15 @@ def nettoyertmp():
         for ancien in (
                 fichier for fichier in (cfg.STATIC / 'tmp').iterdir()
                 if (time() - fichier.stat().st_mtime)/3600 > 3
+        ):
+            if ancien.is_dir():
+                shutil.rmtree(str(ancien))
+            else:
+                ancien.unlink()
+    if cfg.DOCS.is_dir():
+        for ancien in (
+                fichier for fichier in (cfg.DOCS).iterdir()
+                if (time() - fichier.stat().st_mtime)/(86400) > 30
         ):
             if ancien.is_dir():
                 shutil.rmtree(str(ancien))

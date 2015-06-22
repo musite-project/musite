@@ -9,7 +9,7 @@ http://www.lilypond.org
 import os
 import shutil
 import re
-from deps.outils import Path, templateperso, traiter_erreur, url, _
+from deps.outils import Path, copytree, templateperso, traiter_erreur, url, _
 from etc import config as cfg
 from . import txt
 
@@ -106,11 +106,7 @@ restrictives, qui rendent impossibles certaines opérations.
             dest.parent.mkdir(parents=True)
         except FileExistsError as err:
             traiter_erreur(err)
-        shutil.rmtree(self.rnd, ignore_errors=True)
-        shutil.copytree(
-            str(self.dossier), str(self.dossiertmp), symlinks=True,
-            ignore=lambda x, y: '.git'
-        )
+        copytree(self.dossier, self.dossiertmp, ignore=('.git',))
         with self._fichiertmp().open('w') as tmp:
             contenu = self.contenu
             entetes = re.findall(r'\\\header{[^}]*}', contenu)
@@ -135,12 +131,16 @@ restrictives, qui rendent impossibles certaines opérations.
                 },
             ))
         compiler_pdf(self._fichiertmp(), environnement)
-        dest.parent.mkdir(parents=True)
-        destmidi.parent.mkdir(parents=True)
+        try:
+            dest.parent.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
+        try:
+            destmidi.parent.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
         orig.replace(dest)
         origmidi.replace(destmidi)
-        #~ if not cfg.DEVEL:
-            #~ shutil.rmtree(str(self.rnd), ignore_errors=True)
 
     @property
     def titre(self):

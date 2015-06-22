@@ -19,9 +19,9 @@ __license__ = 'MIT'
 
 import os.path
 import sys
-from pathlib import Path
 from functools import wraps
 
+from deps.outils import Path, i18n_path, _
 LIB = Path(os.path.realpath(__file__)).parent / 'deps'
 sys.path.insert(0, str(LIB))
 import bottle as b
@@ -32,7 +32,6 @@ from deps.mistune import markdown
 
 from deps.controleur import Projet, Dossier, Document, DocumentGabc
 from deps import outils as f
-from deps.outils import i18n_path, _
 from deps import auth as a
 from deps import utilisateurs as u
 from etc import config as cfg

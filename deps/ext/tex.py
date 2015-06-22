@@ -14,7 +14,7 @@ from etc import config as cfg
 import os
 import shutil
 import re
-from deps.outils import traiter_erreur, templateperso, _
+from deps.outils import copytree, traiter_erreur, templateperso, _
 
 TEMPLATETEX = templateperso()
 
@@ -97,11 +97,11 @@ class Document(txt.Document):
             environnement if environnement else {'TEXINPUTS': 'lib:'}
         orig = self._fichiertmp('pdf')
         dest = destination if destination else self._fichier('pdf')
-        shutil.rmtree(str(self.rnd), ignore_errors=True)
-        shutil.copytree(
-            str(self.dossier), str(self.dossiertmp), symlinks=True,
-            ignore=lambda x, y: '.git'
-        )
+        try:
+            dest.parent.mkdir(parents=True)
+        except FileExistsError as err:
+            traiter_erreur(err)
+        copytree(self.dossier, self.dossiertmp, ignore=('.git',))
         if self.proprietes['pdf']['aa_perso']:
             with self._fichiertmp().open('w') as doc:
                 doc.write(re.sub(
@@ -124,8 +124,6 @@ class Document(txt.Document):
         except FileExistsError as err:
             traiter_erreur(err)
         orig.replace(dest)
-        if not cfg.DEVEL:
-            shutil.rmtree(str(self.rnd), ignore_errors=True)
 
 
 def compiler_pdf(fichier, environnement=None):
