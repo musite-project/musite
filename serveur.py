@@ -21,9 +21,9 @@ import os.path
 import sys
 from functools import wraps
 
-from deps.outils import Path, i18n_path, _
-LIB = Path(os.path.realpath(__file__)).parent / 'deps'
+LIB = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'deps')
 sys.path.insert(0, str(LIB))
+from deps.outils import Path, i18n_path, _
 import bottle as b
 b.BaseRequest.MEMFILE_MAX = 2048 * 2048
 from bottle import request as rq
