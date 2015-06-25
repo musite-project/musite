@@ -25,6 +25,7 @@ from deps.outils import Path, i18n_path, _
 LIB = Path(os.path.realpath(__file__)).parent / 'deps'
 sys.path.insert(0, str(LIB))
 import bottle as b
+b.BaseRequest.MEMFILE_MAX = 2048 * 2048
 from bottle import request as rq
 from deps.i18n import I18NPlugin as Traduction
 from deps import HTMLTags as h

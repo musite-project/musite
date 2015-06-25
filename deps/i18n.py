@@ -38,7 +38,7 @@ import gettext
 import functools
 from warnings import warn
 
-from bottle import request, redirect, BaseTemplate, template, DictMixin
+from .bottle import request, redirect, BaseTemplate, template, DictMixin
 
 from .lazy import lazy
 

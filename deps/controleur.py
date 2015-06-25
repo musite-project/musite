@@ -9,7 +9,7 @@ import os
 import shutil
 import re
 import bottle as b
-from bottle import request as rq
+from .bottle import request as rq
 from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
