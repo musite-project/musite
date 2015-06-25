@@ -91,7 +91,9 @@ def accueil():
         actions = {}
     liens = {_('Projets'): '_projets'}
     try:
-        with (cfg.PAGES / 'md' / ('Accueil.' + rq.locale + '.md')).open() as acc:
+        with (
+            cfg.PAGES / 'md' / ('Accueil.' + rq.locale + '.md')
+        ).open() as acc:
             corps = markdown(acc.read(-1))
     except FileNotFoundError as err:
         f.traiter_erreur(err)
@@ -122,7 +124,9 @@ def lister_projets():
         f.traiter_erreur(err)
         # Cette exception est levée en l'absence d'authentification
         actions = {}
-    listefichiers = [fichier.relative_to(cfg.DATA) for fichier in cfg.DATA.iterdir()]
+    listefichiers = [
+        fichier.relative_to(cfg.DATA) for fichier in cfg.DATA.iterdir()
+    ]
     # Formatage de la liste des fichiers.
     liste = [
         h.A(
@@ -168,13 +172,13 @@ def admin(action=''):
         retour['corps'] = b.template('utilisateurs')
     else:
         try:
-            with cfg.PAGES / 'md' / ('Admin.' + rq.locale + '.md').open() \
-            as adm:
+            with (
+                cfg.PAGES / 'md' / ('Admin.' + rq.locale + '.md')
+            ).open() as adm:
                 retour['corps'] = markdown(adm.read(-1))
         except FileNotFoundError as err:
             f.traiter_erreur(err)
-            with cfg.PAGES / 'md' / 'Admin.fr.md'.open() \
-            as adm:
+            with (cfg.PAGES / 'md' / 'Admin.fr.md').open() as adm:
                 retour['corps'] = markdown(adm.read(-1))
     return retour
 
@@ -184,7 +188,7 @@ def admin(action=''):
 def groupes():
     """Enregistrement des groupes
     """
-    with cfg.ETC / 'groupes'.open('w') as grp:
+    with (cfg.ETC / 'groupes').open('w') as grp:
         grp.write(rq.forms.decode().groupes)
     b.redirect(i18n_path('/admin/utilisateurs'))
 
@@ -296,7 +300,6 @@ def dossier_creer(nom, element=''):
         b.redirect(i18n_path('/{}/{}'.format(nom, element).replace('//', '/')))
 
 
-
 @APP.get('/_rechercher')
 @APP.get('/_rechercher/<nom>')
 @APP.get('/_rechercher/<nom>/<element:path>')
@@ -406,7 +409,7 @@ def projet_telecharger_envoi(nom=None):
 @APP.get('/_creerprojet/<nom>')
 @b.auth_basic(a.editeur, _('Réservé aux éditeurs'))
 @page
-def projet_creer_infos(nom=None, **args):
+def projet_creer_infos(nom=None, **args):  # pylint:disable=W0613
     """ Page de création d'un projet
     """
     if nom:
@@ -863,7 +866,6 @@ def document_afficher(nom, element=None, ext=None):
             else:
                 return document.contenu()
         except FileNotFoundError as err:
-            raise
             f.traiter_erreur(err)
             # Cette exception est levée s'il n'y a pas de document, ce qui
             # arrive notamment lorsque l'on renonce à créer un nouveau
