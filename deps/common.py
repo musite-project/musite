@@ -42,7 +42,7 @@ try:
 except ImportError:
     from urllib import quote
 
-from .bottle import request, html_escape
+from bottle import request, html_escape
 
 __all__ = ('PY3', 'PY2', 'unicode', 'basestring', 'to_unicode', 'to_bytes',
            'attr_escape', 'html_escape', 'full_url', 'urlquote')
