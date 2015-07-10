@@ -699,7 +699,7 @@ class Dossier:
     def supprimer(self):
         """Suppression d'un dossier et de son contenu
         """
-        shutil.rmtree(self.dossier, ignore_errors=True)
+        shutil.rmtree(str(self.dossier), ignore_errors=True)
         self.depot.sauvegarder(
             message=_('Suppression du dossier {}').format(self.chemin)
         )
