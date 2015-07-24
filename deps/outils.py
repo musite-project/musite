@@ -98,7 +98,7 @@ class Depot():
         On n'utilise pas la méthode commande, car le dossier n'existe pas
         encore !
         """
-        cmd = ['git', 'clone', depot, self.dossier]
+        cmd = ['git', 'clone', depot, str(self.dossier)]
         try:
             resultat = subprocess.check_output(cmd)
         except subprocess.CalledProcessError as err:
