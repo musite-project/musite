@@ -132,6 +132,7 @@ def compiler_pdf(fichier, environnement=None):
     environnement = environnement if environnement else {'TEXINPUTS': 'lib:'}
     commande = [
         'lualatex',
+        '-draftmode',
         '-interaction=nonstopmode',
         '-shell-restricted',
         str(fichier)
@@ -142,10 +143,8 @@ def compiler_pdf(fichier, environnement=None):
         "gregorio,lilypond"
     )
     compiler(commande, fichier, environnement)
-    if fichier.with_suffix('.toc').exists():
-        if cfg.DEVEL:
-            print('Table des matières : 2e compilation')
-        compiler(commande, fichier, environnement)
+    del commande[1]
+    compiler(commande, fichier, environnement)
 
 
 compiler = txt.compiler  # pylint: disable=C0103
