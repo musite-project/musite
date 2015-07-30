@@ -193,9 +193,15 @@ class Document(txt.Document):  # pylint: disable=R0904
         if (
                 not fichier.is_file()
                 or fichier.stat().st_mtime < self._fichier().stat().st_mtime
-                or fichier.stat().st_mtime < self._fichiersortie(
-                    'pdf', chemin=chemin, indice=indice
-                ).stat().st_mtime
+                or (
+                    self._fichiersortie(
+                        'pdf', chemin=chemin, indice=indice
+                    ).is_file()
+                    and
+                    fichier.stat().st_mtime < self._fichiersortie(
+                        'pdf', chemin=chemin, indice=indice
+                    ).stat().st_mtime
+                )
         ):
             try:
                 self.preparer_gabc(fmt, fichier)

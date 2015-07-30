@@ -69,7 +69,7 @@
         {\rubrsym \Vbar\hspace{-.25ex}#1}
 }
 \catcode`\℟=\active \def ℟#1{%
-        {\rubrsym \Rbar\hspace{-.25ex}#1}
+        {\rubrsym \Rbar#1}
 }
 \catcode`\†=\active \def †{%
     {\rubrsym \GreDagger}%
