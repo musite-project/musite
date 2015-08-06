@@ -24,7 +24,7 @@ Les commandes suivantes devraient installer le nécessaire :
     apt-get -y update ; apt-get -y dist-upgrade
     apt-get -y --force-yes install --no-install-recommends \
     texlive texlive-latex-extra texlive-xetex texlive-luatex \
-    texlive-lang-latin texlive-lang-french \
+    texlive-lang-european texlive-lang-french \
     texlive-humanities texlive-extra-utils latex-xcolor \
     texlive-fonts-extra fonts-linuxlibertine lmodern \
     lilypond gregorio gregoriotex \
