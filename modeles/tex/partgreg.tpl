@@ -85,6 +85,9 @@
     {\GreStar}%
 }
 
+\newcommand{\aci}{\bfseries}
+\newcommand{\pri}{\itshape}
+
 
 \begin{document}
 
