@@ -3,6 +3,6 @@
 """
 
 
-def log(evenement):
-    with open('log', 'a') as l:
+def log(evenement, mode='a'):
+    with open('log', mode) as l:
         l.write(str(evenement) + '\n')

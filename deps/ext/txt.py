@@ -317,7 +317,8 @@ def compiler(commande, fichier, environnement):
                 + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
                 + _('Erreurs :')
                 + '\n=========\n'
-                + '\n{}\n'.format(erreurs.decode('utf8'))
+                + '\n{}\n'.format(erreurs.decode('utf8')),
+                mode = 'w'
             )
         except UnicodeDecodeError:
             raise FichierIllisible
