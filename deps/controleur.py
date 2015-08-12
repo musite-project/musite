@@ -376,7 +376,7 @@ class Document:
             try:
                 dest.parent.mkdir(parents=True)
             except FileExistsError as err:
-                traiter_erreur(err)
+                f.traiter_erreur(err)
             shutil.copy2(str(self.fichier), str(dest))
             self.depot.sauvegarder(
                 message=(
@@ -519,7 +519,7 @@ class Dossier:
         try:
             self.dossier.mkdir(parents=True)
         except FileExistsError as err:
-            traiter_erreur(err)
+            f.traiter_erreur(err)
         b.redirect(i18n_path('/' + self.chemin))
 
     def deplacer(self, destination, ecraser=False):
@@ -714,7 +714,7 @@ class Dossier:
         try:
             rnd.mkdir(parents=True)
         except FileExistsError as err:
-            traiter_erreur(err)
+            f.traiter_erreur(err)
         try:
             os.chdir(str(rnd))
             shutil.make_archive(
