@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Mises à jour
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE42299E ; \
-	echo deb http://ppa.launchpad.net/gregorio-project/gregorio/ubuntu trusty main >> /etc/apt/sources.list ; \
+	echo deb http://ppa.launchpad.net/gregorio-project/gregorio-unstable/ubuntu trusty main >> /etc/apt/sources.list ; \
 	apt-get -y update ; apt-get -y dist-upgrade
 
 # Gestion de l'utf8
