@@ -36,7 +36,7 @@ def authentifier(nom, mdp):
     try:
         return utilisateurs()[nom] == crypter(mdp)
     except KeyError:
-        return False
+        return (nom != 'anonyme' and '*' in utilisateurs())
 
 
 def valider(nom, mdp, critere):
