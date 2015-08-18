@@ -17,13 +17,13 @@ PORT = 8080
 PWD = Path(os.path.realpath(__file__)).parents[1]
 ETC = PWD / 'etc'
 EXT = PWD / 'ext'
-TMP = PWD / 'tmp'
 DATA = PWD / 'data'
 I18N = PWD / 'i18n'
 PAGES = PWD / 'pages'
 PANDOC = PWD / 'modeles' / 'pandoc'
 STATIC = PWD / 'static'
 DOCS = STATIC / 'docs'
+TMP = DOCS / 'tmp'
 
 LANGUES = [
     ('fr', 'french'),
