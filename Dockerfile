@@ -39,6 +39,8 @@ RUN cd /opt && \
 	mv /opt/musite/etc/groupes.sample /opt/musite/etc/groupes && \
 	mkdir /opt/musite/tmp /opt/musite/data
 
+VOLUME ["/opt/musite/data","/opt/musite/static/docs","/opt/musite/etc"]
+
 EXPOSE 80
 
 CMD ["/opt/musite/serveur.py"]
