@@ -33,13 +33,15 @@ RUN git config --global user.email "musite@localhost" && \
 # Installation du site
 RUN cd /opt && \
 	git clone --depth=1 https://github.com/jperon/musite && \
-	sed -i "s/DEVEL = True/DEVEL = False/" /opt/musite/etc/config.py && \
-	sed -i "s/PORT = 8080/PORT = 80/" /opt/musite/etc/config.py && \
-	mv /opt/musite/etc/utilisateurs.sample /opt/musite/etc/utilisateurs && \
-	mv /opt/musite/etc/groupes.sample /opt/musite/etc/groupes && \
-	mkdir /opt/musite/tmp /opt/musite/data
+	mkdir /opt/musite/data /opt/musite/etc
 
 VOLUME ["/opt/musite/data","/opt/musite/static/docs","/opt/musite/etc"]
+
+RUN if [ ! -e /opt/musite/etc/config.py ] ; then cp /opt/musite/etc.sample/config.py /opt/musite/etc/ && \
+	sed -i "s/DEVEL = True/DEVEL = False/" /opt/musite/etc/config.py && \
+	sed -i "s/PORT = 8080/PORT = 80/" /opt/musite/etc/config.py ; fi && \
+	if [ ! -e /opt/musite/etc/utilisateurs ] ; then cp /opt/musite/etc.sample/utilisateurs /opt/musite/etc/ ; fi && \
+	if [ ! -e /opt/musite/etc/groupes ] ; then cp /opt/musite/etc.sample/groupes /opt/musite/etc/ ; fi && \
 
 EXPOSE 80
 
