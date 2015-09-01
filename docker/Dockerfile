@@ -33,9 +33,10 @@ RUN git config --global user.email "musite@localhost" && \
 # Installation du site
 RUN cd /opt && \
 	git clone --depth=1 https://github.com/jperon/musite && \
-	mkdir /opt/musite/data /opt/musite/etc
+	mkdir /opt/musite/data /opt/musite/etc && \
+	mkdir /usr/share/fonts/perso
 
-VOLUME ["/opt/musite/data","/opt/musite/static/docs","/opt/musite/etc"]
+VOLUME ["/opt/musite/data","/opt/musite/static/docs","/opt/musite/etc","/usr/share/fonts/perso"]
 
 ADD serveur.sh /opt/musite/serveur.sh
 
