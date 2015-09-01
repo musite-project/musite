@@ -11,8 +11,9 @@
     bottom=<<<proprietes['marge'][1]>>>,
 ]{geometry}
 \usepackage[autocompile]{gregoriotex}
-\usepackage{libertine}
+\usepackage{fontspec}
 \setmainfont{<<<proprietes['texte_police_famille']>>>}
+%if proprietes['texte_police_famille'] != 'EB Garamond':
 \usepackage[%
     activate={true,nocompatibility}%
     ,final%
@@ -21,6 +22,7 @@
     ,stretch=50%
     ,shrink=30%
     ]{microtype}
+%end
 \usepackage{xcolor}
 
 \pagestyle{empty}
