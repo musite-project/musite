@@ -59,15 +59,13 @@
 \def\rubrannot{}
 %end
 
-
-\def\greinitialformat#1{\raisebox{<<<proprietes['initiale_elevation']>>>}{%
-    \fontspec{<<<proprietes['initiale_police']>>>}
-    \fontsize{%
-        <<<proprietes['initiale_taille']>>>%
-    }{%
-        <<<proprietes['initiale_taille']>>>}\selectfont{}%
-    \rubrinit #1%
-}}
+\grechangestyle{initial}{%
+    \fontspec{<<<proprietes['initiale_police']>>>}%
+    \fontsize{<<<proprietes['initiale_taille']>>>}{<<<proprietes['initiale_taille']>>>}\selectfont%
+    \rubrinit
+}
+\let\oldGreSetInitial\GreSetInitial
+\def\GreSetInitial#1{\oldGreSetInitial{\raisebox{<<<proprietes['initiale_elevation']>>>}{#1}}}
 
 \catcode`\℣=\active \def ℣#1{%
         {\rubrsym \Vbar\hspace{-.25ex}#1}
