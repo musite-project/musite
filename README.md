@@ -8,7 +8,7 @@ Une sorte de wiki pour documents musicaux
 
 Musite est prévu pour être le plus simple *possible* à installer, c'est pourquoi ses dépendances sont réduites au minimum requis pour les fonctionnalités attendues :
 
-- [Python](https://www.python.org) en version 3 (testé avec la 3.4) ;
+- [Python](https://www.python.org) en version 3 (testé avec la 3.4), avec la librairie matplotlib (pour la gestion des polices de caractères) ;
 - une distribution de LaTeX, de préférence [TeXLive](https://www.tug.org/texlive) (la seule qui ait été testée), avec au minimum LuaLaTeX et la police Libertine ; une sélection raisonnable d'extensions est toutefois plus que vivement recommandée ;
 - [Gregorio et GregorioTeX](http://gregorio-project.github.io) pour les partitions grégoriennes ;
 - [LilyPond](http://www.lilypond.org) pour les partitions classiques ;
@@ -29,7 +29,7 @@ Les commandes suivantes devraient installer le nécessaire :
     texlive-fonts-extra fonts-linuxlibertine lmodern \
     lilypond gregorio gregoriotex \
     pandoc
-    apt-get -y install git python3
+    apt-get -y install git python3 python3-matplotlib
 
 
 ### Installation

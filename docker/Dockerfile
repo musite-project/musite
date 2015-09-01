@@ -23,7 +23,7 @@ RUN apt-get -y --force-yes install --no-install-recommends \
 	lilypond gregorio gregoriotex \
 	pandoc
 
-RUN apt-get -y install git python3
+RUN apt-get -y install git python3 python3-matplotlib
 
 
 # Configuration de git
