@@ -17,6 +17,7 @@
             value="{{proprietes[prop]}}"
         >
     %elif type(val[1]) is str:
+        %if len(val) == 2:
         <input
             class="chaine"
             name="{{prop}}"
@@ -24,6 +25,17 @@
             placeholder="{{val[0]}}"
             value="{{proprietes[prop]}}"
         >
+        %elif len(val) == 3:
+        <select
+            class="chaine"
+            name="{{prop}}"
+            label="{{val[0]}} :"
+            placeholder="{{val[0]}}"
+        >
+        <option selected>{{proprietes[prop]}}</option>
+        {{!'\n'.join('<option>' + option for option in val[2])}}
+        </select>
+        %end
     %elif type(val[1]) in (list, tuple):
         <input
             class="tuple"

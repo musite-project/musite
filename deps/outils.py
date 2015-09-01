@@ -19,6 +19,7 @@ import random as rd
 from string import ascii_lowercase
 import unicodedata as ud
 import functools
+from matplotlib import font_manager
 from .bottle import SimpleTemplate, template
 from etc import config as cfg
 from .i18n import lazy_gettext as _, i18n_path
@@ -27,6 +28,13 @@ from .i18n import lazy_gettext as _, i18n_path
 # en effet, les autres modules l'importent depuis celui-ci, afin de centraliser
 # tout cela et de permettre le cas échéant de redéfinir cette méthode.
 assert i18n_path
+
+
+# Liste des polices du système
+liste_polices = sorted(set(
+    font_manager.FontProperties(fname=fname).get_name()
+    for fname in font_manager.get_fontconfig_fonts()
+))
 
 
 def copytree(orig, dest, overwrite='u', ignore=None):

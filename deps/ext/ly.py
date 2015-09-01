@@ -9,7 +9,8 @@ http://www.lilypond.org
 import os
 import shutil
 import re
-from deps.outils import Path, copytree, templateperso, traiter_erreur, url, _
+from deps.outils import Path, copytree, templateperso, \
+    traiter_erreur, liste_polices, url, _
 from etc import config as cfg
 from . import txt
 
@@ -41,11 +42,17 @@ class Document(txt.Document):
                     }),
                     'police': (_("Police"), {
                         'police_a_roman':
-                            (_("Roman"), 'Linux Libertine O'),
+                            (_("Roman"), 'Linux Libertine O', liste_polices),
                         'police_b_sans':
-                            (_("Sans"), 'Linux Biolinum O'),
+                            (_("Sans"), 'Linux Biolinum O', liste_polices),
                         'police_c_mono':
-                            (_("Mono"), 'Linux Libertine Mono O'),
+                            (
+                                _("Mono"),
+                                'Linux Libertine Mono O',
+                                liste_polices
+                            ),
+                        'police_taille':
+                            (_("Taille"), 12),
                     }),
                     'portee': (_("Portées"), {
                         'portee_taille': (_('Taille'), 20)
