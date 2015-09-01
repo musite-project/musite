@@ -1,5 +1,5 @@
 \documentclass[%
-,<<<proprietes['texte_taille']>>>pt%    Taille de police.
+,<<<proprietes['texte_police_taille']>>>pt%    Taille de police.
 ]{scrartcl}
 
 \usepackage[%
@@ -12,6 +12,7 @@
 ]{geometry}
 \usepackage[autocompile]{gregoriotex}
 \usepackage{libertine}
+\setmainfont{<<<proprietes['texte_police_famille']>>>}
 \usepackage[%
     activate={true,nocompatibility}%
     ,final%
@@ -58,6 +59,7 @@
 
 
 \def\greinitialformat#1{\raisebox{<<<proprietes['initiale_elevation']>>>}{%
+    \fontspec{<<<proprietes['initiale_police']>>>}
     \fontsize{%
         <<<proprietes['initiale_taille']>>>%
     }{%

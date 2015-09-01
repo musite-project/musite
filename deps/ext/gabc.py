@@ -9,7 +9,7 @@ http://gregorio-project.github.io/
 """
 from . import txt, tex
 from etc import config as cfg
-from deps.outils import templateperso, url, traiter_erreur, _
+from deps.outils import templateperso, url, traiter_erreur, liste_polices, _
 from deps.gabctk import Gabc, Lily, Midi
 import os
 import shutil
@@ -73,7 +73,9 @@ class Document(txt.Document):  # pylint: disable=R0904
                             (_("Espace sous la portée"), '7mm'),
                     }),
                     'texte': (_("Texte"), {
-                        'texte_taille':
+                        'texte_police_famille':
+                            (_("Police"), 'Linux Libertine O', liste_polices),
+                        'texte_police_taille':
                             (_("Taille de la police"), 12),
                         'texte_symboles_couleur':
                             (_("Symboles en couleur"), True),
@@ -82,6 +84,8 @@ class Document(txt.Document):  # pylint: disable=R0904
                                 (_("Couleur"), False),
                             'initiale_elevation':
                                 (_("Élévation"), '0pt'),
+                            'initiale_police':
+                                (_("Police"), 'Linux Libertine O', liste_polices),
                             'initiale_taille':
                                 (_("Taille"), 42),
                             'initiale_espace':
