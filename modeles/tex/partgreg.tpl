@@ -64,8 +64,7 @@
     \fontsize{<<<proprietes['initiale_taille']>>>}{<<<proprietes['initiale_taille']>>>}\selectfont%
     \rubrinit
 }
-\let\oldGreSetInitial\GreSetInitial
-\def\GreSetInitial#1{\oldGreSetInitial{\raisebox{<<<proprietes['initiale_elevation']>>>}{#1}}}
+\grechangedim{initialraise}{<<<proprietes['initiale_elevation']>>>}{0}
 
 \catcode`\℣=\active \def ℣#1{%
         {\rubrsym \Vbar\hspace{-.25ex}#1}
