@@ -57,7 +57,7 @@ class Document(txt.Document):
     def _documentmaitre(self):
         """Test pour savoir s'il s'agit d'un document maître
         """
-        entete = re.compile('\\\\documentclass|\\\\begin{document}')
+        entete = re.compile('\\\\begin{document}')
         with self._fichier().open() as doc:
             for ligne in doc:
                 if entete.match(ligne):
