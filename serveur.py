@@ -835,7 +835,14 @@ def document_exporter(nom, element='', ext=''):
 def document_src(nom, element='', ext=''):
     """ Source d'un document
     """
-    return Document(nom, element, ext).source
+    try:
+        return Document(nom, element, ext).source
+    except FileNotFoundError as err:
+        f.traiter_erreur(err)
+        # Cette exception est levée s'il n'y a pas de document, ce qui
+        # arrive notamment lorsque l'on renonce à créer un nouveau
+        # document.
+        b.redirect(i18n_path('/' + nom))
 
 
 # Listing des dossiers et aperçu des documents
@@ -870,7 +877,12 @@ def document_afficher(nom, element=None, ext=None):
             # Cette exception est levée s'il n'y a pas de document, ce qui
             # arrive notamment lorsque l'on renonce à créer un nouveau
             # document.
-            b.redirect(i18n_path('/' + nom))
+            b.redirect(i18n_path(
+                '/_src/'
+                + nom
+                + ('/' + element if element else "")
+                + ('.' + ext if ext else "")
+            ))
         except TypeError as err:
             f.traiter_erreur(err)
             # Cette exception est levée si l'on tente d'accéder à un
