@@ -16,8 +16,7 @@
 %if proprietes['texte_police_famille'] != 'EB Garamond':
 \usepackage[%
     activate={true,nocompatibility}%
-    ,final%
-    ,tracking=true%
+    ,final
     ,factor=1100%
     ,stretch=50%
     ,shrink=30%
@@ -93,19 +92,48 @@
 \begin{document}
 
 %if proprietes['aa_titre'] != '':
-{\centering\LARGE <<<proprietes['aa_titre']>>>\par
+{\centering\LARGE%
+    %if proprietes['aa_titre_sc']:
+    \sc%
+    %end
+    <<<proprietes['aa_titre']>>>%
+    \par
 \bigskip}
 %end
 
 %if proprietes['ab_type']:
 \greannotation{%
-    {\rubrannot\footnotesize <<<proprietes['ab_type']>>>}%
+    {\rubrannot\footnotesize%
+    %if proprietes['ab_type_sc']:
+    \textsc{%
+    %end
+    <<<proprietes['ab_type']>>>}%
+    %if proprietes['ab_type_sc']:
+    }%
+    %end
 }
 %end
 %if proprietes['ab_mode']:
 \greannotation{%
-    {\rubrannot\footnotesize <<<proprietes['ab_mode']>>>}%
+    {\rubrannot\footnotesize%
+    %if proprietes['ab_mode_sc']:
+    \textsc{%
+    %end
+    <<<proprietes['ab_mode']>>>}%
+    %if proprietes['ab_mode_sc']:
+    }%
+    %end
 }
+%end
+%if proprietes['ac_commentaire']:
+\grecommentary{%
+    %if proprietes['ac_commentaire_sc']:
+    \textsc{%
+    %end
+    <<<proprietes['ac_commentaire']>>>}%
+    %if proprietes['ac_commentaire_sc']:
+    }%
+    %end
 %end
 \gregorioscore{<<<partition>>>}
 

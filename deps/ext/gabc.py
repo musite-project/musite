@@ -39,6 +39,7 @@ class Document(txt.Document):  # pylint: disable=R0904
                 }),
                 'ly': (self.ly, {
                     'tempo':                (_("Tempo"), 165),
+                    'transpauto':           (_("Transposition auto"), True),
                     'transposition':        (_("Transposition"), 0),
                 }),
                 'pdf': (self.pdf, {
@@ -47,10 +48,20 @@ class Document(txt.Document):  # pylint: disable=R0904
                     'document': (_("Document"), {
                         'aa_titre':
                             (_("Titre"), ''),
+                        'aa_titre_sc':
+                            (_("(petites capitales)"), False),
                         'ab_mode':
                             (_("Mode"), ''),
+                        'ab_mode_sc':
+                            (_("(petites capitales)"), False),
                         'ab_type':
                             (_("Type"), ''),
+                        'ab_type_sc':
+                            (_("(petites capitales)"), False),
+                        'ac_commentaire':
+                            (_("Commentaire"), ''),
+                        'ac_commentaire_sc':
+                            (_("(petites capitales)"), False),
                         'ba_papier':
                             (
                                 _("Taille de la page (largeur, hauteur)"),
@@ -136,7 +147,8 @@ class Document(txt.Document):  # pylint: disable=R0904
             proprietes = {
                 'aa_titre':     self._gabc_entete('name'),
                 'ab_mode':      mode,
-                'ab_type':      type_piece
+                'ab_type':      type_piece,
+                'ac_commentaire':   self._gabc_entete('commentary')
             }
             self.proprietes['pdf'] = self._traiter_options(
                 'pdf', self.proprietes_detail['pdf'], proprietes
@@ -185,7 +197,11 @@ class Document(txt.Document):  # pylint: disable=R0904
 
         Renvoie un objet partition défini dans gabctk
         """
-        return self._gabc.partition(transposition=transposition)
+        return self._gabc.partition(
+            transposition=transposition
+            if not self.proprietes['ly']['transpauto']
+            else None
+        )
 
     def afficher(self, actualiser=2):
         return self.afficher_pdf(actualiser=actualiser)
