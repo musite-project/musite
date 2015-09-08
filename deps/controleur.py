@@ -736,6 +736,10 @@ class Dossier:
         """Intégration d'une archive au sein d'un dossier
         """
         tmp = cfg.DATA/ '.tmp' / motaleatoire(6)
+        try:
+            (cfg.DATA/'.tmp').mkdir()
+        except FileExistsError as err:
+            f.traiter_erreur(err)
         tmp.mkdir()
         tmp_archive = tmp / archive.filename
         archive.save(str(tmp_archive))
