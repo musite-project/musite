@@ -735,7 +735,7 @@ class Dossier:
     def telecharger_envoi(self, archive):
         """Intégration d'une archive au sein d'un dossier
         """
-        tmp = cfg.DATA/ 'tmp' / motaleatoire(6)
+        tmp = cfg.DATA/ '.tmp' / motaleatoire(6)
         tmp.mkdir()
         tmp_archive = tmp / archive.filename
         archive.save(str(tmp_archive))
