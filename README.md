@@ -36,7 +36,7 @@ Les commandes suivantes devraient installer le nécessaire :
 
 Clonez le dépôt de musite (si vous voulez avoir tout l'historique des changements, enlevez `--depth=1` :
 
-    git clone --depth=1 https://github.com/jperon/musite
+    git clone --depth=1 https://github.com/musite-project/musite
 
 Puis placez-vous dans le dossier musite obtenu ; créez un dossier *tmp* pour les fichiers temporaires et un dossier *data* pour les données, puis renommez les modèles de fichiers utilisateurs/groupes. Ce qui donne, sous Linux :
 
@@ -64,7 +64,7 @@ Et voilà !
 Éventuellement, vous pouvez utiliser la fonction *Cloner projet* de la page *Projets* pour importer la documentation
 de musite :
 
-    https://github.com/jperon/musite-doc
+    https://github.com/musite-project/musite-doc
 
 
 ## Configuration
