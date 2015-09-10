@@ -82,6 +82,8 @@ class Document(txt.Document):  # pylint: disable=R0904
                             (_("Épaisseur des lignes"), 20),
                         'notes_espace_lignes_texte':
                             (_("Espace sous la portée"), '7mm'),
+                        'notes_espace_sous_texte':
+                            (_("Espace sous le texte"), '0mm'),
                     }),
                     'texte': (_("Texte"), {
                         'texte_police_famille':
