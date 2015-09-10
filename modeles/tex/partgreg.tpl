@@ -29,6 +29,7 @@
 \grechangestaffsize{<<<proprietes['notes_taille']>>>}
 \grechangestafflinethickness{<<<proprietes['notes_epaisseur_lignes']>>>}
 \grechangedim{spacelinestext}{<<<proprietes['notes_espace_lignes_texte']>>>}{0}
+\grechangedim{spacebeneathtext}{<<<proprietes['notes_espace_sous_texte']>>>}{0}
 \grechangedim{annotationseparation}{<<<proprietes['annotations_espace']>>>}{0}
 \grechangedim{annotationraise}{<<<proprietes['annotations_elevation']>>>}{0}
 \grechangedim{beforeinitialshift}{<<<proprietes['initiale_espace'][0]>>>}{0}
