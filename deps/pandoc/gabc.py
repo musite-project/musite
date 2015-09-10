@@ -134,7 +134,7 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
                 staffsize = int(
                     meta['music']['c']['gregorio']['c']['staffsize']['c']
                 )
-            except TypeError:
+            except (KeyError, TypeError):
                 staffsize = 17
             if fmt == "latex":
                 if ident == "":
@@ -170,7 +170,7 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
                 staffsize = int(
                     meta['music']['c']['gregorio']['c']['staffsize']['c']
                 )
-            except TypeError:
+            except (KeyError, TypeError):
                 staffsize = 17
             if fmt == "latex":
                 if ident == "":
