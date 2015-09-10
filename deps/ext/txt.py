@@ -324,7 +324,7 @@ def compiler(commande, fichier, environnement):
             raise FichierIllisible
         if compilation.returncode:
             print(sortie, erreurs)
-            raise ErreurCompilation
+            raise ErreurCompilation(sortie, erreurs)
     finally:
         os.chdir(str(cfg.PWD))
 
@@ -347,4 +347,5 @@ class FichierIllisible(Exception):
 class ErreurCompilation(Exception):
     """Exception levée en cas d'erreur de compilation
     """
-    pass
+    def __init__(self, sortie=None, erreurs=None):
+        print(sortie, erreurs)

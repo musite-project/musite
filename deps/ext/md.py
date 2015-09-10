@@ -19,7 +19,7 @@ class Document(txt.Document):
     """Document markdown
     """
     def __init__(self, chemin, proprietes=None):
-        proprietes_tex = {
+        proprietes_papier = {
             'document': (_("Document"), {
                 'ba_papier':
                     (_("Taille de la page"), 'a4'),
@@ -30,7 +30,9 @@ class Document(txt.Document):
                     ),
                 'page_numero':
                     (_("Numéros de page"), True),
-            }),
+            })
+        }
+        proprietes_tex = {
             'police': (_("Police"), {
                 'police_famille':
                     (_("Nom"), 'libertine'),
@@ -38,6 +40,7 @@ class Document(txt.Document):
                     (_("Taille de la police"), '12pt'),
             })
         }
+        proprietes_tex.update(proprietes_papier)
         txt.Document.__init__(
             self, chemin,
             # Liste des formats, avec :
@@ -46,10 +49,16 @@ class Document(txt.Document):
             # - l'intitulé correspondant à ces propriétés ;
             # - la valeur par défaut de ces propriétés.
             formats={
-                'pdf': (self.pdf, proprietes_tex),
-                'tex': (self.tex, proprietes_tex),
-                'reveal.js': (self.revealjs, {'theme': (_("Thème"), 'black')}),
                 'beamer': (self.beamer, {}),
+                'docx': (self.docx, proprietes_papier),
+                'epub': (self.epub, {}),
+                'pdf': (self.pdf, proprietes_tex),
+                'odt': (self.odt, proprietes_papier),
+                'reveal.js': (self.revealjs, {'theme': (_("Thème"), 'black', (
+                    'black', 'night', 'serif', 'simple', 'white',
+                ))}),
+                'rtf': (self.rtf, {}),
+                'tex': (self.tex, proprietes_tex),
             },
             proprietes=proprietes
         )
@@ -78,6 +87,38 @@ class Document(txt.Document):
         if self.doit_etre_actualise(fichierpdf, actualiser):
             self.preparer('pdf', fichierpdf, fmt=fmt)
         return url(fichierpdf)
+
+    def docx(self, chemin='docx', indice='', fmt=None, actualiser=2):
+        """Format docx
+        """
+        fichierdocx = self._fichiersortie('docx', chemin=chemin, indice=indice)
+        if self.doit_etre_actualise(fichierdocx, actualiser):
+            self.preparer('docx', fichierdocx, fmt)
+        return url(fichierdocx)
+
+    def epub(self, chemin='epub', indice='', fmt=None, actualiser=2):
+        """Format epub
+        """
+        fichierepub = self._fichiersortie('epub', chemin=chemin, indice=indice)
+        if self.doit_etre_actualise(fichierepub, actualiser):
+            self.preparer('epub', fichierepub, fmt)
+        return url(fichierepub)
+
+    def odt(self, chemin='odt', indice='', fmt=None, actualiser=2):
+        """Format odt
+        """
+        fichierodt = self._fichiersortie('odt', chemin=chemin, indice=indice)
+        if self.doit_etre_actualise(fichierodt, actualiser):
+            self.preparer('odt', fichierodt, fmt)
+        return url(fichierodt)
+
+    def rtf(self, chemin='rtf', indice='', fmt=None, actualiser=2):
+        """Format rtf
+        """
+        fichierrtf = self._fichiersortie('rtf', chemin=chemin, indice=indice)
+        if self.doit_etre_actualise(fichierrtf, actualiser):
+            self.preparer('rtf', fichierrtf, fmt)
+        return url(fichierrtf)
 
     def tex(self, chemin='tex', indice='', fmt=None, actualiser=2):
         """Format tex
@@ -198,7 +239,7 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
             commande = commande + arguments
         commande.append(str(fichier))
         if cfg.DEVEL:
-            stderr.write(str(commande) + '\n\n')
+            stderr.write(' '.join(commande) + '\n\n')
         environnement = os.environ.copy()
         environnement['shell_escape_commands'] = (
             "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
