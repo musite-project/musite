@@ -735,9 +735,10 @@ class Dossier:
     def telecharger_envoi(self, archive):
         """Intégration d'une archive au sein d'un dossier
         """
-        tmp = cfg.DATA/ '.tmp' / motaleatoire(6)
+        tmp_root = cfg.DATA/'.tmp'
+        tmp = tmp_root / motaleatoire(6)
         try:
-            (cfg.DATA/'.tmp').mkdir()
+            (tmp_root).mkdir()
         except FileExistsError as err:
             f.traiter_erreur(err)
         tmp.mkdir()
@@ -774,7 +775,7 @@ class Dossier:
             return self.afficher(_("Ceci n'est pas une archive zip."))
         finally:
             os.chdir(str(cfg.PWD))
-            shutil.rmtree(str(tmp))
+            shutil.rmtree(str(tmp_root))
 
     def telecharger_envoi_infos(self):
         """Informations pour l'envoi d'un fichier
