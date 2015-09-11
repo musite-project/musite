@@ -69,7 +69,7 @@ def latexsnippet(code, kvs, staffsize=17):
         ) + snippet
     snippet = (
         "\\grechangestaffsize{%s}\n" % staffsize +
-        "\\def\\greinitialformat#1{{\\fontsize{%s}{%s}\\selectfont{}#1}}" %
+        "\\grechangestyle{initial}{\\fontsize{%s}{%s}\\selectfont{}}" %
         (2.5 * staffsize, 2.5 * staffsize)
     ) + snippet
     snippet = "\\setlength{\\parskip}{0pt}\n" + snippet + code

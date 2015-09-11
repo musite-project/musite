@@ -14,7 +14,7 @@ from subprocess import CalledProcessError
 from pkgutil import iter_modules
 from importlib import import_module
 from . import outils as f
-from .outils import Path, GitError, i18n_path, ls, url, motaleatoire, _
+from .outils import Path, GitError, i18n_path, ls, url, motaleatoire, erreur, _
 from . import auth as a
 from . import HTMLTags as h
 from .mistune import markdown
@@ -418,8 +418,19 @@ Il y a eu une erreur pendant le traitement du document.
 Ceci vient probablement d'une erreur de syntaxe ou d'une erreur dans vos
 paramètres ; si vous êtes absolument certain du contraire,
 merci de signaler le problème.
-                    """
-                )))
+
+Voici la sortie de la commande :
+
+"""
+                )
+                + _('Sortie :')
+                + '\n========\n'
+                + '\n{}\n\n\n\n'.format(err.sortie)
+                + '−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−\n\n\n\n'
+                + _('Erreurs :')
+                + '\n=========\n'
+                + '\n{}\n'.format(err.erreurs)
+            ))
 
     def exporter_infos(self, fmt):
         """Informations pour l'export

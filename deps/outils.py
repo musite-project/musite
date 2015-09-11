@@ -373,10 +373,13 @@ def templateperso(syntaxe='<% %> % <<< >>>'):
     return functools.partial(template, template_adapter=Adaptateur)
 
 
-def err(txt):
+def erreur(txt):
     """Affichage d'informations sur stderr
     """
-    stderr.write(txt)
+    try:
+        stderr.write(txt.decode() + '\n\n')
+    except AttributeError:
+        stderr.write(str(txt) + '\n\n')
 
 
 def traiter_erreur(err):  # pylint: disable=W0613
