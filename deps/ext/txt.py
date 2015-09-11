@@ -300,7 +300,7 @@ def compiler(commande, fichier, environnement):
     """
     try:
         os.chdir(str(fichier.parent))
-        err(environnement + '\n\n')
+        err(str(environnement) + '\n\n')
         err(' '.join(commande) + '\n\n')
         compilation = sp.Popen(
             commande,
