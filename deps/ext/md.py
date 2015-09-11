@@ -238,8 +238,6 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
         if arguments:
             commande = commande + arguments
         commande.append(str(fichier))
-        if cfg.DEVEL:
-            stderr.write(' '.join(commande) + '\n\n')
         environnement = os.environ.copy()
         environnement['shell_escape_commands'] = (
             "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"

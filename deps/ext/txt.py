@@ -14,7 +14,7 @@ import subprocess as sp
 import shutil
 from deps import HTMLTags as h
 from deps import bottle as b
-from deps.outils import Path, motaleatoire, traiter_erreur, url, _
+from deps.outils import Path, motaleatoire, traiter_erreur, url, err, _
 from deps.mistune import markdown
 from deps import jrnl as l
 from etc import config as cfg
@@ -300,8 +300,8 @@ def compiler(commande, fichier, environnement):
     """
     try:
         os.chdir(str(fichier.parent))
-        if cfg.DEVEL:
-            print(environnement)
+        err(environnement + '\n\n')
+        err(' '.join(commande) + '\n\n')
         compilation = sp.Popen(
             commande,
             env=environnement,

@@ -373,6 +373,12 @@ def templateperso(syntaxe='<% %> % <<< >>>'):
     return functools.partial(template, template_adapter=Adaptateur)
 
 
+def err(txt):
+    """Affichage d'informations sur stderr
+    """
+    stderr.write(txt)
+
+
 def traiter_erreur(err):  # pylint: disable=W0613
     """Méthode appelée lorsqu'une exception est levée
     """
