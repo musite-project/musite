@@ -4,6 +4,73 @@ Une sorte de wiki pour documents musicaux
 
 ## Installation
 
+### Le plus simple − sous Linux, mais aussi sous Windows ou OsX
+
+Musite a une image [Docker](https://www.docker.com/) hébergée sur [hub.docker.com](https://hub.docker.com/), automatiquement mise à jour.
+
+#### Installation de Docker
+
+Sous Debian/Ubuntu :
+
+    apt-get install docker.io
+
+Pour les autres distributions Linux, voyez la documentation de votre système.
+
+Sous Windows, voyez [ici](https://docs.docker.com/installation/windows/)
+
+Sous OsX, voyez [là](https://docs.docker.com/installation/mac/)
+
+#### Téléchargement de musite
+
+Sous Linux, saisissez la commande suivante :
+
+    docker pull musite/musite
+
+Sous Windows ou OsX, recherchez à partir de Kitematic l'image musite/musite
+
+#### Lancement
+
+Sous Linux :
+
+```
+/usr/bin/docker run \
+	--rm \
+	-v DOSSIER_DATA:/opt/musite/data \
+	-v DOSSIER_DOCUMENTS_PRODUITS:/opt/musite/static/docs \
+	-v DOSSIER_CONFIGURATION_MUSITE:/opt/musite/etc \
+	-v DOSSIER_POLICES:/usr/share/fonts/perso \
+	-p PORT:80 --name $1 musite/musite &
+```
+
+Remplacez les noms de dossiers en majuscules par l'emplacement des dossiers où vous voulez stocker :
+
+- les données sur lesquelles vous travaillerez (*sources* de vos documents) ;
+- les documents produits (pdf, etc. résultant de votre travail) ;
+- la configuration de musite (là notamment où seront stockés les noms d'utilisateurs/mots de passe) ;
+- les polices que vous voulez pouvoir utiliser depuis musite.
+
+Remplacez PORT par le nombre de votre choix, sachant que ce nombre devra être saisi pour accéder au site.
+Par exemple, si vous mettez `-p 8080:80`, vous aurez à saisir comme adresse, dans votre navigateur,
+`http://localhost:8080`.
+
+Sous Windows et OsX, voyez la documentation de Kitematic.
+
+#### Arrêt
+
+Sous Linux :
+
+    docker stop musite
+
+Sous Windows et OsX ; cf. documentation de Kitematic.
+
+#### Mise-à-jour
+
+Il suffit de relancer la commande `docker pull musite/musite`.
+
+Si votre système a peu d'espace disque disponible, n'hésitez pas à faire une petite recherche sur
+Google pour voir comment nettoyer les anciennes images après mise-à-jour.
+
+
 ### Dépendances
 
 Musite est prévu pour être le plus simple *possible* à installer, c'est pourquoi ses dépendances sont réduites au minimum requis pour les fonctionnalités attendues :
