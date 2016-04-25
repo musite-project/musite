@@ -34,11 +34,11 @@ class Document(txt.Document):  # pylint: disable=R0904
             # - la valeur par défaut de ces propriétés.
             formats={
                 'midi': (self.midi, {
-                    'tempo':                (_("Tempo"), 165),
+                    'tempo':                (_("Tempo"), 190),
                     'transposition':        (_("Transposition"), 0),
                 }),
                 'ly': (self.ly, {
-                    'tempo':                (_("Tempo"), 165),
+                    'tempo':                (_("Tempo"), 180),
                     'transpauto':           (_("Transposition auto"), True),
                     'transposition':        (_("Transposition"), 0),
                 }),
