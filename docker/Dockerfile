@@ -4,8 +4,9 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Mises à jour
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE42299E ; \
+    echo deb http://httpredir.debian.org/debian unstable main >> /etc/apt/sources.list; \
 	echo deb http://ppa.launchpad.net/gregorio-project/gregorio-unstable/ubuntu trusty main >> /etc/apt/sources.list ; \
-	apt-get -y update ; apt-get -y dist-upgrade
+	apt-get -y update ; apt-get -y dist-upgrade ; apt-get -y autoremove --purge
 
 # Gestion de l'utf8
 RUN apt-get -y install locales
