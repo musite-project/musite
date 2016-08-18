@@ -8,7 +8,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE42299E ; \
 	apt-get -y update ; apt-get -y dist-upgrade
 
 # Gestion de l'utf8
-RUN apt-get install locales
+RUN apt-get -y install locales
 RUN locale-gen C.UTF-8 && \
     /usr/sbin/update-locale LANG=C.UTF-8
 
