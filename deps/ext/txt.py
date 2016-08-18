@@ -14,7 +14,7 @@ import subprocess as sp
 import shutil
 from deps import HTMLTags as h
 from deps import bottle as b
-from deps.outils import Path, motaleatoire, traiter_erreur, url, _
+from deps.outils import Path, motaleatoire, traiter_erreur, url, erreur, _
 from deps.mistune import markdown
 from deps import jrnl as l
 from etc import config as cfg
@@ -199,20 +199,7 @@ class Document:
             )
         except ErreurCompilation as err:
             traiter_erreur(err)
-            return (markdown(
-                _(
-                    """\
-Il y a eu une erreur pendant le traitement du document.
-Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
-certain du contraire, merci de signaler le problème.
-
-{}
-
-Voici la sortie de la commande :
-
-                    """
-                ).format(message_erreur)
-            ) + traiter_erreur_compilation(self.dossiertmp))
+            return traiter_erreur_compilation(self.dossiertmp, message_erreur)
 
     @property
     def contenu(self):
@@ -300,8 +287,8 @@ def compiler(commande, fichier, environnement):
     """
     try:
         os.chdir(str(fichier.parent))
-        if cfg.DEVEL:
-            print(environnement)
+        erreur(str(environnement) + '\n\n')
+        erreur(' '.join(commande) + '\n\n')
         compilation = sp.Popen(
             commande,
             env=environnement,
@@ -323,16 +310,28 @@ def compiler(commande, fichier, environnement):
         except UnicodeDecodeError:
             raise FichierIllisible
         if compilation.returncode:
-            print(sortie, erreurs)
-            raise ErreurCompilation(sortie, erreurs)
+            raise ErreurCompilation(sortie.decode(), erreurs.decode())
     finally:
         os.chdir(str(cfg.PWD))
 
 
-def traiter_erreur_compilation(dossier):
+def traiter_erreur_compilation(dossier, message_erreur = ''):
     """Réaction en cas d'erreur de compilation
     """
-    return Document(dossier.as_posix() + '/log').afficher()
+    return markdown(
+                _(
+                    """\
+Il y a eu une erreur pendant le traitement du document.
+Ceci vient probablement d'une erreur de syntaxe ; si vous êtes absolument
+certain du contraire, merci de signaler le problème.
+
+{}
+
+Voici la sortie de la commande :
+
+                    """
+                ).format(message_erreur)
+            ) + Document(dossier.as_posix() + '/log').afficher()
 
 
 class FichierIllisible(Exception):
@@ -347,5 +346,11 @@ class FichierIllisible(Exception):
 class ErreurCompilation(Exception):
     """Exception levée en cas d'erreur de compilation
     """
+<<<<<<< HEAD
     def __init__(self, sortie=None, erreurs=None):
         print(sortie, erreurs)
+=======
+    def __init__(self, sortie='', erreurs=''):
+        self.sortie = sortie
+        self.erreurs = erreurs
+>>>>>>> 1061cca57fd690d921d556f57be97a5686f635ca

@@ -229,7 +229,7 @@ class Document(txt.Document):  # pylint: disable=R0904
                 self.preparer_gabc(fmt, fichier)
             except IndexError as err:
                 traiter_erreur(err)
-                raise ErreurCompilation
+                raise ErreurCompilation('','')
         return url(fichier)
 
     def ly(self, chemin=None, indice=''):  # pylint: disable=C0103

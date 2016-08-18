@@ -13,6 +13,7 @@ from sys import stderr
 from . import txt
 from etc import config as cfg
 from deps.outils import copytree, url, traiter_erreur, _
+from deps.mistune import markdown
 
 
 class Document(txt.Document):
@@ -68,7 +69,11 @@ class Document(txt.Document):
         return self.est_obsolete(self._fichiersortie('html'))
 
     def afficher(self, actualiser=0):
-        return self.html(actualiser=actualiser)
+        try:
+            return self.html(actualiser=actualiser)
+        except ErreurCompilation as err:
+            traiter_erreur(err)
+            return traiter_erreur_compilation(self.dossiertmp)
 
     def html(self, chemin='html', indice='', fmt=None, actualiser=2):
         """Format html
@@ -183,6 +188,10 @@ class Document(txt.Document):
                 self.proprietes[ext]['marge'][3],
                 '--variable=include-before:' +
                 '\\widowpenalty=10000\\clubpenalty=10000',
+                '--variable=header-includes:' +
+                "\\usepackage[autocompile]{gregoriotex}",
+                '--variable=header-includes:' +
+                "\\usepackage{lyluatex}",
             ]
             if not self.proprietes[ext]['page_numero']:
                 arguments.append(
@@ -246,15 +255,18 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
             "gregorio,lilypond"
         )
         environnement['TEXINPUTS'] = ("lib:")
-        try:
-            compiler(commande, fichier, environnement)
-        except ErreurCompilation as err:
-            traiter_erreur(err)
-            raise
+        #try:
+        compiler(commande, fichier, environnement)
     finally:
         os.chdir(str(cfg.PWD))
 
-compiler = txt.compiler  # pylint: disable=C0103
+
+# pylint: disable=C0103
+compiler = txt.compiler
+
+
+# pylint: disable=C0103
+traiter_erreur_compilation = txt.traiter_erreur_compilation
 
 
 FichierIllisible = txt.FichierIllisible

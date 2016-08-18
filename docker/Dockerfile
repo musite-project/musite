@@ -32,7 +32,7 @@ RUN git config --global user.email "musite@localhost" && \
 
 # Installation du site
 RUN cd /opt && \
-	git clone --depth=1 https://github.com/jperon/musite && \
+	git clone --depth=1 https://github.com/musite-project/musite && \
 	mkdir /opt/musite/data /opt/musite/etc && \
 	mkdir /usr/share/fonts/perso
 

@@ -872,18 +872,7 @@ def document_afficher(nom, element=None, ext=None):
                 return document.contenu(actualiser=int(actualiser))
             else:
                 return document.contenu()
-        except FileNotFoundError as err:
-            f.traiter_erreur(err)
-            # Cette exception est levée s'il n'y a pas de document, ce qui
-            # arrive notamment lorsque l'on renonce à créer un nouveau
-            # document.
-            b.redirect(i18n_path(
-                '/_src/'
-                + nom
-                + ('/' + element if element else "")
-                + ('.' + ext if ext else "")
-            ))
-        except TypeError as err:
+        except (FileNotFoundError, TypeError) as err:
             f.traiter_erreur(err)
             # Cette exception est levée si l'on tente d'accéder à un
             # emplacement inexistant.
@@ -893,7 +882,6 @@ def document_afficher(nom, element=None, ext=None):
                 + ('/' + element if element else "")
                 + ('.' + ext if ext else "")
             ))
-            raise
 
 
 # Enregistrement des documents après édition

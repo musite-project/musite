@@ -8,6 +8,7 @@ en plusieurs points du programme.
 """
 import os
 import re
+from sys import stderr
 from pathlib import Path
 from sre_constants import error as ReError
 import shutil
@@ -372,11 +373,19 @@ def templateperso(syntaxe='<% %> % <<< >>>'):
     return functools.partial(template, template_adapter=Adaptateur)
 
 
+def erreur(txt):
+    """Affichage d'informations sur stderr
+    """
+    try:
+        stderr.write(txt.decode() + '\n\n')
+    except AttributeError:
+        stderr.write(str(txt) + '\n\n')
+
+
 def traiter_erreur(err):  # pylint: disable=W0613
     """Méthode appelée lorsqu'une exception est levée
     """
-    if cfg.DEVEL:
-        print(traceback.format_exc())
+    stderr.write(traceback.format_exc() + '\n')
 
 
 def url(fichier):
