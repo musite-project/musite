@@ -3,9 +3,7 @@ FROM debian:stable
 ENV DEBIAN_FRONTEND noninteractive
 
 # Mises à jour
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE42299E ; \
-    echo deb http://httpredir.debian.org/debian unstable main >> /etc/apt/sources.list; \
-	echo deb http://ppa.launchpad.net/gregorio-project/gregorio-unstable/ubuntu trusty main >> /etc/apt/sources.list ; \
+RUN echo deb http://httpredir.debian.org/debian unstable main >> /etc/apt/sources.list; \
 	apt-get -y update ; apt-get -y dist-upgrade ; apt-get -y autoremove --purge
 
 # Gestion de l'utf8
@@ -21,7 +19,7 @@ RUN apt-get -y --force-yes install --no-install-recommends \
 	texlive-lang-european texlive-lang-french \
 	texlive-humanities texlive-extra-utils latex-xcolor \
 	texlive-fonts-extra fonts-linuxlibertine lmodern \
-	lilypond gregorio gregoriotex \
+	lilypond \
 	pandoc
 
 RUN apt-get -y install git python3 python3-matplotlib
