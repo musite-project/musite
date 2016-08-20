@@ -19,7 +19,7 @@ RUN apt-get -y --force-yes install --no-install-recommends \
 	texlive-lang-european texlive-lang-french \
 	texlive-humanities texlive-extra-utils latex-xcolor \
 	texlive-fonts-extra fonts-linuxlibertine lmodern \
-	lilypond \
+	texlive-music lilypond \
 	pandoc
 
 RUN apt-get -y install git python3 python3-matplotlib
