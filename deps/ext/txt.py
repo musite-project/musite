@@ -346,11 +346,6 @@ class FichierIllisible(Exception):
 class ErreurCompilation(Exception):
     """Exception levée en cas d'erreur de compilation
     """
-<<<<<<< HEAD
-    def __init__(self, sortie=None, erreurs=None):
-        print(sortie, erreurs)
-=======
     def __init__(self, sortie='', erreurs=''):
         self.sortie = sortie
         self.erreurs = erreurs
->>>>>>> 1061cca57fd690d921d556f57be97a5686f635ca

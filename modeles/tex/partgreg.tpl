@@ -28,12 +28,12 @@
 
 \grechangestaffsize{<<<proprietes['notes_taille']>>>}
 \grechangestafflinethickness{<<<proprietes['notes_epaisseur_lignes']>>>}
-\grechangedim{spacelinestext}{<<<proprietes['notes_espace_lignes_texte']>>>}{0}
-\grechangedim{spacebeneathtext}{<<<proprietes['notes_espace_sous_texte']>>>}{0}
-\grechangedim{annotationseparation}{<<<proprietes['annotations_espace']>>>}{0}
-\grechangedim{annotationraise}{<<<proprietes['annotations_elevation']>>>}{0}
-\grechangedim{beforeinitialshift}{<<<proprietes['initiale_espace'][0]>>>}{0}
-\grechangedim{afterinitialshift}{<<<proprietes['initiale_espace'][1]>>>}{0}
+\grechangedim{spacelinestext}{<<<proprietes['notes_espace_lignes_texte']>>>}{fixed}
+\grechangedim{spacebeneathtext}{<<<proprietes['notes_espace_sous_texte']>>>}{fixed}
+\grechangedim{annotationseparation}{<<<proprietes['annotations_espace']>>>}{fixed}
+\grechangedim{annotationraise}{<<<proprietes['annotations_elevation']>>>}{fixed}
+\grechangedim{beforeinitialshift}{<<<proprietes['initiale_espace'][0]>>>}{fixed}
+\grechangedim{afterinitialshift}{<<<proprietes['initiale_espace'][1]>>>}{fixed}
 
 
 \definecolor{gregoriocolor}{rgb}{%
@@ -64,7 +64,7 @@
     \fontsize{<<<proprietes['initiale_taille']>>>}{<<<proprietes['initiale_taille']>>>}\selectfont%
     \rubrinit
 }
-\grechangedim{initialraise}{<<<proprietes['initiale_elevation']>>>}{0}
+\grechangedim{initialraise}{<<<proprietes['initiale_elevation']>>>}{fixed}
 
 \catcode`\℣=\active \def ℣#1{%
         {\rubrsym \Vbar\hspace{-.25ex}#1}

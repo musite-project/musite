@@ -63,7 +63,7 @@ def latexsnippet(code, kvs, staffsize=17):
         ) + snippet
     if 'annotation' in kvs:
         snippet = (
-            "\\grechangedim{annotationseparation}{%s mm}{0}\n"
+            "\\grechangedim{annotationseparation}{%s mm}{fixed}\n"
             "\\greannotation{{\\fontsize{%s}{%s}\\selectfont{}%s}}\n" %
             (staffsize / 60, annotationsize, annotationsize, kvs['annotation'])
         ) + snippet
@@ -155,7 +155,7 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
                 )
                 with open(infile, 'r') as doc:
                     code = doc.read().split('%%\n')[1]
-                return [Image([], [
+                return [Image(['', [], []], [], [
                     png(
                         contents,
                         latexsnippet('\\gregorioscore', kvs, staffsize)
@@ -186,7 +186,7 @@ def gabc(key, value, fmt, meta):                   # pylint:disable=I0011,W0613
                     label
                     )]
             else:
-                return Para([Image([], [
+                return Para([Image(['', [], []], [], [
                     png(
                         contents,
                         latexsnippet('\\gabcsnippet', kvs, staffsize)
