@@ -132,6 +132,7 @@ def compiler_pdf(fichier, environnement=None):
     environnement = environnement if environnement else {'TEXINPUTS': 'lib:'}
     commande = [
         'lualatex',
+        '-draftmode',
         '-interaction=nonstopmode',
         '-shell-restricted',
         str(fichier)
