@@ -1,4 +1,3 @@
-\RequirePackage{luatex85}
 \documentclass[%
 ,<<<proprietes['texte_police_taille']>>>pt%    Taille de police.
 ]{scrartcl}
