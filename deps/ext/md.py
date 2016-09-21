@@ -254,7 +254,7 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
             "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
             "gregorio,lilypond"
         )
-        environnement['TEXINPUTS'] = ("lib:")
+        environnement['TEXINPUTS'] = ("lib:" + str(cfg.PANDOC) + ":")
         #try:
         compiler(commande, fichier, environnement)
     finally:
