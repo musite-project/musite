@@ -196,10 +196,11 @@ class Document:
                     actions[_('Éditer gabc')] = '_gabc_editer/' + self.chemin
         except TypeError as err:
             f.traiter_erreur(err)
-        liens = {
-            _('Projet'): self.projet,
-            _('Dossier'): '/'.join(self.chemin.split('/')[:-1])
-        }
+#        liens = {
+#            _('Projet'): self.projet,
+#            _('Dossier'): '/'.join(self.chemin.split('/')[:-1])
+#        }
+        liens = {}
         try:
             exports = {
                 fmt: self.chemin + '?fmt=' + fmt
@@ -513,10 +514,11 @@ class Dossier:
                     '_supprimerdossier/' + self.chemin
         except TypeError as err:
             f.traiter_erreur(err)
-        liens = {
-            _('Projet'): self.projet,
-            _('Parent'): '/'.join(self.chemin.split('/')[:-1])
-        }
+#        liens = {
+#            _('Projet'): self.projet,
+#            _('Parent'): '/'.join(self.chemin.split('/')[:-1])
+#        }
+        liens = {}
         return {
             'corps': contenu,
             'actions': actions,
@@ -839,7 +841,8 @@ class Projet(Dossier):
                     actions[_('Créer projet')] = '_creerprojet'
         except TypeError as err:
             f.traiter_erreur(err)
-        liens = {_('Projet'): self.projet}
+#        liens = {_('Projet'): self.projet}
+        liens = {}
         return {
             'corps': contenu,
             'actions': actions,

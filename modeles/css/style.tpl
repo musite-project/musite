@@ -26,12 +26,18 @@ float:left;
 border: 0px solid #ccc;
 background-color: #fff;
 margin: 0px;
-padding: 5px;
+padding: 1px;
 font-size: 108%;
 margin-left:100px;
 padding-left:20px;
 min-width: 404px;
 height:40px;
+}
+
+#chemin {
+position:absolute;
+top:60px;
+left:150px;
 }
 
 #langues {

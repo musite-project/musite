@@ -49,6 +49,16 @@
         <div id="entete">
             <h1 id='titre'><a href={{i18n_path('/')}}>{{cfg.TITRE}}</a></h1>
         </div>
+        <div id="chemin">
+            <b><a href={{i18n_path('/_projets')}}>Projets</a></b>
+            %elmts = rq['ORIGINAL_PATH'].split('/')[2:]
+            %for idx, elmt in enumerate(elmts):
+            %print('Élément: ' + elmt)
+            %if not len(elmt) or elmt[0] != '_':
+            / <a href={{i18n_path('/' + '/'.join(elmts[0:idx + 1]))}}>{{elmt}}</a>
+            %end
+            %end
+        </div>
         <div id="langues">
             %for langue in sorted(langue[0] for langue in languages):
             <a href="{{str(i18n_path()).replace(str(i18n_path('/')), '/{}/'.format(langue))}}">{{langue}}</a>&nbsp;
