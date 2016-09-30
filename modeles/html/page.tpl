@@ -53,7 +53,6 @@
             <b><a href={{i18n_path('/_projets')}}>Projets</a></b>
             %elmts = rq['ORIGINAL_PATH'].split('/')[2:]
             %for idx, elmt in enumerate(elmts):
-            %print('Élément: ' + elmt)
             %if not len(elmt) or elmt[0] != '_':
             / <a href={{i18n_path('/' + '/'.join(elmts[0:idx + 1]))}}>{{elmt}}</a>
             %end

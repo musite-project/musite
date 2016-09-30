@@ -2,7 +2,7 @@
 $if(fontfamily)$
 \usepackage{$fontfamily$}
 $else$
-\usepackage{lmodern}
+\usepackage{libertine}
 $endif$
 $if(linestretch)$
 \usepackage{setspace}
