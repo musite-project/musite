@@ -973,16 +973,16 @@ if cfg.DEVEL:
         app=WEBAPP,
         host=cfg.HOTE,
         port=cfg.PORT,
-        server='cherrypy',
         # Rechargement automatique du serveur, utile pendant le développement.
         reloader=True
     )
 # En production ####
 else:
-    from deps.cherrypy.wsgiserver.wsgiserver3 import CherryPyWSGIServer
-    SERVER = CherryPyWSGIServer(
-        (cfg.HOTE, cfg.PORT),
+    from deps.wsgiserver import WSGIServer
+    SERVER = WSGIServer(
         WEBAPP,
+        host=cfg.HOTE,
+        port=cfg.PORT,
         server_name='Musite',
         numthreads=30)
     SERVER.start()
