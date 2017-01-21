@@ -1,6 +1,8 @@
 FROM musite/gregorio
 
-RUN apt-get -y install git python3 python3-matplotlib
+# La deuxième commande ci-dessous est un contournement temporaire d'un bug de python3-matplotlib
+RUN apt-get -y install git python3 python3-matplotlib ; \
+	sed -i s/"%{file}'"/"%{file}\\\\\\\\n'"/ /usr/lib/python3/dist-packages/matplotlib/font_manager.py
 
 
 # Configuration de git
