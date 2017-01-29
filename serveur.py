@@ -227,11 +227,18 @@ def static(chemin='/'):
     """ Fichiers statiques
     """
     telecharger = True if rq.query.action == 'telecharger' else False
-    return b.static_file(
+    document = b.static_file(
         str(Path(chemin)),
         root=str(cfg.STATIC),
         download=telecharger
     )
+    if isinstance(document, b.HTTPError):
+        document = b.static_file(
+            str(Path(chemin + '/index.html')),
+            root=str(cfg.STATIC),
+            download=telecharger
+        )
+    return document
 
 
 @APP.get('/favicon.ico')

@@ -191,11 +191,13 @@ class Document:
         """Affichage du document pdf en html (base 64)
         """
         try:
-            return h.OBJECT(
-                data="{}".format(self.pdf(actualiser=actualiser)),
-                Type="application/pdf",
+            return h.IFRAME(
+                src="/static/js/ViewerJS/?zoom=page-width#"
+                    + "{}".format(self.pdf(actualiser=actualiser)),
                 width="100%",
-                height="100%"
+                height="100%",
+                allowfullscreen=True,
+                webkitallowfullscreen=True
             )
         except ErreurCompilation as err:
             traiter_erreur(err)
