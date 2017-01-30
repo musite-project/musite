@@ -192,7 +192,7 @@ class Document:
         """
         try:
             return h.IFRAME(
-                src="/static/js/ViewerJS/?zoom=page-width#"
+                src="/static/js/ViewerJS/?zoom=page-actual#"
                     + "{}".format(self.pdf(actualiser=actualiser)),
                 width="100%",
                 height="100%",

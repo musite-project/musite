@@ -29,7 +29,7 @@ class Document:
         """
         self.preparer()
         return h.IFRAME(
-            src="/static/js/ViewerJS/?zoom=page-width#"
+            src="/static/js/ViewerJS/?zoom=page-actual#"
                 + "{}".format(url(self._fichier())),
             width="100%",
             height="100%",

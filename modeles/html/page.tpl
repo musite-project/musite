@@ -9,6 +9,7 @@
 %if cfg.DEVEL: print('\n', dict(rq), '\n'); end
     <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="/css">
     <title>{{cfg.TITRE + rq['PATH_INFO']}}</title>
     %try:
@@ -44,7 +45,7 @@
     <body>
     %end
         <div id="logo">
-            <a href={{i18n_path('/')}}><img src="/static/img/logo.png" width="150px" alt="Musite"></a>
+            <img id="logo-img" src="/static/img/logo.png" alt="Musite">
         </div>
         <div id="entete">
             <h1 id='titre'><a href={{i18n_path('/')}}>{{cfg.TITRE}}</a></h1>
@@ -64,13 +65,18 @@
             %end
         </div>
 
-        <div id="menu">
+        <div id="corps">
+                {{!corps}}
+        </div>
+
+        <button id="btn-menu" class="btn-menu">≡</button>
+        <div id="menu" class="menu">
             %try:
             %if midi:
             %if prefixe != 'https':
             <object data="{{prefixe + '://' + hote + i18n_path(midi)}}" type="audio/x-midi" width="50px" height="25px">
             %end
-            <input type="button" value="▶" id='btnmidi' onclick="doPlay(mp, this);"/>
+            <input type="button" value="▶" id='btn-midi' onclick="doPlay(mp, this);"/>
             %if prefixe != 'https':
             </object>
             %end
@@ -169,10 +175,6 @@
                     %end
                 </ul>
             </div>
-        </div>
-
-        <div id="corps">
-                {{!corps}}
         </div>
     </body>
 </html>
