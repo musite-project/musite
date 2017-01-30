@@ -48,9 +48,14 @@ def valider(nom, mdp, critere):
     if 'utilisateur' in critere:
         return (nom == critere['utilisateur'])
     elif 'utilisateurs' in critere:
-        return (nom in critere['utilisateurs'].keys())
+        return (
+            nom in critere['utilisateurs'].keys()
+        )
     elif 'groupe' in critere:
-        return (nom in groupes()[critere['groupe']])
+        return (
+            nom in groupes()[critere['groupe']]
+            or '*' in groupes()[critere['groupe']]
+        )
 
 
 def admin(nom=None, mdp=None):
