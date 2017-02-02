@@ -12,6 +12,7 @@ user des mécanismes d'héritage de Python en vous basant sur ce module.
 import os.path
 import subprocess as sp
 import shutil
+from time import time
 from deps import HTMLTags as h
 from deps import bottle as b
 from deps.outils import Path, motaleatoire, traiter_erreur, url, erreur, _
@@ -192,8 +193,9 @@ class Document:
         """
         try:
             return h.IFRAME(
-                src="/static/js/ViewerJS/?zoom=page-actual#"
-                    + "{}".format(self.pdf(actualiser=actualiser)),
+                src="/static/js/ViewerJS/?zoom=page-actual#{}?{}".format(
+                    self.pdf(actualiser=actualiser), int(time())
+                ),
                 width="100%",
                 height="100%",
                 allowfullscreen=True,
@@ -250,7 +252,9 @@ class Document:
             self._fichier().unlink()
         except FileNotFoundError as err:
             traiter_erreur(err)
-        for doc in cfg.DOCS.glob('*/' + str(self._fichierrelatif().with_suffix('')) + '.*'):
+        for doc in cfg.DOCS.glob(
+            '*/{}.*'.format(self._fichierrelatif().with_suffix(''))
+        ):
             print(doc)
             doc.unlink()
 
