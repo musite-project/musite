@@ -15,11 +15,23 @@ partition.
 # Variables globales ###################################################
 
 TITRE = "Cantus"
+H_LA = 57  # Le nombre correspond au "pitch" MIDI.
 TEMPO = 165
 DUREE_EPISEME = 1.7
 DUREE_AVANT_QUILISMA = 2
 DUREE_POINT = 2.3
 DEBUG = False
+ABC_ENTETE = '''
+X: 1
+T: %(titre)s
+L: 1/8
+M: none
+K: transpose=%(transposition)s
+U: P = !uppermordent!
+%(musique)s
+w: %(paroles)s
+'''
+
 # pylint:disable=W1401
 LILYPOND_ENTETE = '''\\version "2.18"
 
@@ -71,8 +83,10 @@ import os
 import sys
 import getopt
 import re
-from midiutil.MidiFile import MIDIFile
 import unicodedata as ud
+from midiutil.MidiFile import MIDIFile
+from abc2xml import abc2xml
+abc2xml.info = lambda x, warn=1: x
 
 
 # Méthodes globales ####################################################
@@ -89,6 +103,8 @@ def aide(erreur, code, commande=os.path.basename(sys.argv[0])):
         + '-i <input.gabc>\n          '
         + '[-o <output.mid>]\n          '
         + '[-l <output.ly>]\n          '
+        + '[-c <output.abc>]\n          '
+        + '[-x <output.xml>]\n          '
         + '[-e <texte.txt>]\n          '
         + '[-t <tempo>]\n          '
         + '[-d <transposition>]\n          '
@@ -109,12 +125,14 @@ def traiter_options(arguments):  # pylint:disable=R0912
     try:
         opts = getopt.getopt(
             arguments,
-            "hi:o:l:e:m:b:t:d:n:a:v",
+            "hi:o:l:c:x:e:m:b:t:d:n:a:v",
             [
                 "help",             # Aide
                 "entree=",          # Fichier gabc
                 "midi=",            # Fichier MIDI
                 "lily=",            # Code ly
+                "abc=",             # Code abc
+                "mxml=",            # Code MusicXML
                 "export=",          # Texte
                 "musique=",         # Code gabc
                 "tab=",             # Fichier "tablature" pour accompagnement
@@ -136,6 +154,10 @@ def traiter_options(arguments):  # pylint:disable=R0912
             options['sortie']['midi'] = arg
         elif opt in ("-l", "--lily"):
             options['sortie']['lily'] = FichierTexte(arg)
+        elif opt in ("-c", "--abc"):
+            options['sortie']['abc'] = FichierTexte(arg)
+        elif opt in ("-x", "--mxml"):
+            options['sortie']['xml'] = FichierTexte(arg)
         elif opt in ("-e", "--export"):
             options['sortie']['texte'] = FichierTexte(arg)
         elif opt in ("-m", "--musique"):
@@ -179,11 +201,11 @@ def sansaccents(input_str):
     return "".join([c for c in nkfd_form if not ud.combining(c)]).replace(
         '℣', 'V'
     )\
-    .replace('℟', 'R')\
-    .replace('æ', 'ae')\
-    .replace('œ', 'oe')\
-    .replace('ǽ', 'ae')\
-    .replace('œ́', 'oe')
+        .replace('℟', 'R')\
+        .replace('æ', 'ae')\
+        .replace('œ', 'oe')\
+        .replace('ǽ', 'ae')\
+        .replace('œ́', 'oe')
 
 
 def sortie_verbeuse(debug, gabc, partition):
@@ -232,6 +254,17 @@ def gabctk(
     if 'lily' in sortie:
         lily = Lily(partition, titre=titre, tempo=tempo)
         lily.ecrire(sortie['lily'].chemin)
+    # Créer le fichier abc
+    if 'abc' in sortie or 'xml' in sortie:
+        abc = Abc(partition, titre=titre, tempo=tempo)
+        if 'abc' in sortie:
+            abc.ecrire(
+                sortie['abc'].chemin, abc=True
+            )
+        if 'xml' in sortie:
+            abc.ecrire(
+                sortie['xml'].chemin, abc=False, xml=True
+            )
     # S'assurer de la présence de certains caractères,
     # à la demande de l'utilisateur.
     # Création d'une variable contenant les paroles.
@@ -375,6 +408,12 @@ class Gabc:
         partition = Partition(
             self.entetes['name'], transposition=transposition
         )
+        reprise = re.compile("<i>.*i*j\..*</i>")
+        for i, syllabe in enumerate(syllabes):
+            rep = reprise.search(syllabe)
+            if rep:
+                syllabes[i - 2] += ' ' + rep.group(0)
+                syllabes[i] = reprise.sub('', syllabe)
         # Extraction des différents signes
         mot = []
         for txt, nme in zip(syllabes, neumes):
@@ -630,6 +669,48 @@ class Syllabe(ObjetLie):
             .replace("<sp>'Œ</sp>", 'Œ́')
 
     @property
+    def abc(self):
+        """Texte de la syllabe adapté pour abc"""
+        abc_texte = self.texte
+        try:
+            if abc_texte[0] == ' ':
+                abc_texte = abc_texte[1:]
+        except IndexError:
+            pass
+        special = re.compile(re.escape('<v>') + '.*' + re.escape('</v>'))
+        if special.search(abc_texte):
+            abc_texte = special.sub('', abc_texte)
+        if (
+                not len(abc_texte)
+                and not (
+                    len(self.neume) == 1
+                    and isinstance(self.neume[0], Clef)
+                )
+        ):
+            abc_texte = ''
+        abc_texte = abc_texte.replace(' ', '~')
+        return abc_texte\
+            .replace('-', '')\
+            .replace('*', '~✶').replace('~~', '~')\
+            .replace('<i>', '').replace('</i>', '')\
+            .replace('<b>', '').replace('</b>', '')\
+            .replace('{', '').replace('}', '')\
+            .replace('<sp>R/</sp>', '℟')\
+            .replace('<sp>V/</sp>', '℣')\
+            .replace('<sp>ae</sp>', 'æ')\
+            .replace("<sp>'ae</sp>", 'ǽ')\
+            .replace("<sp>'æ</sp>", 'ǽ')\
+            .replace('<sp>AE</sp>', 'Æ')\
+            .replace("<sp>'AE</sp>", 'Ǽ')\
+            .replace("<sp>'Æ</sp>", 'Ǽ')\
+            .replace('<sp>oe</sp>', 'œ')\
+            .replace("<sp>'oe</sp>", 'œ́')\
+            .replace("<sp>'œ</sp>", 'œ́')\
+            .replace('<sp>OE</sp>', 'Œ')\
+            .replace("<sp>'OE</sp>", 'Œ́')\
+            .replace("<sp>'Œ</sp>", 'Œ́')
+
+    @property
     def musique(self):
         """Liste des notes associées à la syllabe"""
         return self.neume
@@ -660,6 +741,11 @@ class Neume(list):
     def ly(self):  # pylint:disable=C0103
         """Expression lilypond du neume"""
         return ''.join(signe.ly for signe in self)
+
+    @property
+    def abc(self):
+        """Expression lilypond du neume"""
+        return ''.join(signe.abc for signe in self)
 
     def traiter_gabc(self, gabc):
         """Extraction des signes à partir du code gabc"""
@@ -741,6 +827,7 @@ class Signe(ObjetLie):
         if alterations:
             self.alterations = alterations
         self._ly = ''
+        self._abc = ''
 
     @property
     def ly(self):  # pylint:disable=C0103
@@ -755,6 +842,20 @@ class Signe(ObjetLie):
     def ly(self, valeur):  # pylint:disable=C0103
         """'Setter' pour l'expression ly"""
         self._ly = valeur
+
+    @property
+    def abc(self):
+        """Code abc par défaut
+
+        Cette méthode permet d'éviter qu'un signe n'ayant pas d'expression en
+        abc renvoie l'expression de la note précédente.
+        """
+        return self._abc
+
+    @abc.setter
+    def abc(self, valeur):
+        """'Setter' pour l'expression abc"""
+        self._abc = valeur
 
     def __repr__(self):
         return str(type(self).__name__) + ' : ' + self.gabc
@@ -840,6 +941,17 @@ class Barre(Signe):
             '::': "||"
         }[self.gabc])
 
+    @property
+    def abc(self):
+        """Correspondance entre les barres gabc et les barres abc"""
+        return {
+            '': "",
+            ',': "|",
+            ';': "|",
+            ':': "|",
+            '::': "||"
+        }[self.gabc]
+
 
 class Clef(Signe):
     """Clefs"""
@@ -898,13 +1010,16 @@ class SigneRythmique(Signe):
     """Épisèmes, points"""
     def __init__(self, gabc, **params):
         Signe.__init__(self, gabc, **params)
-        self.precedent.appliquer({
-            "'": 'ictus',
-            '_': 'episeme',
-            '.': 'point',
-            'w': 'quilisma',
-            '~': 'liquescence',
-        }[self.gabc])
+        try:
+            self.precedent.appliquer({
+                "'": 'ictus',
+                '_': 'episeme',
+                '.': 'point',
+                'w': 'quilisma',
+                '~': 'liquescence',
+            }[self.gabc])
+        except AttributeError:
+            print("Bizarrerie : signe rythmique sans note.")
 
 
 class Note(Signe):
@@ -920,6 +1035,7 @@ class Note(Signe):
         # la suite, s'il se rencontre un épisème, un point, etc.
         self.duree = 1
         self._ly = self.g2ly()
+        self._abc = self.g2abc()
         self._nuances = []
         self.neume.possede_note = True
         if self.neume.element_ferme:
@@ -982,6 +1098,23 @@ class Note(Signe):
             ly = ' \\tiny{} \\normalsize'.format(ly)
         return ly
 
+    @property
+    def abc(self):
+        abc = self._abc
+        if 'point' in self._nuances:
+            while abc[-1] == ' ':
+                abc = abc[:-1]
+            abc = abc + '2'
+        if 'episeme' in self._nuances:
+            abc = '!tenuto!' + abc
+        if 'ictus' in self._nuances:
+            abc = '!wedge!' + abc
+        if 'quilisma' in self._nuances:
+            abc = 'P' + abc
+        if 'liquescence' in self._nuances:
+            pass
+        return abc
+
     def ouvrir_element(self):
         """Indique à la note qu'elle ouvre un élément neumatique
 
@@ -995,6 +1128,7 @@ class Note(Signe):
 
         Ceci est surtout nécessaire pour lilypond
         """
+        self._abc += ' '
         if 'point' in self._nuances:
             self._ly = self._ly.replace('[', '')
         else:
@@ -1066,12 +1200,22 @@ class Note(Signe):
         note += '8'
         return note
 
+    def g2abc(self):
+        """Renvoi du code abc correspondant à la note"""
+        # Nom de la note
+        return (
+            'A,', '_B' 'B,',
+            'C', '_D', 'D', '_E', 'E', 'F', '_G', 'G', '_A', 'A', '_B', 'B',
+            'c', '_d', 'd', '_e', 'e', 'f', '_g', 'g', '_a', 'a', '_b', 'b',
+            "c'", "_d'", "d'", "_e'", "e'", "f'", "_g'", "g'", "_a'", "a'"
+        )[self.hauteur - 58]
+
     def g2mid(self, gabc=None):
         """Renvoi de la note correspondant à une lettre gabc"""
         if not gabc:
             gabc = self.gabc
         # Définition de la gamme.
-        h_la = 57  # Le nombre correspond au "pitch" MIDI.
+        h_la = H_LA
         gamme = {
             'notes': ('la', 'si', 'do', 're', 'mi', 'fa', 'sol'),
             'hauteurs': (
@@ -1178,7 +1322,7 @@ class Lily:
             "c, ", "des, ", "d, ", "ees, ", "e, ", "f, ",
             "fis, ", "g, ", "aes, ", "a, ", "bes, ", "b, ",
             "c", "des", "d", "ees", "e", "f",
-            "fis", "g", "aes", "a", "bes", "b", "c"
+            "fis", "g", "aes", "a", "bes", "b", "c'"
             )[(partition.transposition + 12) % 24]
         self.tonalite = partition.tonalite[0]
         self.texte, self.musique = self.traiter_partition(partition)
@@ -1216,6 +1360,75 @@ class Lily:
         })
 
 
+class Abc:
+    """Partition abc"""
+    def __init__(self, partition, titre, tempo):
+        self.tonalite = partition.tonalite[0]
+        self.texte, self.musique = self.traiter_partition(partition)
+        self.titre = titre
+        self.tempo = int(tempo/2)
+        self.texte, self.musique = self.traiter_partition(partition)
+        self.code = ABC_ENTETE % {
+            'titre': self.titre,
+            'tonalite': self.tonalite,
+            'musique': self.musique,
+            'transposition': partition.transposition,
+            'paroles': self.texte
+        }
+
+    @classmethod
+    def traiter_partition(self, partition):
+        """Création de la partition abc"""
+        texte = ''
+        musique = ''
+        for m, mot in enumerate(partition):
+            for i, syllabe in enumerate(mot):
+                syl = syllabe.abc
+                if i + 1 < len(mot):
+                    syl = syl + '-'
+                notes = tuple(notes for notes in syllabe.musique)
+                for j, note in enumerate(notes):
+                    musique += note.abc
+                    if isinstance(note, Note) or isinstance(note, Alteration):
+                        if j == 0:
+                            texte += syl
+                            if syl == '':
+                                texte += '_'
+                        elif not isinstance(notes[j - 1], Alteration):
+                            texte += '_'
+                    elif isinstance(note, Barre) and j == 0:
+                        if texte[-2] == '_' and syl != '':
+                            texte = texte[:-2] + syl
+                        else:
+                            texte = texte[:-1] + syl
+            texte += ' '
+            musique += ' '
+        return texte, musique[:-3] + '|]'
+
+    def ecrire(self, chemin, abc=True, xml=False):
+        """Écriture effective du fichier abc"""
+        sortie = FichierTexte(chemin)
+        if abc:
+            sortie.ecrire(self.code)
+        if xml:
+            dossier, fichier = os.path.split(chemin)
+            fichier = '' if fichier == '-' else fichier
+            if fichier and not dossier:
+                dossier = '.'
+            abc2xml.convert(
+                dossier, fichier[:-4], self.code, False, False, False
+            )
+
+
+class MusicXML(Abc):
+    """Classe encapsulant la classe Abc pour produire du MusicXML"""
+    def __init__(self, partition, titre, tempo):
+        Abc.__init__(self, partition, titre, tempo)
+
+    def ecrire(self, chemin):
+        Abc.ecrire(self, chemin, abc=False, xml=True)
+
+
 class Midi:
     """Musique midi"""
     def __init__(self, partition, titre, tempo):
@@ -1239,7 +1452,7 @@ class Midi:
         volume = 127
         for mot in partition:
             for i, syllabe in enumerate(mot):
-                syl = str(syllabe)
+                syl = str(syllabe).replace('℣', 'V').replace('℟', 'R')
                 if i + 1 < len(mot):
                     syl = syl + '-'
                 for j, note in enumerate(
@@ -1273,7 +1486,7 @@ class Midi:
             open(sys.stdout.fileno(), 'wb')
             if chemin == '-'
             else open(chemin, 'wb')
-        )as sortie:
+        ) as sortie:
             self.sortiemidi.writeFile(sortie)
 
 

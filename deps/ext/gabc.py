@@ -10,7 +10,7 @@ http://gregorio-project.github.io/
 from . import txt, tex
 from etc import config as cfg
 from deps.outils import templateperso, url, traiter_erreur, liste_polices, _
-from deps.gabctk import Gabc, Lily, Midi
+from deps.gabctk import Gabc, Lily, Midi, Abc, MusicXML
 import os
 import shutil
 
@@ -35,6 +35,16 @@ class Document(txt.Document):  # pylint: disable=R0904
             formats={
                 'midi': (self.midi, {
                     'tempo':                (_("Tempo"), 190),
+                    'transposition':        (_("Transposition"), 0),
+                }),
+                'abc': (self.abc, {
+                    'tempo':                (_("Tempo"), 180),
+                    'transpauto':           (_("Transposition auto"), True),
+                    'transposition':        (_("Transposition"), 0),
+                }),
+                'xml': (self.xml, {
+                    'tempo':                (_("Tempo"), 180),
+                    'transpauto':           (_("Transposition auto"), True),
                     'transposition':        (_("Transposition"), 0),
                 }),
                 'ly': (self.ly, {
@@ -98,7 +108,8 @@ class Document(txt.Document):  # pylint: disable=R0904
                             'initiale_elevation':
                                 (_("Élévation"), '0pt'),
                             'initiale_police':
-                                (_("Police"), 'Linux Libertine O', liste_polices),
+                                (_("Police"),
+                                    'Linux Libertine O', liste_polices),
                             'initiale_taille':
                                 (_("Taille"), 42),
                             'initiale_espace':
@@ -229,13 +240,23 @@ class Document(txt.Document):  # pylint: disable=R0904
                 self.preparer_gabc(fmt, fichier)
             except IndexError as err:
                 traiter_erreur(err)
-                raise ErreurCompilation('','')
+                raise ErreurCompilation('', '')
         return url(fichier)
 
     def ly(self, chemin=None, indice=''):  # pylint: disable=C0103
         """Format lilypond
         """
         return self.gabc(fmt='ly', chemin=chemin, indice=indice)
+
+    def abc(self, chemin=None, indice=''):
+        """Format abc
+        """
+        return self.gabc(fmt='abc', chemin=chemin, indice=indice)
+
+    def xml(self, chemin=None, indice=''):
+        """Format xml
+        """
+        return self.gabc(fmt='xml', chemin=chemin, indice=indice)
 
     def midi(self, chemin=None, indice=''):
         """Format midi
@@ -285,7 +306,9 @@ class Document(txt.Document):  # pylint: disable=R0904
             traiter_erreur(err)
         fichier = {
             'midi': Midi,
-            'ly':   Lily
+            'ly':   Lily,
+            'abc':  Abc,
+            'xml':  MusicXML,
         }[fmt](
             titre=self._gabc_entete('name'),
             partition=self.partition(
