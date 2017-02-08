@@ -14,13 +14,14 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 See the GNU General Public License for more details. <http://www.gnu.org/licenses/gpl.html>.
 '''
 
+import types, sys, os, re, datetime
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 from pyparsing import Word, OneOrMore, Optional, Literal, NotAny, MatchFirst
 from pyparsing import Group, oneOf, Suppress, ZeroOrMore, Combine, FollowedBy
 from pyparsing import srange, CharsNotIn, StringEnd, LineEnd, White, Regex
 from pyparsing import nums, alphas, alphanums, ParseException, Forward
 try:    import xml.etree.cElementTree as E
 except: import xml.etree.ElementTree as E
-import types, sys, os, re, datetime
 
 VERSION = 71
 
@@ -728,6 +729,7 @@ class MusicXml:
                 'B':'book', 'D':'discography', 'F':'fileurl', 'S':'source'}
     metaMap = {'C':'composer'}  # mapping of composer is fixed
     metaTypes = {'composer':1,'lyricist':1,'poet':1,'arranger':1,'translator':1} # valid MusicXML meta data types
+    phraseMap = {'shortphrase':'tick','mediumphrase':'short'}   # MusicXML bar line styles for ABC phrase decorations
 
     def __init__ (s):
         s.pageFmtCmd = []   # set by command line option -p
@@ -1358,7 +1360,11 @@ class MusicXml:
                     s.mkBarline (maat, 'left', lev + 1, ending=bar)
             elif x.name == 'rbar':
                 bar = x.t[0]
-                if bar == '.|':
+                if len(s.nextdecos) and s.nextdecos [0] in s.phraseMap:  # all normal decorations have been processed at this point
+                    barStyle = s.phraseMap [s.nextdecos [0]]    # ad-hoc translation of the first remaining decoration
+                    s.mkBarline (maat, 'right', lev + 1, style=barStyle)
+                    s.nextdecos = []
+                elif bar == '.|':
                     s.mkBarline (maat, 'right', lev + 1, style='dotted')
                 elif ':' in bar:  # backward repeat
                     s.mkBarline (maat, 'right', lev + 1, style='light-heavy', dir='backward')
@@ -1836,7 +1842,7 @@ def convert (pad, fnm, abc_string, mxl, rOpt, tOpt):
     if pad:
         if not mxl or mxl in ['a', 'add']:
             outfnm = os.path.join (pad, ifnm + '.xml')  # joined with path from -o option
-            outfile = open (outfnm, 'w')
+            outfile = open (outfnm, 'w', encoding='utf-8')
             outfile.write (xmldoc)
             outfile.close ()
             info ('%s written' % outfnm, warn=0)
