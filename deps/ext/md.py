@@ -252,7 +252,7 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
         environnement = os.environ.copy()
         environnement['shell_escape_commands'] = (
             "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
-            "gregorio,gregorio-4_2_0,lilypond"
+            "gregorio,gregorio-5_0_1,gregorio-4_2_0,lilypond"
         )
         environnement['TEXINPUTS'] = ("lib:" + str(cfg.PANDOC) + ":")
         #try:
