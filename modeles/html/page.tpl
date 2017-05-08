@@ -55,7 +55,7 @@
             %elmts = rq['ORIGINAL_PATH'].split('/')[2:]
             %for idx, elmt in enumerate(elmts):
             %if not len(elmt) or elmt[0] != '_':
-            / <a href={{i18n_path('/' + '/'.join(elmts[0:idx + 1]))}}>{{elmt}}</a>
+            / <a href={{re.sub('_[^/]*/', '', str(i18n_path('/' + '/'.join(elmts[0:idx + 1]))))}}>{{elmt}}</a>
             %end
             %end
         </div>
