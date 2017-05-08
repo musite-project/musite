@@ -87,7 +87,7 @@ def latex2png(snippet, outfile):
     environment = os.environ
     environment['shell_escape_commands'] = \
         "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,\
-        gregorio,gregorio-4_2_0"
+        gregorio,gregorio-5_0_1,gregorio-4_2_0"
     proc = Popen(
         ["lualatex", '-output-directory=' + IMAGEDIR, texdocument],
         stdin=PIPE,

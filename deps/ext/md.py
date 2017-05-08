@@ -255,7 +255,6 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
             "gregorio,gregorio-5_0_1,gregorio-4_2_0,lilypond"
         )
         environnement['TEXINPUTS'] = ("lib:" + str(cfg.PANDOC) + ":")
-        #try:
         compiler(commande, fichier, environnement)
     finally:
         os.chdir(str(cfg.PWD))

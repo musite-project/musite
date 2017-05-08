@@ -311,7 +311,7 @@ def compiler(commande, fichier, environnement):
                 + _('Erreurs :')
                 + '\n=========\n'
                 + '\n{}\n'.format(erreurs.decode('utf8')),
-                mode = 'w'
+                mode='w'
             )
         except UnicodeDecodeError:
             raise FichierIllisible
@@ -321,7 +321,7 @@ def compiler(commande, fichier, environnement):
         os.chdir(str(cfg.PWD))
 
 
-def traiter_erreur_compilation(dossier, message_erreur = ''):
+def traiter_erreur_compilation(dossier, message_erreur=''):
     """Réaction en cas d'erreur de compilation
     """
     return markdown(
