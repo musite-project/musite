@@ -39,7 +39,7 @@ Sous Linux :
 	-v DOSSIER_DOCUMENTS_PRODUITS:/opt/musite/static/docs \
 	-v DOSSIER_CONFIGURATION_MUSITE:/opt/musite/etc \
 	-v DOSSIER_POLICES:/usr/share/fonts/perso \
-	-p PORT:80 --name $1 musite/musite &
+	-p PORT:80 --name NOM musite/musite &
 ```
 
 Remplacez les noms de dossiers en majuscules par l'emplacement des dossiers où vous voulez stocker :
@@ -52,6 +52,8 @@ Remplacez les noms de dossiers en majuscules par l'emplacement des dossiers où 
 Remplacez PORT par le nombre de votre choix, sachant que ce nombre devra être saisi pour accéder au site.
 Par exemple, si vous mettez `-p 8080:80`, vous aurez à saisir comme adresse, dans votre navigateur,
 `http://localhost:8080`.
+
+Remplacez NOM par le nom de votre choix.
 
 Sous Windows et OsX, voyez la documentation de Kitematic.
 
