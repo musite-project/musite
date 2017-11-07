@@ -116,9 +116,9 @@ restrictives, qui rendent impossibles certaines opérations.
         copytree(self.dossier, self.dossiertmp, ignore=('.git',))
         with self._fichiertmp().open('w') as tmp:
             contenu = self.contenu
-            entetes = re.findall(r'\\\header{[^}]*}', contenu)
+            entetes = re.findall(r'\\header{[^}]*}', contenu)
             entetes = entetes[0] if len(entetes) else ''
-            papier = re.findall(r'\\\paper{[^}]*}', contenu)
+            papier = re.findall(r'\\paper{[^}]*}', contenu)
             papier = papier[0] if len(papier) else ''
             entetes = (
                 entete for entete in entetes.split('\n')[1:-1]
