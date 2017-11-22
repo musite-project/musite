@@ -140,7 +140,7 @@ def compiler_pdf(fichier, environnement=None):
     environnement = dict(os.environ, **environnement)
     environnement['shell_escape_commands'] = (
         "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
-        "gregorio,gregorio-5_0_1,gregorio-4_2_0,lilypond,pandoc"
+        "gregorio,gregorio-5_0_2,gregorio-5_0_1,gregorio-4_2_0,lilypond,pandoc"
     )
     compiler(commande, fichier, environnement)
     del commande[1]
