@@ -316,7 +316,10 @@ class Document(txt.Document):  # pylint: disable=R0904
             ),
             tempo=self.proprietes[fmt]['tempo']
         )
-        fichier.ecrire(FichierTexte(str(dest)))
+        if fmt != 'midi':
+            fichier.ecrire(FichierTexte(str(dest)))
+        else:
+            fichier.ecrire(dest)
 
 
 def compiler_pdf(fichier, environnement=None):
