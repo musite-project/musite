@@ -10,7 +10,7 @@ http://gregorio-project.github.io/
 from . import txt, tex
 from etc import config as cfg
 from deps.outils import templateperso, url, traiter_erreur, liste_polices, _
-from deps.gabctk import Gabc, Lily, Midi, Abc, MusicXML
+from deps.gabctk import Gabc, Lily, Midi, Abc, MusicXML, FichierTexte
 import os
 import shutil
 
@@ -316,7 +316,7 @@ class Document(txt.Document):  # pylint: disable=R0904
             ),
             tempo=self.proprietes[fmt]['tempo']
         )
-        fichier.ecrire(str(dest))
+        fichier.ecrire(FichierTexte(str(dest)))
 
 
 def compiler_pdf(fichier, environnement=None):

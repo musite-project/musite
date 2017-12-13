@@ -32,10 +32,15 @@ assert i18n_path
 
 
 # Liste des polices du système
-liste_polices = sorted(set(
-    font_manager.FontProperties(fname=fname).get_name()
-    for fname in font_manager.get_fontconfig_fonts()
-))
+def liste_polices():
+    for fname in font_manager.get_fontconfig_fonts():
+        try:
+            yield font_manager.FontProperties(fname=fname).get_name()
+        except RuntimeError:
+            pass
+
+
+liste_polices = sorted(set(liste_polices()))
 
 
 def copytree(orig, dest, overwrite='u', ignore=None):
