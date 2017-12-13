@@ -235,7 +235,6 @@ def pandoc(fichier, destination, fmt=None, arguments=None):
         os.chdir(str(fichier.parent))
         commande = [
             'pandoc',
-            '-S',
             '-s',
             '--data-dir', str(cfg.PANDOC),
             '--self-contained',
