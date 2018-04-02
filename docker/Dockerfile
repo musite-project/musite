@@ -1,6 +1,6 @@
 FROM musite/gregorio
 
-RUN apt-get -y install git python3 python3-matplotlib
+RUN apt-get -y install git python3 python3-matplotlib python3-distutils
 
 
 # Configuration de git
