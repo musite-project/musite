@@ -134,17 +134,26 @@ def compiler_pdf(fichier, environnement=None):
         'lualatex',
         '-draftmode',
         '-interaction=nonstopmode',
-        '-shell-restricted',
+        '-shell-escape',
         str(fichier)
     ]
     environnement = dict(os.environ, **environnement)
     environnement['shell_escape_commands'] = (
         "bibtex,bibtex8,kpsewhich,makeindex,mpost,repstopdf,"
-        "gregorio,gregorio-5_0_2,gregorio-5_0_1,gregorio-4_2_0,lilypond,pandoc"
+        "gregorio,gregorio-5_0_2,gregorio-5_0_1,gregorio-4_2_0,"
+        "lilypond,lilypond.real,pandoc,gs"
     )
     compiler(commande, fichier, environnement)
     del commande[1]
     compiler(commande, fichier, environnement)
+    tmp_pdf = str(fichier.with_suffix('-out.pdf'))
+    pdf = str(fichier.with_suffix('.pdf'))
+    commande = [
+        'gs', '-q', '-dBATCH', '-dNOPAUSE', '-sDEVICE=pdfwrite',
+        '-sOutputFile=' + tmp_pdf, pdf
+    ]
+    compiler(commande, fichier, environnement)
+    os.replace(tmp_pdf, pdf)
 
 
 compiler = txt.compiler  # pylint: disable=C0103
