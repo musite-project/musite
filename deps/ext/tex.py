@@ -146,7 +146,7 @@ def compiler_pdf(fichier, environnement=None):
     compiler(commande, fichier, environnement)
     del commande[1]
     compiler(commande, fichier, environnement)
-    tmp_pdf = str(fichier.with_suffix('-out.pdf'))
+    tmp_pdf = str(fichier.with_suffix('.tmpdf'))
     pdf = str(fichier.with_suffix('.pdf'))
     commande = [
         'gs', '-q', '-dBATCH', '-dNOPAUSE', '-sDEVICE=pdfwrite',
